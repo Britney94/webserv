@@ -5,6 +5,7 @@ int main()
 	ConfigInfo config;
 	
 	config.parse((char *)"./config/default.conf");
+	std::cout << config;
 	return 0;
 }
 

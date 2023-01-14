@@ -207,9 +207,10 @@ int ConfigInfo::getMaxFd() const {
 }
 
 ConfigInfo::~ConfigInfo(){
+	return ;
 }
 
-std::ostream	&operator<<(std::ostream &x, ConfigInfo inf)
+std::ostream	&operator<<(std::ostream &x, ConfigInfo const & inf)
 {
 	x << "**** ConfigInfo ****" << std::endl;
 	x << "Size : " << inf.getSize() << std::endl;

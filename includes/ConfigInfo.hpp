@@ -41,6 +41,6 @@ class ConfigInfo {
 		Location	_tmp_loc;
 };
 
-std::ostream	&operator<<(std::ostream &x, ConfigInfo inf);
+std::ostream	&operator<<(std::ostream &x, ConfigInfo const & inf);
 
 #endif
