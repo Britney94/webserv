@@ -19,8 +19,8 @@ int	ClientRequest::checkMethod() {
 		_status = 405;
 	if (_method == "DELETE" || !_loc.allow[2])
 		_status = 405;
-	// if (_method == "PUT" || !_loc.allow[3])
-	// 	_status = 405;
+	if (_method == "PUT" || !_loc.allow[3])
+		_status = 405;
 	return _status;
 }
 
@@ -136,6 +136,7 @@ int	ClientRequest::determinateLoc() {
 	_loc.allow[0] = _info.getAllow("GET");
 	_loc.allow[1] = _info.getAllow("POST");
 	_loc.allow[2] = _info.getAllow("DELETE");
+	_loc.allow[3] = _info.getAllow("PUT");
 	_loc.clientSize = _info.getClientSize();
 
 	if (_uri.find(".") != std::string::npos)
@@ -155,10 +156,11 @@ int	ClientRequest::determinateLoc() {
 					_loc.clientSize = it->clientSize;
 				if (it->cgi.size())
 					_loc.cgi = it->cgi;
-				if (it->allow[0] || it->allow[1] || it->allow[2]) {
+				if (it->allow[0] || it->allow[1] || it->allow[2] || it->allow[3]) {
 					_loc.allow[0] = it->allow[0];
 					_loc.allow[1] = it->allow[1];
 					_loc.allow[2] = it->allow[2];
+					_loc.allow[3] = it->allow[3];
 				}
 				if (ext == it->uri)
 					return _status;

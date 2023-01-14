@@ -10,6 +10,6 @@ class	AutoIndex {
 		~AutoIndex();
 
 		std::string	renderPage(std::string directory, std::string path, int port, std::string host);
-}
+};
 
 #endif

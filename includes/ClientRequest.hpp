@@ -13,7 +13,7 @@ class	ClientRequest {
 		int			checkSyntax();
 		int			checkMethod();
 		int			checkSize();
-		int			isMethod(std::string word)
+		int			isMethod(std::string word);
 		int			determinateLoc();
 		std::string	determinateFile();
 
@@ -29,6 +29,6 @@ class	ClientRequest {
 		std::string	_file;
 		int			_status;
 
-}
+};
 
 #endif

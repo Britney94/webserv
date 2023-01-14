@@ -19,37 +19,52 @@
 #include <stdlib.h>
 #include <errno.h>
 
-struct Location
+class Location
 {
-	std::string	uri; 
-	std::string	root;
-	std::string	index;
-	std::string	cgi;
-	int	        allow[3]; // GET POST DELETE : 0 si interdit, 1 si autorise
-	long		clientSize;
-	std::vector<Location>	loc;
+	public:
+		std::string	uri; 
+		std::string	root;
+		std::string	index;
+		std::string	cgi;
+		int	        allow[4]; // GET POST DELETE PUT: 0 si interdit, 1 si autorise
+		long		clientSize;
+		std::vector<Location>	loc;
 
-	Location&	operator=(Location& copy) {
-		uri = copy.uri;
-		root = copy.root;
-		index = copy.index;
-		cgi = copy.cgi;
-		allow[0] = copy.allow[0];
-		allow[1] = copy.allow[1];
-		allow[2] = copy.allow[2];
-		clientSize = copy.clientSize;
-		loc = copy.loc;
-	}
+		Location(void){
+			uri = "";
+			root = "";
+			index = "";
+			cgi = "";
+			allow[0] = 0;
+			allow[1] = 0;
+			allow[2] = 0;
+			allow[3] = 0;
+			clientSize = -1;
+		};
+
+		Location& operator=(Location copy) {
+		 	uri = copy.uri;
+		 	root = copy.root;
+		 	index = copy.index;
+		 	cgi = copy.cgi;
+		 	allow[0] = copy.allow[0];
+		 	allow[1] = copy.allow[1];
+		 	allow[2] = copy.allow[2];
+		 	allow[3] = copy.allow[3];
+		 	clientSize = copy.clientSize;
+		 	loc = copy.loc;
+			return *this;
+		};
 };
 
-#include "AutoIndex.hpp"
-#include "CGI.hpp"
-#include "ClientRequest.hpp"
+//#include "AutoIndex.hpp"
+//#include "CGI.hpp"
+//#include "ClientRequest.hpp"
 #include "ConfigInfo.hpp"
 #include "File.hpp"
 #include "Server.hpp"
 #include "ServerInfo.hpp"
-#include "WebServer.hpp"
+//#include "WebServer.hpp"
 // #include "HttpResponse.hpp"
 
 #define BLANK "\033[0m"

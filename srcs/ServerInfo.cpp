@@ -3,82 +3,142 @@
 ServerInfo::ServerInfo(void)
 {
 	// Default constructor arbitrary values set
-	this->_error = "";
 	this->_ip = "0.0.0.0";
-	this->_serverName = "localhost";
-	this->_clientSize = 1000; 
+	this->_clientSize = 1000;
+	this->_root = "./data/my_website/";
+	this->_index = "index.html";
 	this->_autoIndex = 0; 
 	this->_allow[0] = 0;
 	this->_allow[1] = 0;
 	this->_allow[2] = 0;
+	this->_allow[3] = 0;
 	// this->_loc = NULL;
 }
 
-int	ServerInfo::setServerName(std::string line)
+int	ServerInfo::setServerNames(std::string names)
 {
-	std::string	serverName = line;
-
-	if (serverName.find(" ") != std::string::npos) {
-		serverName.erase(0, serverName.find(" "));
-		while (serverName.find(" ")) {
-
-		}
-		this->_serverName = &line[line.find(" ") + 1];
+	names.erase(0, names.find(' ') + 1);
+	if (names.at(names.length() - 1) == '\n')
+		names.erase(names.at(names.length() - 1));
+	while (names.find(' ') != std::string::npos) {
+		_serverNames.push_back(names.substr(0, names.find(' ')));
+		names.erase(0, names.find(' ') + 1);
 	}
+	_serverNames.push_back(names);
 	return 0;
 }
 
 int	ServerInfo::setIp(std::string line)
 {
-	if (line.find("localhost") != std::string::npos)
-		this->_ip = "127.0.0.1";
-	else
-		if (line.find(" ") != std::string::npos)
-			this->_ip = &line[line.find(" ") + 1];
-	if (this->_ip != "127.0.0.1" && this->_ip != "0.0.0.0")
-		this->_error = "ip address not valid";
+	line.erase(0, line.find(' ') + 1);
+	if (line.at(line.length() - 1) == '\n')
+		line.erase(line.at(line.length() - 1));
+	line.erase(line.find(':'));
+	if (line != "127.0.0.1" && line != "0.0.0.0") {
+		std::cerr << "Error: Parsing configuration file : ip address" << std::endl;
+		return 1;
+	}
+	return 0;
+}
+
+int	ServerInfo::setRoot(std::string line) {
+	line.erase(0, line.find(' ') + 1);
+	if (line.at(line.length() - 1) == '\n')
+		line.erase(line.at(line.length() - 1));
+	_root = line;
+	return 0;
+}
+
+int	ServerInfo::setIndex(std::string line) {
+	line.erase(0, line.find(' ') + 1);
+	if (line.at(line.length() - 1) == '\n')
+		line.erase(line.at(line.length() - 1));
+	_index = line;
+	return 0;
+}
+
+int	ServerInfo::setAutoIndex(std::string line) {
+	line.erase(0, line.find(' ') + 1);
+	if (line.at(line.length() - 1) == '\n')
+		line.erase(line.at(line.length() - 1));
+	_autoIndex = (line == "on");
+	if (line != "on" && line != "off") {
+		std::cerr << "Error: Parsing configuration file : autoindex" << std::endl;
+		return 1;
+	}
+	return 0;
 }
 
 int	ServerInfo::setClientSize(std::string line)
 {
 	if (line.find(" ") != std::string::npos)
-		this->_clientSize = atoi(&line[line.find(" ")]);
-}
-
-int	ServerInfo::setAutoIndex(int autoIndex)
-{
-	this->_autoIndex = autoIndex;
+		this->_clientSize = atoi(&line[line.find(" ") + 1]);
+	if (_clientSize == 0) {
+		std::cerr << "Error: Parsing configuration file : clientSize" << std::endl;
+		return 1;
+	}
+	return 0;
 }
 
 int	ServerInfo::setAllow(std::string line)
-// GET POST DELETE : 0 si interdit, 1 si autorise
 {
-	if (line.find("GET") != std::string::npos)
-			this->_allow[0] = 1;
-	if (line.find("POST") != std::string::npos)
-			this->_allow[1] = 1;
-	if (line.find("DELETE") != std::string::npos)
-			this->_allow[2] = 1;
+	line.erase(0, line.find(' ') + 1);
+	if (line.at(line.length() - 1) == '\n')
+		line.erase(line.at(line.length() - 1));
+	while (line.find(' ') != std::string::npos) {
+		if (line.substr(0, line.find(' ')) == "GET")
+			_allow[0] = 1;
+		else if (line.substr(0, line.find(' ')) == "POST")
+			_allow[1] = 1;
+		else if (line.substr(0, line.find(' ')) == "DELETE")
+			_allow[2] = 1;
+		else if (line.substr(0, line.find(' ')) == "PUT")
+			_allow[3] = 1;
+		else {
+			std::cerr << "Error: Parsing configuration file : allow_methods" << std::endl;
+			return 1;
+		}
+		line.erase(0, line.find(' ') + 1);
+	}
+	if (line.substr(0, line.find(' ')) == "GET")
+		_allow[0] = 1;
+	else if (line.substr(0, line.find(' ')) == "POST")
+		_allow[1] = 1;
+	else if (line.substr(0, line.find(' ')) == "DELETE")
+		_allow[2] = 1;
+	else if (line.substr(0, line.find(' ')) == "PUT")
+		_allow[3] = 1;
+	else {
+		std::cerr << "Error: Parsing configuration file : allow_methods" << std::endl;
+		return 1;
+	}
+	return 0;
 }
 
 int	ServerInfo::setLoc(Location& loc)
 {
 	this->_loc.push_back(loc);
+	return 0;
 }
 
-std::string	ServerInfo::getError()
+std::vector<std::string> ServerInfo::getServerNames()
 {
-	return (this->_error);
-}
-
-std::string ServerInfo::getServerName()
-{
-	return(this->_serverName);
+	return(this->_serverNames);
 }
 
 std::string ServerInfo::getIp()
 {
 	return (this->_ip);
+}
+
+std::string ServerInfo::getRoot()
+{
+	return (this->_root);
+}
+
+std::string ServerInfo::getIndex()
+{
+	return (this->_index);
 }
 
 long int	ServerInfo::getClientSize()
@@ -91,15 +151,21 @@ int	ServerInfo::getAutoIndex()
 	return(this->_autoIndex);
 }
 
+std::vector<Location>	ServerInfo::getLoc() {
+	return _loc;
+}
+
 int	ServerInfo::getAllow(std::string allow)
 // GET POST DELETE : 0 si interdit, 1 si autorise, return -1 if not found
 {
 	if (allow == "GET")
-			return (this->_allow[0]);
+		return (this->_allow[0]);
 	if (allow == "POST")
-			return (this->_allow[1]);
+		return (this->_allow[1]);
 	if (allow == "DELETE")
-			return (this->_allow[2]);
+		return (this->_allow[2]);
+	if (allow == "PUT")
+		return (this->_allow[3]);
 	return (-1);
 }
 
@@ -143,26 +209,28 @@ std::ostream	&operator<<(std::ostream &x, std::vector<Location> loc)
 std::ostream	&operator<<(std::ostream &x, ServerInfo inf)
 {
 	x << "**** ServerInfo ****" << std::endl;
-	x << inf.getServerName() << ", ";
+	for (std::vector<std::string>::iterator it = inf.getServerNames().begin(); it != inf.getServerNames().end(); it++) {
+		x << *it << ", ";
+	}
 	x << inf.getIp() << ", ";
 	x << inf.getClientSize() << ", ";
 	x << inf.getAutoIndex();
-	if (inf._allow[0] != 0)
+	if (inf.getAllow("GET") != 0)
 	{
 		x << ", ";
 		x << "GET ";
 	}
-	if (inf._allow[1] != 0)
+	if (inf.getAllow("POST") != 0)
 	{
 		x << ", ";
 		x << "POST ";
 	}
-	if (inf._allow[2] != 0)
+	if (inf.getAllow("DELETE") != 0)
 	{
 		x << ", ";
 		x << "DELETE ";
 	}
 	x << std::endl;
-	x << inf._loc;
+	x << inf.getLoc();
 	return (x);
 }

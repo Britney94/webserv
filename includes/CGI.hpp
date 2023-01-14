@@ -8,6 +8,6 @@ class	CGI {
 	~CGI();
 
 	int	execute();
-}
+};
 
 #endif

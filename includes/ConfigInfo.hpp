@@ -20,15 +20,15 @@ class ConfigInfo {
 		std::map<int, Server>	parse(char *filename);
 		
 		void	setErrorFiles();
-		void	setErrorFile(std::string line);
+		int		setErrorFile(std::string line);
 		void	setSize(int size);
 		
-		std::map<int, std::string>	getErrors();
-		int getError();
-		int	getSize();
-		int	getMaxFd();
+		std::map<int, std::string>	getErrors() const;
+		int getError() const;
+		int	getSize() const;
+		int	getMaxFd() const;
 		
-		Location	setupLoc(File& file, std::string curr_line);
+		Location&	setupLoc(File& file, std::string curr_line);
 	
 	private:
 		std::map<int, Server>		_servers;
@@ -37,6 +37,8 @@ class ConfigInfo {
 		int	_err;
 		int	_maxFd;
 		int	_size;
+
+		Location	_tmp_loc;
 };
 
 std::ostream	&operator<<(std::ostream &x, ConfigInfo inf);

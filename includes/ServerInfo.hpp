@@ -18,19 +18,26 @@ class ServerInfo {
 	*/
 
 		ServerInfo();
-		int	setServerName(std::string name);
+		~ServerInfo();
+		
+		int	setServerNames(std::string names);
 		int	setIp(std::string line);
+		int	setIndex(std::string line);
+		int	setRoot(std::string line);
 		int	setClientSize(std::string line);
 		int	setAutoIndex(std::string line);
 		int	setAllow(std::string line);
 		int	setLoc(Location& loc);
-		std::string	getError();
-		std::string	getServerNames();
+		
 		std::string	getIp();
-		long	getClientSize();
-		int	getAutoIndex();
-		int	getAllow(std::string allow);
-		~ServerInfo();
+		std::string	getRoot();
+		std::string	getIndex();
+		long		getClientSize();
+		int			getAutoIndex();
+		int			getAllow(std::string allow);
+
+		std::vector<std::string>	getServerNames();
+		std::vector<Location>		getLoc();
 	
 	private:
 	
@@ -38,7 +45,7 @@ class ServerInfo {
 		std::string					_ip;
 		std::string					_root;
 		std::string					_index;
-		int							_allow[3]; // GET POST DELETE : 0 si interdit, 1 si autorise
+		int							_allow[4]; // GET POST DELETE PUT: 0 si interdit, 1 si autorise
 		long						_clientSize;
 		int							_autoIndex; //0 si off, 1 si on
 		std::vector<Location>		_loc;

@@ -123,7 +123,6 @@ int	Server::parseRequest() {
 
 	if (ret <= 0) {
 		this->close_socket();
-		free(buffer);
 		std::cerr << "Error : Could not read from the socket.\n" << std::endl;
 		return -1;
 	}
@@ -136,11 +135,13 @@ int	Server::parseRequest() {
 			parseChunked(); 
 	}
 
-	ServerInfo	clientInfo = requestInfos();
-	ClientRequest	client(clientInfo, _request);
+	std::cout << _request << std::endl;
 
-	_file_request = client.getFile();
-	_status = client.getStatus();
+	// ServerInfo	clientInfo = requestInfos();
+	// ClientRequest	client(clientInfo, _request);
+
+	// _file_request = client.getFile();
+	// _status = client.getStatus();
 
 	return 0;
 }
@@ -162,8 +163,8 @@ void	Server::parseChunked() {
 	received = _request.substr(_request.find("\r\n\r\n") + 4);
 
 	while (received.size()) {
-		i = _received.find("\r\n") + 2;
-		size = stoi(_received.substr(0, i - 2), 0, 16);
+		i = received.find("\r\n") + 2;
+		//size = std::stoi(received.substr(0, i - 2), 0, 16);
 		body += received.substr(i, i + size);
 		received = received.substr(i + size + 2);
 	}
@@ -173,19 +174,19 @@ void	Server::parseChunked() {
 
 int	Server::sendResponse(std::map<int, std::string> errors) {
 	
-	HttpResponse	response(_file_request, _status, requestInfos().getAutoIndex(), errors);
-	std::string		message = response.getResponse();
-	int	ret;
+	// HttpResponse	response(_file_request, _status, requestInfos().getAutoIndex(), errors);
+	// std::string		message = response.getResponse();
+	// int	ret;
 
-	ret = write(_socket, message, message.size());
-	if (ret < 0) {
-		// Verifier si 0 succes ou erreur
-		// Gestion d'erreur
-	}
+	// ret = write(_socket, message, message.size());
+	// if (ret < 0) {
+	// 	// Verifier si 0 succes ou erreur
+	// 	// Gestion d'erreur
+	// }
 
-	this->close_socket();
-	_request.erase();
-	_file_request.erase();
+	// this->close_socket();
+	// _request.erase();
+	// _file_request.erase();
 
 	return (0);
 }
@@ -199,9 +200,9 @@ ServerInfo	Server::requestInfos() {
 		found = _request.find("Host:");
 
 	serv_name = _request.substr(found + 5);
-	if (serv_name.front() == ' ')
+	if (serv_name.at(0) == ' ')
 		serv_name.erase(0, 1);
-	serv_name = serv_name.substr(0, _serv_name.find("\r\n"));
+	serv_name = serv_name.substr(0, serv_name.find("\r\n"));
 
 	for (std::vector<ServerInfo *>::iterator it = _infos.begin(); it != _infos.end(); it++) {
 		for (std::vector<std::string>::iterator name = (*it)->getServerNames().begin(); name != (*it)->getServerNames().end(); name++) {
@@ -214,6 +215,10 @@ ServerInfo	Server::requestInfos() {
 
 std::string	Server::getError(){
 	return _error;
+}
+
+std::vector<ServerInfo *>	Server::getInfos() {
+	return _infos;
 }
 
 std::ostream	&operator<<(std::ostream &x, Server serv)

@@ -19,11 +19,12 @@ class Server {
 		int	getSocket();
 		void	close_socket();
 		int	parseRequest();
-		int	sendResponse();
+		int	sendResponse(std::map<int, std::string> errors);
 		int	chunkedRequest();
 		void	parseChunked();
 		ServerInfo	requestInfos();
 		std::string	getError();
+		std::vector<ServerInfo *>	getInfos();
 		ServerInfo	*_default;
 		std::vector<ServerInfo *>	_infos;
 		~Server(void);

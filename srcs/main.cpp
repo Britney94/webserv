@@ -2,8 +2,9 @@
 
 int main()
 {
-	ConfigInfo config((char *)"./config/default.conf");
-	std::cout << config;
+	ConfigInfo config;
+	
+	config.parse((char *)"./config/default.conf");
 	return 0;
 }
 
