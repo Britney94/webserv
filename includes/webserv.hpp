@@ -64,7 +64,7 @@ class Location
 #include "File.hpp"
 #include "Server.hpp"
 #include "ServerInfo.hpp"
-//#include "WebServer.hpp"
+#include "WebServer.hpp"
 // #include "HttpResponse.hpp"
 
 #define BLANK "\033[0m"

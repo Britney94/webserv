@@ -16,7 +16,7 @@ class Server {
 		void	addNewInfo(ServerInfo* new_infos);
 		void	setSocket(int socket_descriptor);
 		int	accept_fd();
-		int	getSocket();
+		int	getSocket() const;
 		void	close_socket();
 		int	parseRequest();
 		int	sendResponse(std::map<int, std::string> errors);
@@ -24,7 +24,7 @@ class Server {
 		void	parseChunked();
 		ServerInfo	requestInfos();
 		std::string	getError();
-		std::vector<ServerInfo *>	getInfos();
+		std::vector<ServerInfo *>	getInfos() const;
 		ServerInfo	*_default;
 		std::vector<ServerInfo *>	_infos;
 		~Server(void);
@@ -38,6 +38,6 @@ class Server {
 		int	_size;
 };
 
-std::ostream	&operator<<(std::ostream &x, Server serv);
+std::ostream	&operator<<(std::ostream &x, Server const & serv);
 
 #endif

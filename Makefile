@@ -16,6 +16,7 @@ CFLAGS = -std=c++98 #-Wall -Wextra -Werror -std=c++98
 INCLUDES = -I ./includes/
 
 SRCS = srcs/Server.cpp \
+	   srcs/WebServer.cpp \
        srcs/ServerInfo.cpp \
        srcs/File.cpp \
        srcs/ConfigInfo.cpp \

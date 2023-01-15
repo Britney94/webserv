@@ -76,7 +76,7 @@ Server::~Server(void)
 }
 
 
-int	Server::getSocket(void)
+int	Server::getSocket(void) const
 {
 	// Simple getter : socket descriptor
 	return (this->_socket);
@@ -217,18 +217,18 @@ std::string	Server::getError(){
 	return _error;
 }
 
-std::vector<ServerInfo *>	Server::getInfos() {
+std::vector<ServerInfo *>	Server::getInfos() const {
 	return _infos;
 }
 
-std::ostream	&operator<<(std::ostream &x, Server serv)
+std::ostream	&operator<<(std::ostream &x, Server const & serv)
 {
-	x << "**** Server ****" << std::endl;
-	// x << serv.getSocket();
-	std::cout << " | ";
-	serv.setSocket(15);
-	// x << serv.getSocket();
-	std::cout << " | ";
-	x << serv._default;
+	int	count = 1;
+
+	x << "Socket: " << serv.getSocket() << std::endl;
+	for (std::vector<ServerInfo *>::iterator it = serv.getInfos().begin(); count <= serv.getInfos().size(); it++) {
+		x << "ServerInfo n°" << count++ << std::endl << (*it)->getIp() << std::endl; 
+	}
+	x << std::endl;
 	return (x);
 }

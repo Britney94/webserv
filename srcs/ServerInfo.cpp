@@ -15,6 +15,21 @@ ServerInfo::ServerInfo(void)
 	// this->_loc = NULL;
 }
 
+ServerInfo::ServerInfo(ServerInfo* copy) {
+	this->_allow[0] = copy->_allow[0];
+	this->_allow[1] = copy->_allow[1];
+	this->_allow[2] = copy->_allow[2];
+	this->_allow[3] = copy->_allow[3];
+	this->_index = copy->_index;
+	this->_root = copy->_root;
+	this->_clientSize = copy->_clientSize;
+	this->_autoIndex = copy->_autoIndex;
+	this->_serverNames = copy->_serverNames;
+	this->_loc = copy->_loc;
+	this->_ip = copy->_ip;
+}
+
+
 int	ServerInfo::setServerNames(std::string names)
 {
 	names.erase(0, names.find(' ') + 1);
@@ -121,41 +136,41 @@ int	ServerInfo::setLoc(Location& loc)
 	return 0;
 }
 
-std::vector<std::string> ServerInfo::getServerNames()
+std::vector<std::string> ServerInfo::getServerNames() const
 {
 	return(this->_serverNames);
 }
 
-std::string ServerInfo::getIp()
+std::string ServerInfo::getIp() const
 {
 	return (this->_ip);
 }
 
-std::string ServerInfo::getRoot()
+std::string ServerInfo::getRoot() const
 {
 	return (this->_root);
 }
 
-std::string ServerInfo::getIndex()
+std::string ServerInfo::getIndex() const
 {
 	return (this->_index);
 }
 
-long int	ServerInfo::getClientSize()
+long int	ServerInfo::getClientSize() const
 {
 	return (this->_clientSize);
 }
 
-int	ServerInfo::getAutoIndex()
+int	ServerInfo::getAutoIndex() const
 {
 	return(this->_autoIndex);
 }
 
-std::vector<Location>	ServerInfo::getLoc() {
+std::vector<Location>	ServerInfo::getLoc() const {
 	return _loc;
 }
 
-int	ServerInfo::getAllow(std::string allow)
+int	ServerInfo::getAllow(std::string allow) const
 // GET POST DELETE : 0 si interdit, 1 si autorise, return -1 if not found
 {
 	if (allow == "GET")
@@ -174,63 +189,37 @@ ServerInfo::~ServerInfo()
 	this->_loc.clear();
 }
 
-std::ostream	&operator<<(std::ostream &x, std::vector<Location> loc)
+std::ostream	&operator<<(std::ostream &x, Location const & inf)
 {
-	int	i = 0;
-	while (i < loc.size())
-	{
-		Location	tmp = loc.at(i);
-		x << "Location at[" << i << "] : ";
-		x << tmp.uri << ", ";
-		x << tmp.root << ", ";
-		x << tmp.index;
-		if (tmp.allow[0] != 0)
-		{
-			x << ", ";
-			x << "GET ";
-		}
-		if (tmp.allow[1] != 0)
-		{
-			x << ", ";
-			x << "POST ";
-		}
-		if (tmp.allow[2] != 0)
-		{
-			x << ", ";
-			x << "DELETE ";
-		}
-		if (i < loc.size() - 1)
-			x << std::endl;
-		i++;
+	x << "URI: " << inf.uri << std::endl;
+	x << "Root: " << inf.root << std::endl;
+	x << "Index: " << inf.index << std::endl;
+	x << "ClientSize: " << inf.clientSize << std::endl;
+	x << "CGI: " << inf.cgi << std::endl;
+	x << "Allow_methods: " << inf.allow[0] << inf.allow[1] << inf.allow[2] << inf.allow[3] << std::endl;
+	for (std::vector<Location>::const_iterator in = inf.loc.begin(); in != inf.loc.end(); in++) {
+		x << *in << std::endl;
 	}
+	x << std::endl;
 	return (x);
 }
 
-std::ostream	&operator<<(std::ostream &x, ServerInfo inf)
+std::ostream	&operator<<(std::ostream &x, ServerInfo const & inf)
 {
-	x << "**** ServerInfo ****" << std::endl;
-	for (std::vector<std::string>::iterator it = inf.getServerNames().begin(); it != inf.getServerNames().end(); it++) {
-		x << *it << ", ";
-	}
-	x << inf.getIp() << ", ";
-	x << inf.getClientSize() << ", ";
-	x << inf.getAutoIndex();
-	if (inf.getAllow("GET") != 0)
-	{
-		x << ", ";
-		x << "GET ";
-	}
-	if (inf.getAllow("POST") != 0)
-	{
-		x << ", ";
-		x << "POST ";
-	}
-	if (inf.getAllow("DELETE") != 0)
-	{
-		x << ", ";
-		x << "DELETE ";
+	x << "Server_names: ";
+	for (std::vector<std::string>::iterator name = inf.getServerNames().begin(); name != inf.getServerNames().end(); name++) {
+		x << *name << " ";
 	}
 	x << std::endl;
-	x << inf.getLoc();
+	x << "Ip address: " << inf.getIp() << std::endl;
+	x << "Root: " << inf.getRoot() << std::endl;
+	x << "Index: " << inf.getIndex() << std::endl;
+	x << "Allow: " << inf.getAllow("GET") << inf.getAllow("POST") << inf.getAllow("DELETE") << inf.getAllow("PUT") << std::endl;
+	x << "ClientSize: " << inf.getClientSize() << std::endl;
+	x << "Autoindex: " << inf.getAutoIndex() << std::endl;
+	for (std::vector<Location>::iterator loc = inf.getLoc().begin(); loc != inf.getLoc().end(); loc++) {
+		x << *loc << std::endl;
+	}
+	x << std::endl;
 	return (x);
 }

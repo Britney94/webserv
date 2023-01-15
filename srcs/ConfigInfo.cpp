@@ -21,7 +21,7 @@ ConfigInfo::ConfigInfo(char *filename){
 	this->_servers = this->parse(filename);
 }
 
-std::map<int, Server>	ConfigInfo::parse(char *filename){
+std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	File		file(filename);
 	int			ret = 0;
 	std::string	line = file.getLine();
@@ -50,12 +50,12 @@ std::map<int, Server>	ConfigInfo::parse(char *filename){
 						return _servers;
 					}
 					try {
-						_servers.at(port).addNewInfo(tmpInfo);
+						_servers.at(port)->addNewInfo(tmpInfo);
 					}
 					catch (std::out_of_range& e) {
 						Server	*new_server = new Server(tmpInfo, port);
 
-						_servers.insert(std::make_pair(port, *new_server));
+						_servers.insert(std::make_pair(port, new_server));
 					}
 				}
 				else if (line.find("root ") != std::string::npos)
@@ -93,7 +93,6 @@ std::map<int, Server>	ConfigInfo::parse(char *filename){
 		}
 		else if (line.size() == 0) {
 			line = file.getLine();
-			// std::cout << line << std::endl;
 		}
 		else {
 			std::cerr << "Error: Parsing configuration file : unknown directive : " << line << std::endl;
@@ -102,10 +101,10 @@ std::map<int, Server>	ConfigInfo::parse(char *filename){
 		}
 	}
 	this->_size = _servers.size();
-	for (std::map<int, Server>::iterator it = _servers.begin(); it != _servers.end(); it++) {
-		if (it->second.getSocket() > _maxFd)
-			_maxFd = it->second.getSocket();
-		for (std::vector<ServerInfo *>::iterator allow = it->second.getInfos().begin(); allow != it->second.getInfos().end(); allow++) {
+	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
+		if (it->second->getSocket() > _maxFd)
+			_maxFd = it->second->getSocket();
+		for (std::vector<ServerInfo *>::iterator allow = it->second->getInfos().begin(); allow != it->second->getInfos().end(); allow++) {
 			if (!((*allow)->getAllow("GET")) && !((*allow)->getAllow("POST")) &&
 				!((*allow)->getAllow("DELETE")) && !((*allow)->getAllow("PUT")) ) {
 				
@@ -198,6 +197,11 @@ std::map<int, std::string>	ConfigInfo::getErrors() const {
 		return (this->_errorFiles);
 }
 
+std::map<int, Server *>	ConfigInfo::getServers() const {
+	return _servers;
+}
+
+
 int ConfigInfo::getSize() const {
 		return (this->_size);
 }
@@ -212,8 +216,11 @@ ConfigInfo::~ConfigInfo(){
 
 std::ostream	&operator<<(std::ostream &x, ConfigInfo const & inf)
 {
-	x << "**** ConfigInfo ****" << std::endl;
-	x << "Size : " << inf.getSize() << std::endl;
-	x << "MaxFd : " << inf.getMaxFd() << std::endl;
+	int	count = 1;
+
+	x << "**** ConfigInfo ****" << std::endl << std::endl;
+	for (std::map<int, Server *>::const_iterator it = inf.getServers().begin(); count <= inf.getSize(); it++) {
+		x << "*** Server n°" << count++ << std::endl << *(it->second) << std::endl;
+	}
 	return (x);
 }

@@ -18,6 +18,7 @@ class ServerInfo {
 	*/
 
 		ServerInfo();
+		ServerInfo(ServerInfo* copy);
 		~ServerInfo();
 		
 		int	setServerNames(std::string names);
@@ -29,15 +30,15 @@ class ServerInfo {
 		int	setAllow(std::string line);
 		int	setLoc(Location& loc);
 		
-		std::string	getIp();
-		std::string	getRoot();
-		std::string	getIndex();
-		long		getClientSize();
-		int			getAutoIndex();
-		int			getAllow(std::string allow);
+		std::string	getIp() const;
+		std::string	getRoot() const;
+		std::string	getIndex() const;
+		long		getClientSize() const;
+		int			getAutoIndex() const;
+		int			getAllow(std::string allow) const;
 
-		std::vector<std::string>	getServerNames();
-		std::vector<Location>		getLoc();
+		std::vector<std::string>	getServerNames() const;
+		std::vector<Location>		getLoc() const;
 	
 	private:
 	
@@ -51,7 +52,7 @@ class ServerInfo {
 		std::vector<Location>		_loc;
 };
 
-std::ostream	&operator<<(std::ostream &x, std::vector<Location> _loc);
-std::ostream	&operator<<(std::ostream &x, ServerInfo inf);
+std::ostream	&operator<<(std::ostream &x, Location const & inf);
+std::ostream	&operator<<(std::ostream &x, ServerInfo const & inf);
 
 #endif
