@@ -187,6 +187,9 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	// this->close_socket();
 	// _request.erase();
 	// _file_request.erase();
+	write(_socket, "Hello", 5);
+	this->close_socket();
+	
 
 	return (0);
 }
