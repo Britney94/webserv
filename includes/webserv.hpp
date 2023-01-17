@@ -18,11 +18,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <dirent.h>
+#include <sstream>
+#include <sys/wait.h>
 
 
 
-//#include "AutoIndex.hpp"
-//#include "CGI.hpp"
+#include "AutoIndex.hpp"
+#include "CGI.hpp"
 #include "Location.hpp"
 #include "ClientRequest.hpp"
 #include "ConfigInfo.hpp"
