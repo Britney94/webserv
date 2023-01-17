@@ -1,6 +1,6 @@
 NAME = webserv 
-CC = c++
-CFLAGS = -std=c++98 -Wall -Wextra -Werror
+CC = c++ -g #TO DELETE -g
+CFLAGS = -std=c++98 -Wall -Wextra #-Werror
 INCLUDES = -I ./includes/
 
 SRCS = srcs/Server.cpp \
@@ -42,6 +42,6 @@ pouette: $(OBJS)
 
 
 test: all
-	@ valgrind ./webserv config/default.conf
+	@ valgrind --leak-check=full --track-origins=yes ./webserv config/default.conf
 
 .PHONY: all clean fclean re bonus

@@ -9,14 +9,11 @@ WebServer::~WebServer(void) {
 }
 
 int	WebServer::parsefile(char *filename) {
-	
 	_servers = _config.parse(filename);
 	if (_config.getError() == 1) {
 		return 0;
 	}
-
 	_max_fd = _config.getMaxFd();
-
 	FD_ZERO(&_sockets);
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
 		FD_SET(it->second->getSocket(), &_sockets);
@@ -127,6 +124,8 @@ void	WebServer::reset(void) {
 
 int	WebServer::clean(void) {
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
 		it->second->close_socket();
+	}
 	return 0;
 }

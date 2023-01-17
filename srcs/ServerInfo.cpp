@@ -221,6 +221,7 @@ int	ServerInfo::getAllow(std::string allow) const
 ServerInfo::~ServerInfo()
 {
 	this->_loc.clear();
+	
 }
 
 std::ostream	&operator<<(std::ostream &x, Location const & inf)

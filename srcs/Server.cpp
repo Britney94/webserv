@@ -72,6 +72,9 @@ Server::~Server(void)
 	// Default destructor, closes the
 	// socket descriptor generated at
 	// construction.
+	if (this->_default)
+		delete(this->_default);
+	this->_infos.clear();
 	close(this->_socket);
 }
 
@@ -111,8 +114,8 @@ int	Server::accept_fd() {
 }
 
 void	Server::close_socket() {
-	if (_socket > 0)
-		close(_socket);
+	if (this->_socket > 0)
+		close(this->_socket);
 }
 
 int	Server::parseRequest() {
