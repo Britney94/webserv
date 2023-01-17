@@ -135,12 +135,13 @@ int	Server::parseRequest() {
 			parseChunked(); 
 	}
 
-	std::cout << _request << std::endl;
+	std::cout << std::endl << std::endl << GREEN << "*** Request ***\n" << _request << BLANK << std::endl;
 
-	// ServerInfo	clientInfo = requestInfos();
-	// ClientRequest	client(clientInfo, _request);
+	ServerInfo	clientInfo(requestInfos());
+	ClientRequest	client(clientInfo, _request);
 
 	// _file_request = client.getFile();
+	// _body = client.getBody();
 	// _status = client.getStatus();
 
 	return 0;
@@ -174,7 +175,7 @@ void	Server::parseChunked() {
 
 int	Server::sendResponse(std::map<int, std::string> errors) {
 	
-	// HttpResponse	response(_file_request, _status, requestInfos().getAutoIndex(), errors);
+	// HttpResponse	response(_file_request, _status, requestInfos().getAutoIndex(), errors, body);
 	// std::string		message = response.getResponse();
 	// int	ret;
 
@@ -194,26 +195,32 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	return (0);
 }
 
-ServerInfo	Server::requestInfos() {
+ServerInfo	*Server::requestInfos() {
 	std::string	serv_name;
-	int			found;
+	size_t		found;
 
 	found = _request.find("HOST:");
 	if (found == std::string::npos)
 		found = _request.find("Host:");
+	if (found == std::string::npos)
+		return _default;
 
 	serv_name = _request.substr(found + 5);
 	if (serv_name.at(0) == ' ')
 		serv_name.erase(0, 1);
 	serv_name = serv_name.substr(0, serv_name.find("\r\n"));
+	if (serv_name.find(":") != std::string::npos)
+		serv_name.erase(serv_name.find(":"));
 
 	for (std::vector<ServerInfo *>::iterator it = _infos.begin(); it != _infos.end(); it++) {
-		for (std::vector<std::string>::iterator name = (*it)->getServerNames().begin(); name != (*it)->getServerNames().end(); name++) {
-			if (serv_name == *name)
-			return *(*it);
+		for (int count = 0; count < (*it)->getServerNames().size(); count++) {
+			
+			std::string	name = (*it)->getServerNames().at(count);
+			if (serv_name == name)
+				return (*it);
 		}
 	}
-	return *_default;
+	return _default;
 }
 
 std::string	Server::getError(){
@@ -230,7 +237,7 @@ std::ostream	&operator<<(std::ostream &x, Server const & serv)
 
 	x << "Socket: " << serv.getSocket() << std::endl;
 	for (std::vector<ServerInfo *>::iterator it = serv.getInfos().begin(); count <= serv.getInfos().size(); it++) {
-		x << "ServerInfo n°" << count++ << std::endl << (*it)->getIp() << std::endl; 
+		x << "ServerInfo n°" << count++ << std::endl << (*it) << std::endl; 
 	}
 	x << std::endl;
 	return (x);

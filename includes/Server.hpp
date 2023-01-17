@@ -22,7 +22,7 @@ class Server {
 		int	sendResponse(std::map<int, std::string> errors);
 		int	chunkedRequest();
 		void	parseChunked();
-		ServerInfo	requestInfos();
+		ServerInfo	*requestInfos();
 		std::string	getError();
 		std::vector<ServerInfo *>	getInfos() const;
 		ServerInfo	*_default;
@@ -33,6 +33,7 @@ class Server {
 		struct sockaddr_in	_addr;
 		std::string	_file_request;
 		std::string	_request;
+		std::string	_body;
 		int	_socket;
 		int	_status;
 		int	_size;

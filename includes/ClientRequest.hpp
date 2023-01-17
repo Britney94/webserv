@@ -19,6 +19,7 @@ class	ClientRequest {
 
 		int			getStatus() const;
 		std::string	getFile() const;
+		std::string	getBody() const;
 
 	private:
 		ServerInfo	_info;
@@ -27,6 +28,7 @@ class	ClientRequest {
 		std::string	_method;
 		std::string	_uri;
 		std::string	_file;
+		std::string	_body;
 		int			_status;
 
 };

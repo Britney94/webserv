@@ -111,7 +111,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 				(*allow)->setAllow("allow_methods GET POST DELETE PUT");
 			}
 		}
-
 	}
 	return (_servers);
 }
@@ -120,7 +119,9 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	Location	tmp;
 	std::string	line = file.getLine();
 
-	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.length() - 3);
+	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.find("{") - (curr_line.find("location ") + 9));
+	while (tmp.uri.at(tmp.uri.length() - 1) == ' ')
+		tmp.uri.erase(tmp.uri.length() - 1);
 	if (tmp.uri.find(".") == std::string::npos && tmp.uri.at(tmp.uri.length() - 1) != '/')
 		tmp.uri += "/";
 	if (tmp.uri.find("*") != std::string::npos)
@@ -138,16 +139,16 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 		if (line.find("location ") != std::string::npos)
 			tmp.loc.push_back(setupLoc(file, line));
 		else if (line.find("root ") != std::string::npos) {
-			tmp.root = line.substr(line.find(" ") + 1, line.find("\n"));
-			if (tmp.root.at(tmp.uri.length() - 1) != '/')
+			tmp.root = line.substr(line.find(" ") + 1);
+			if (tmp.root.at(tmp.root.length() - 1) != '/')
 				tmp.root += "/";
 		}
 		else if (line.find("index ") != std::string::npos)
-			tmp.index = line.substr(line.find(" ") + 1, line.find("\n"));
+			tmp.index = line.substr(line.find(" ") + 1);
 		else if (line.find("cgi_pass ") != std::string::npos)
-			tmp.cgi = line.substr(line.find(" ") + 1, line.find("\n"));
+			tmp.cgi = line.substr(line.find(" ") + 1);
 		else if (line.find("client_body_buffer_size ") != std::string::npos)
-			tmp.clientSize = atoi(&(line.substr(line.find(" ") + 1, line.find("\n")))[0]);
+			tmp.clientSize = atoi(&(line.substr(line.find(" ") + 1))[0]);
 		else if (line.find("allow_methods ") != std::string::npos) {
 			if (line.find("GET") != std::string::npos)
 				tmp.allow[0] = 1;

@@ -2,24 +2,30 @@
 
 ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info), _request(request), _status(200), _file("") {
 	checkSyntax();
+std::cout << "Syntax checked! Status: " << _status << std::endl;
 	determinateLoc();
+std::cout << "Location found! Root is: " << _loc.root << std::endl;
 	checkMethod();
+std::cout << "Method checked! Status: " << _status << std::endl;
 	checkSize();
+std::cout << "Size of body checked! Status: " << _status << std::endl;
 	determinateFile();
+std::cout << "File requested: " << _file << " Status: " << _status << std::endl << std::endl;
 }
 
 ClientRequest::~ClientRequest() {
-
+	
 }
 
 int	ClientRequest::checkMethod() {
-	if (_method == "GET" || !_loc.allow[0])
+std::cout << "Method: " << _method << " Allowed[GPDP]: " << _loc.allow[0] << _loc.allow[1] << _loc.allow[2] << _loc.allow[3] << std::endl;
+	if (_method == "GET" && !_loc.allow[0])
 		_status = 405;
-	if (_method == "POST" || !_loc.allow[1])
+	if (_method == "POST" && !_loc.allow[1])
 		_status = 405;
-	if (_method == "DELETE" || !_loc.allow[2])
+	if (_method == "DELETE" && !_loc.allow[2])
 		_status = 405;
-	if (_method == "PUT" || !_loc.allow[3])
+	if (_method == "PUT" && !_loc.allow[3])
 		_status = 405;
 	return _status;
 }
@@ -39,10 +45,16 @@ int	ClientRequest::checkSyntax() {
 		return _status;
 	}
 
+//std::cout << "Host found" << std::endl;
+
 	std::string	firstLine = _request.substr(0, _request.find("\r\n") + 2);
 	std::string	word = firstLine.substr(0, firstLine.find(" "));
-	
+
+// std::cout << "FirstLine: " << firstLine << std::endl;
+
+
 	for (int count = 1; count < 4; count++) {
+// std::cout << "Word: " << word << std::endl;
 		if (count == 1) {
 			if (!isMethod(word)) {
 				_status = 400;
@@ -63,6 +75,8 @@ int	ClientRequest::checkSyntax() {
 		word = firstLine.substr(0, firstLine.find(" "));
 	}
 
+//std::cout << "FirstLine OK!" << std::endl;
+
 	std::string copy_request = _request;
 	std::string	bodyLine;
 	std::string	header_field;
@@ -71,8 +85,10 @@ int	ClientRequest::checkSyntax() {
 
 	copy_request.erase(0, copy_request.find("\r\n") + 2);
 	bodyLine = copy_request.substr(0, copy_request.find("\r\n") + 2);
-	
+
+
 	while (bodyLine.length() && bodyLine != "\r\n") {
+// std::cout << "Bodyline: " << bodyLine << std::endl;
 		if (bodyLine.find(":") == std::string::npos) {
 			_status = 400;
 			return _status;
@@ -80,6 +96,8 @@ int	ClientRequest::checkSyntax() {
 		
 		header_field = bodyLine.substr(0, bodyLine.find(":"));
 		value = bodyLine.substr(bodyLine.find(":") + 1);
+// std::cout << "Header_field: " << header_field << std::endl;
+// std::cout << "Value " << value << std::endl;
 
 		if (value.find("\r\n") == std::string::npos || !header_field.length() || !value.length()) {
 			_status = 400;
@@ -87,19 +105,22 @@ int	ClientRequest::checkSyntax() {
 		}
 
 		if (header_field.find("Content-Length") != std::string::npos || header_field.find("CONTENT-LENGTH") != std::string::npos) {
-			if (value.front() == ' ')
+			if (value.at(0) == ' ')
 				value.erase(0, 1);
-			body_size = atoi(value);
+			body_size = atoi(&(value)[0]);
 		}
 
 		copy_request.erase(0, copy_request.find("\r\n") + 2);
 		bodyLine = copy_request.substr(0, copy_request.find("\r\n") + 2);
 	}
 
+//std::cout << "Headers OK!" << std::endl;
+
 	if (!bodyLine.length())
 		return 200;
 	
 	copy_request.erase(0, 2);
+	_body = copy_request;
 	if (copy_request.size() != body_size) {
 		_status = 400;
 		return _status;
@@ -109,14 +130,17 @@ int	ClientRequest::checkSyntax() {
 }
 
 int	ClientRequest::checkSize() {
+	if (_body.size() > _loc.clientSize)
+		_status = 413;
 	return _status;
 }
 
 std::string	ClientRequest::determinateFile() {
-	std::string	file_uri = _uri.substr(_loc.uri.lenght());
+	std::string	file_uri = _uri.substr(_loc.uri.length());
 
 	_file = _loc.root + file_uri;
-	if (!_info.getAutoIndex() && _file.back() == '/') {
+
+	if (!_info.getAutoIndex() && _file.at(_file.length() - 1) == '/') {
 		if (_loc.index.size() && _loc.index != "")
 			_file += _loc.index;
 		else
@@ -139,38 +163,45 @@ int	ClientRequest::determinateLoc() {
 	_loc.allow[3] = _info.getAllow("PUT");
 	_loc.clientSize = _info.getClientSize();
 
-	if (_uri.find(".") != std::string::npos)
-		ext = _uri.substr(_uri.find("."));
-	_uri.erase(_uri.find_last_of('/'));
 	tmp_uri = _uri;
+	if (tmp_uri.find(".") != std::string::npos)
+		ext = tmp_uri.substr(tmp_uri.find("."));
+	tmp_uri.erase(tmp_uri.find_last_of('/') + 1);
+std::cout << "URI: " << tmp_uri << " EXT: " << ext << std::endl;
 
 	while (tmp_vec.size() != 0) {
 		int	loop = 1;
-		for (std::vector<Location>::iterator it = tmp_vec.begin(); it != tmp_vec.end() && loop; it++) {
-			if (_uri == it->uri || ext == it->uri) {
-				if (it->root.size())
-					_loc.root = it->root;
-				if (it->index.size())
-					_loc.index = it->index;
-				if (it->clientSize != _loc.clientSize)
-					_loc.clientSize = it->clientSize;
-				if (it->cgi.size())
-					_loc.cgi = it->cgi;
-				if (it->allow[0] || it->allow[1] || it->allow[2] || it->allow[3]) {
-					_loc.allow[0] = it->allow[0];
-					_loc.allow[1] = it->allow[1];
-					_loc.allow[2] = it->allow[2];
-					_loc.allow[3] = it->allow[3];
+		for (int count = 0; count < tmp_vec.size() && loop; count++) {
+			Location tmp = tmp_vec.at(count);
+//std::cout << "URI demande:" << tmp_uri << " URI de la location: " << tmp.uri << std::endl;
+			if (tmp_uri == tmp.uri || ext == tmp.uri) {
+				_loc.uri = tmp_uri;
+				if (tmp.root.size())
+					_loc.root = tmp.root;
+				if (tmp.index.size())
+					_loc.index = tmp.index;
+				if (tmp.clientSize != _loc.clientSize)
+					_loc.clientSize = tmp.clientSize;
+				if (tmp.cgi.size())
+					_loc.cgi = tmp.cgi;
+				if (tmp.allow[0] || tmp.allow[1] || tmp.allow[2] || tmp.allow[3]) {
+					_loc.allow[0] = tmp.allow[0];
+					_loc.allow[1] = tmp.allow[1];
+					_loc.allow[2] = tmp.allow[2];
+					_loc.allow[3] = tmp.allow[3];
 				}
-				if (ext == it->uri)
+				if (ext == tmp.uri)
 					return _status;
-				tmp_vec = it->loc;
+				tmp_vec = tmp.loc;
 				loop = 0;
-				_uri = tmp_uri;
 			}
 		}
-		if (loop)
-			_uri.erase(_uri.find_last_of('/') + 1);
+		if (tmp_uri == "/")
+			return _status;
+		if (loop) {
+			tmp_uri.erase(tmp_uri.length() - 1);
+			tmp_uri.erase(tmp_uri.find_last_of('/') + 1);
+		}
 	}
 	return _status;
 }
@@ -179,6 +210,10 @@ int	ClientRequest::getStatus() const {
 	return _status;
 }
 
-int	ClientRequest::getFile() const {
+std::string	ClientRequest::getFile() const {
 	return _file;
+}
+
+std::string	ClientRequest::getBody() const {
+	return _body;
 }

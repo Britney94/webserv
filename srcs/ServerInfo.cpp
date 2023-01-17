@@ -25,16 +25,49 @@ ServerInfo::ServerInfo(ServerInfo* copy) {
 	this->_clientSize = copy->_clientSize;
 	this->_autoIndex = copy->_autoIndex;
 	this->_serverNames = copy->_serverNames;
-	this->_loc = copy->_loc;
+	for (std::vector<Location>::iterator it = copy->_loc.begin(); it != copy->_loc.end(); it++) {
+		this->_loc.push_back(*it);
+	}
 	this->_ip = copy->_ip;
+}
+
+ServerInfo::ServerInfo(ServerInfo& copy) {
+	this->_allow[0] = copy._allow[0];
+	this->_allow[1] = copy._allow[1];
+	this->_allow[2] = copy._allow[2];
+	this->_allow[3] = copy._allow[3];
+	this->_index = copy._index;
+	this->_root = copy._root;
+	this->_clientSize = copy._clientSize;
+	this->_autoIndex = copy._autoIndex;
+	this->_serverNames = copy._serverNames;
+	for (std::vector<Location>::iterator it = copy._loc.begin(); it != copy._loc.end(); it++) {
+		this->_loc.push_back(*it);
+	}
+	this->_ip = copy._ip;
+}
+
+ServerInfo&	ServerInfo::operator=(ServerInfo& copy) {
+	this->_allow[0] = copy._allow[0];
+	this->_allow[1] = copy._allow[1];
+	this->_allow[2] = copy._allow[2];
+	this->_allow[3] = copy._allow[3];
+	this->_index = copy._index;
+	this->_root = copy._root;
+	this->_clientSize = copy._clientSize;
+	this->_autoIndex = copy._autoIndex;
+	this->_serverNames = copy._serverNames;
+	for (std::vector<Location>::iterator it = copy._loc.begin(); it != copy._loc.end(); it++) {
+		this->_loc.push_back(*it);
+	}
+	this->_ip = copy._ip;
+	return *this;
 }
 
 
 int	ServerInfo::setServerNames(std::string names)
 {
 	names.erase(0, names.find(' ') + 1);
-	if (names.at(names.length() - 1) == '\n')
-		names.erase(names.at(names.length() - 1));
 	while (names.find(' ') != std::string::npos) {
 		_serverNames.push_back(names.substr(0, names.find(' ')));
 		names.erase(0, names.find(' ') + 1);
@@ -53,6 +86,7 @@ int	ServerInfo::setIp(std::string line)
 		std::cerr << "Error: Parsing configuration file : ip address" << std::endl;
 		return 1;
 	}
+	_ip = line;
 	return 0;
 }
 
@@ -207,8 +241,10 @@ std::ostream	&operator<<(std::ostream &x, Location const & inf)
 std::ostream	&operator<<(std::ostream &x, ServerInfo const & inf)
 {
 	x << "Server_names: ";
+	std::cout << "Server_names: ";
 	for (std::vector<std::string>::iterator name = inf.getServerNames().begin(); name != inf.getServerNames().end(); name++) {
 		x << *name << " ";
+		std::cout << *name << " ";
 	}
 	x << std::endl;
 	x << "Ip address: " << inf.getIp() << std::endl;

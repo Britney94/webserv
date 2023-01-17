@@ -5,8 +5,8 @@
 // 	ConfigInfo config;
 	
 // 	config.parse((char *)"./config/default.conf");
-// 	std::cout << "triple out" << std::endl;
-// 	std::cout << config;
+// 	std::cout << config.getServers()[8180]->getInfos().at(0)->getServerNames().at(0) << std::endl;
+// 	// std::cout << config;
 // 	return 0;
 // }
 

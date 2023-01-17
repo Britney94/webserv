@@ -106,8 +106,8 @@ int	WebServer::launch(void) {
 						_max_fd = new_socket;
 					
 					_acceptfds.insert(std::make_pair(it->first, new_fd));
-					pending--;
 				}
+				pending--;
 				break;
 			}
 		}

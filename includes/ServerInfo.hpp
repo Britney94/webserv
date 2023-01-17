@@ -19,8 +19,11 @@ class ServerInfo {
 
 		ServerInfo();
 		ServerInfo(ServerInfo* copy);
+		ServerInfo(ServerInfo& copy);
 		~ServerInfo();
 		
+		ServerInfo&	operator=(ServerInfo& copy);
+
 		int	setServerNames(std::string names);
 		int	setIp(std::string line);
 		int	setIndex(std::string line);
