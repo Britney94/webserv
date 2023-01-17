@@ -10,6 +10,21 @@
 // 	return 0;
 // }
 
+// int main()
+// {
+// 	ServerInfo info;
+
+// 	info.setClientSize("client_max_body_size sqq0qdsq");
+// 	// ConfigInfo config((char *)"./config/default.conf");
+// 	// std::cout << config;
+// 	ConfigInfo config((char *)"./config/default.conf");
+// 	std::cout << config;
+// 	CGI cgi;
+// 	autoindex index;
+// 	std::cout << index.renderPage("YoupiBanane", "YoupiBanane", 80, "Youpi");
+// 	return 0;
+// }
+
 int main(int argc, char **argv)
 {
 	WebServer	server;
