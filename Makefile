@@ -17,7 +17,9 @@ INCLUDES = -I ./includes/
 
 SRCS = srcs/Server.cpp \
        srcs/Location.cpp \
-	   srcs/WebServer.cpp \
+       srcs/WebServer.cpp \
+       srcs/AutoIndex.cpp \
+       src/CGI.cpp \
        srcs/ServerInfo.cpp \
        srcs/ClientRequest.cpp \
        srcs/File.cpp \
