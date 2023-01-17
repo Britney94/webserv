@@ -236,7 +236,8 @@ std::ostream	&operator<<(std::ostream &x, Server const & serv)
 	int	count = 1;
 
 	x << "Socket: " << serv.getSocket() << std::endl;
-	for (std::vector<ServerInfo *>::iterator it = serv.getInfos().begin(); count <= (int)serv.getInfos().size(); it++) {
+	std::vector<ServerInfo *>::iterator it;
+	for (it = serv.getInfos().begin(); count <= (int)serv.getInfos().size(); it++) {
 		x << "ServerInfo n°" << count++ << std::endl << (*it) << std::endl; 
 	}
 	x << std::endl;

@@ -105,7 +105,8 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
 		if (it->second->getSocket() > _maxFd)
 			_maxFd = it->second->getSocket();
-		for (std::vector<ServerInfo *>::iterator allow = it->second->getInfos().begin(); allow != it->second->getInfos().end(); allow++) {
+		std::vector<ServerInfo *>::iterator allow;
+		for (allow = it->second->getInfos().begin(); allow != it->second->getInfos().end(); allow++) {
 			if (!((*allow)->getAllow("GET")) && !((*allow)->getAllow("POST")) &&
 				!((*allow)->getAllow("DELETE")) && !((*allow)->getAllow("PUT")) ) {
 				
@@ -221,7 +222,8 @@ std::ostream	&operator<<(std::ostream &x, ConfigInfo const & inf)
 	int	count = 1;
 
 	x << "**** ConfigInfo ****" << std::endl << std::endl;
-	for (std::map<int, Server *>::const_iterator it = inf.getServers().begin(); count <= inf.getSize(); it++) {
+	std::map<int, Server *>::const_iterator it;
+	for (it = inf.getServers().begin(); count <= inf.getSize(); it++) {
 		x << "*** Server n°" << count++ << std::endl << *(it->second) << std::endl;
 	}
 	return (x);

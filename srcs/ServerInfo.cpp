@@ -242,7 +242,8 @@ std::ostream	&operator<<(std::ostream &x, ServerInfo const & inf)
 {
 	x << "Server_names: ";
 	std::cout << "Server_names: ";
-	for (std::vector<std::string>::iterator name = inf.getServerNames().begin(); name != inf.getServerNames().end(); name++) {
+	std::vector<std::string>::iterator name;
+	for (name = inf.getServerNames().begin(); name != inf.getServerNames().end(); name++) {
 		x << *name << " ";
 		std::cout << *name << " ";
 	}
@@ -253,7 +254,8 @@ std::ostream	&operator<<(std::ostream &x, ServerInfo const & inf)
 	x << "Allow: " << inf.getAllow("GET") << inf.getAllow("POST") << inf.getAllow("DELETE") << inf.getAllow("PUT") << std::endl;
 	x << "ClientSize: " << inf.getClientSize() << std::endl;
 	x << "Autoindex: " << inf.getAutoIndex() << std::endl;
-	for (std::vector<Location>::iterator loc = inf.getLoc().begin(); loc != inf.getLoc().end(); loc++) {
+	std::vector<Location>::iterator loc;
+	for (loc = inf.getLoc().begin(); loc != inf.getLoc().end(); loc++) {
 		x << *loc << std::endl;
 	}
 	x << std::endl;
