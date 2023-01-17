@@ -12,26 +12,25 @@ class	ClientRequest {
 
 		int			checkSyntax();
 		int			checkMethod();
-		int			isMethod(std::string word)
-		Location	getLoc();
+		int			checkSize();
+		int			isMethod(std::string word);
+		int			determinateLoc();
 		std::string	determinateFile();
-
-	// 1: Verifier que la syntaxe du message est correct -> sinon regarder code erreur
-	// 2: Verifier que la methode est autorise et taille client autorise -> sinon code erreur
-	// 3: Determiner la location a utiliser
-	// 4: Determiner le fichier
 
 		int			getStatus() const;
 		std::string	getFile() const;
+		std::string	getBody() const;
 
 	private:
 		ServerInfo	_info;
+		Location	_loc;
 		std::string	_request;
 		std::string	_method;
 		std::string	_uri;
-		int			_status;
 		std::string	_file;
+		std::string	_body;
+		int			_status;
 
-}
+};
 
 #endif

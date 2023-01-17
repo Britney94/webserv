@@ -23,9 +23,9 @@ class WebServer {
 	private:
 		
 		ConfigInfo				_config;
-		std::map<int, Server>	_servers;
-		std::map<int, Server>	_acceptfds;
-		std::map<int, Server>	_writablefds;	
+		std::map<int, Server *>	_servers;
+		std::map<int, Server *>	_acceptfds;
+		std::map<int, Server *>	_writablefds;	
 		fd_set					_sockets;
 		int						_max_fd;
 };

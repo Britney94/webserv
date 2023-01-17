@@ -19,19 +19,11 @@
 #include <stdlib.h>
 #include <errno.h>
 
-struct Location
-{
-	std::string	uri; 
-	std::string	root;
-	std::string	index;
-	std::string	cgi;
-	int	        allow[3]; // GET POST DELETE : 0 si interdit, 1 si autorise
-	long		clientSize;
-	std::vector<Location>	loc;
-};
 
-#include "AutoIndex.hpp"
-#include "CGI.hpp"
+
+//#include "AutoIndex.hpp"
+//#include "CGI.hpp"
+#include "Location.hpp"
 #include "ClientRequest.hpp"
 #include "ConfigInfo.hpp"
 #include "File.hpp"
