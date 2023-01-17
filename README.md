@@ -7,23 +7,34 @@ You must write a HTTP server in C++ 98.
 # How to test ?
 
 **Curl :link:**
+
 `curl 127.0.0.1:8055` 
+
 Renvois le contenus HTML de la page
+
 `curl -X GET 127.0.0.1:8055` (or POST or DELETE)
+
 Renvois le contenus de la page, mais en "request" la méthode (dans l'exemple GET)
+
 `curl -X GET -H "Content-Type: plain/text" --data "BODY IS HERE write something shorter" 127.0.0.1:8055`
+
 Le -H envois un header bonus, et --data envois un body content (par exemple Content-Length à la taille de ce dernier)
 
 **Telnet :pager:**
+
 `telnet 127.0.0.1 8055`
+
 Va se permettre de se connecter au serveur directement (telnet host ip)
+
 ```
 GET /index.html HTTP/1.1
 Host: example.com
 ```
+
 Permet d'envoyé une requete GET au serveur
 
 **Firefox :mag_right:**
+
 Il suffis d'ajoutée dans la barre de recherche : `127.0.0.1:8055` (host:port) et cela nous renveras sur les pages du site (l'autoindex), ont peut donc se balader dedans.
 
 # Introduction
