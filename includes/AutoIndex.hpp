@@ -1,15 +1,15 @@
 #ifndef AUTOINDEX_HPP
-# define AUTOINDEX_HPP
+#define AUTOINDEX_HPP
+
+#pragma once
 
 #include "webserv.hpp"
 
-class	AutoIndex {
-
+class autoindex{
 	public:
-		AutoIndex();
-		~AutoIndex();
-
+		autoindex(){};
 		std::string	renderPage(std::string directory, std::string path, int port, std::string host);
+		~autoindex(){};	
 };
 
 #endif
