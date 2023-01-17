@@ -174,7 +174,7 @@ void	Server::parseChunked() {
 }
 
 int	Server::sendResponse(std::map<int, std::string> errors) {
-	
+	(void)errors;
 	// HttpResponse	response(_file_request, _status, requestInfos().getAutoIndex(), errors, body);
 	// std::string		message = response.getResponse();
 	// int	ret;
@@ -213,7 +213,7 @@ ServerInfo	*Server::requestInfos() {
 		serv_name.erase(serv_name.find(":"));
 
 	for (std::vector<ServerInfo *>::iterator it = _infos.begin(); it != _infos.end(); it++) {
-		for (int count = 0; count < (*it)->getServerNames().size(); count++) {
+		for (int count = 0; count < (int)(*it)->getServerNames().size(); count++) {
 			
 			std::string	name = (*it)->getServerNames().at(count);
 			if (serv_name == name)
@@ -236,7 +236,7 @@ std::ostream	&operator<<(std::ostream &x, Server const & serv)
 	int	count = 1;
 
 	x << "Socket: " << serv.getSocket() << std::endl;
-	for (std::vector<ServerInfo *>::iterator it = serv.getInfos().begin(); count <= serv.getInfos().size(); it++) {
+	for (std::vector<ServerInfo *>::iterator it = serv.getInfos().begin(); count <= (int)serv.getInfos().size(); it++) {
 		x << "ServerInfo n°" << count++ << std::endl << (*it) << std::endl; 
 	}
 	x << std::endl;

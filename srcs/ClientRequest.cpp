@@ -1,6 +1,6 @@
 #include "../includes/ClientRequest.hpp"
 
-ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info), _request(request), _status(200), _file("") {
+ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info), _request(request), _file(""), _status(200){
 	checkSyntax();
 std::cout << "Syntax checked! Status: " << _status << std::endl;
 	determinateLoc();
@@ -121,7 +121,7 @@ int	ClientRequest::checkSyntax() {
 	
 	copy_request.erase(0, 2);
 	_body = copy_request;
-	if (copy_request.size() != body_size) {
+	if ((long)copy_request.size() != (long)body_size) {
 		_status = 400;
 		return _status;
 	}
@@ -130,7 +130,7 @@ int	ClientRequest::checkSyntax() {
 }
 
 int	ClientRequest::checkSize() {
-	if (_body.size() > _loc.clientSize)
+	if ((long)_body.size() > (long)_loc.clientSize)
 		_status = 413;
 	return _status;
 }
@@ -171,7 +171,7 @@ std::cout << "URI: " << tmp_uri << " EXT: " << ext << std::endl;
 
 	while (tmp_vec.size() != 0) {
 		int	loop = 1;
-		for (int count = 0; count < tmp_vec.size() && loop; count++) {
+		for (int count = 0; count < (int)tmp_vec.size() && loop; count++) {
 			Location tmp = tmp_vec.at(count);
 //std::cout << "URI demande:" << tmp_uri << " URI de la location: " << tmp.uri << std::endl;
 			if (tmp_uri == tmp.uri || ext == tmp.uri) {

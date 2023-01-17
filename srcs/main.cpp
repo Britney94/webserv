@@ -28,7 +28,7 @@
 int main(int argc, char **argv)
 {
 	WebServer	server;
-	char	*filename;
+	char	*filename = NULL;
 	if (argc == 1)
 		filename = ((char *)"./config/default.conf");
 	else if (argc == 2)

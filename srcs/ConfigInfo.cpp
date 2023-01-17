@@ -7,6 +7,7 @@ ConfigInfo::ConfigInfo(){
 }
 
 ConfigInfo::ConfigInfo(ConfigInfo& copy){
+	(void)copy;
 	this->_err = 0;
 	this->_maxFd = 0;
 	this->setSize(0);
@@ -166,7 +167,7 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 }
 
 int	ConfigInfo::setErrorFile(std::string line) {
-	int error = atoi(&(line.substr(line.find(" " + 1)))[0]);
+	int error = atoi(&(line.substr(line.find(" ") + 1))[0]);
 
 	if (error < 400 || error >= 600)
 		return 1;

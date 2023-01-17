@@ -1,25 +1,13 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: shdorlin <shdorlin@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/11/17 18:32:32 by shdorlin          #+#    #+#              #
-#    Updated: 2022/12/12 19:09:21 by kejebane         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME = webserv 
 CC = c++
-CFLAGS = -std=c++98 #-Wall -Wextra -Werror -std=c++98
+CFLAGS = -std=c++98 -Wall -Wextra #-Werror
 INCLUDES = -I ./includes/
 
 SRCS = srcs/Server.cpp \
        srcs/Location.cpp \
        srcs/WebServer.cpp \
        srcs/AutoIndex.cpp \
-       src/CGI.cpp \
+       srcs/CGI.cpp \
        srcs/ServerInfo.cpp \
        srcs/ClientRequest.cpp \
        srcs/File.cpp \
