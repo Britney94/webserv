@@ -49,7 +49,6 @@ Server::Server(ServerInfo* infos, int port)
 	this->_status = 200;
 }
 
-
 Server::Server(Server& copy, int new_socket)
 {
 	this->_socket = new_socket;
@@ -99,7 +98,6 @@ void	Server::addNewInfo(ServerInfo* new_infos)
 	this->_infos.push_back(new_infos);
 	this->_size++;
 }
-
 
 int	Server::accept_fd() {
 	

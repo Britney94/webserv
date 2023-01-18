@@ -1,6 +1,6 @@
 NAME = webserv 
 CC = c++ #-g #TO DELETE -g
-CFLAGS = -std=c++98 -Wall -Wextra -Werror
+CFLAGS = #-std=c++98 -Wall -Wextra -Werror
 INCLUDES = -I ./includes/
 
 SRCS = srcs/Server.cpp \

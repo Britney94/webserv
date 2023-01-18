@@ -27,14 +27,13 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	int			ret = 0;
 	std::string	line = file.getLine();
 	while (file.lineHistory < file.getMaxLine()){
-		
 		if (line.find("server {") != std::string::npos){
 			ServerInfo	*tmpInfo = new ServerInfo();
 			line = file.getLine();
 			while (line.find("server {") == std::string::npos && file.lineHistory < file.getMaxLine()) {
 				if (line.find("server_name ") != std::string::npos)
 					ret = (*tmpInfo).setServerNames(line);
-				else if (line.find("listen ") != std::string::npos) {
+				else if (line.find("listen ") != std::string::npos){
 					int	port;
 					if (line.find(":") != std::string::npos) {
 						port = atoi(&line[line.find(":") + 1]);
