@@ -3,7 +3,6 @@
 std::vector<char>	permissions(const char *file)
 {
 	struct stat	st;
-	//char		*modeval = (char *)malloc(sizeof(char) * 9 + 1);
 	std::vector<char>	modeval(9, 'e');
 
 	if (stat(file, &st) == 0)
@@ -11,25 +10,24 @@ std::vector<char>	permissions(const char *file)
 		mode_t perm = st.st_mode;
 		modeval[0] = (perm & S_IRUSR) ? 'r' : '-';
 		modeval[1] = (perm & S_IWUSR) ? 'w' : '-';
-	    modeval[2] = (perm & S_IXUSR) ? 'x' : '-';
+		modeval[2] = (perm & S_IXUSR) ? 'x' : '-';
 		modeval[3] = (perm & S_IRGRP) ? 'r' : '-';
 		modeval[4] = (perm & S_IWGRP) ? 'w' : '-';
 		modeval[5] = (perm & S_IXGRP) ? 'x' : '-';
 		modeval[6] = (perm & S_IROTH) ? 'r' : '-';
 		modeval[7] = (perm & S_IWOTH) ? 'w' : '-';
 		modeval[8] = (perm & S_IXOTH) ? 'x' : '-';
-		//modeval[9] = '\0';
 		return modeval;     
 	}
 	else
 	{
 		perror("Error stat call: ");
 		return modeval;     
-		//return strerror(errno);
 	}
-};
+}
 
 HttpResponse::HttpResponse() {
+	this->_status = -1;
 	return ;
 }
 
@@ -85,13 +83,10 @@ int	HttpResponse::createResponse()
 	// 3rd : DEBUG, print the content in outstream,
 	// 4th : Generate a header + body according to situation (ongoing)
 	
-	std::ifstream			filestream;
-	std::filebuf			filebuf;
-
-std::cout << "File to open: " << _file << std::endl;
-std::cout << "Status: " << _status << std::endl;
-std::cout << "Method: " << _method << std::endl;
-std::cout << "Body: " << _body << std::endl;
+	std::cout << "File to open: " << _file << std::endl;
+	std::cout << "Status: " << _status << std::endl;
+	std::cout << "Method: " << _method << std::endl;
+	std::cout << "Body: " << _body << std::endl;
 
 
 	if (_status >= 400 && _status < 500)
@@ -99,13 +94,21 @@ std::cout << "Body: " << _body << std::endl;
 		// Status was already set by another feature
 		// body becomes the corresponding error file
 
-		filestream.open(_errorFiles[_status].c_str());
-		filestream >> this->_file_content; 
-		std::cout << this->_file_content << std::endl; 	// DEBUG
+		int	fd_err_file = open(error_file_map[_status].c_str(), O_RDONLY);
+		if (fd_err_file < 0)
+		{
+			perror("Problem open error file, fd, etc.\n");
+			return ;
+		}
+		char	read_buf[2147483407];
+		read(fd_path_file, read_buf, 2147483407);
+		read_buf[2147483406] = '\0';
+		std::string	tmp_str_char = read_buf;
+		this->_file_content = tmp_str_char;
 	}
 	else
 	{
-		// Status must be defined here
+		//  Status will be defined here
 
 		std::string	path = _file;
 
@@ -117,43 +120,49 @@ std::cout << "Body: " << _body << std::endl;
 		}
 		else if (ret > 0 && _method != "PUT")
 		{
-			filestream.open(path.c_str());
-			while (filestream.good()) {
-				std::getline(filestream, this->_file_content);
-				this->_body += this->_file_content;
-				this->_body += '\n';
+			int	fd_path_file = open(path.c_str(), O_RDONLY);
+			if (fd_path_file < 0)
+			{
+				perror("Problem open path file, fd, etc.\n");
+				return ;
 			}
-			std::cout << "File content: " << this->_file_content << std::endl; 	// DEBUG
+			char	read_buf[2147483407];
+			read(fd_path_file, read_buf, 2147483407);
+			read_buf[2147483406] = '\0';
+			std::string	tmp_str_char = read_buf;
+			this->_file_content = tmp_str_char;
 			this->_status = 200;				// SUCCESS
 		}
 		else if (ret < 0)
 		{
-			// Couldn't open the file
+			// Can't open the file, following error procedure
 
-			//char	*file_permissions = permissions(path.c_str());
 			std::vector<char>	file_permissions = permissions(path.c_str());
 			if (file_permissions[0] == 'e')
 				this->_status = 404;
 			else if (_method == "POST")
 			{
 				if (file_permissions[1] == '-')
-					this->_status = 403;	// using method object as is
+					this->_status = 403;
 			}
 			else if (_method == "GET")
 			{
 				if (file_permissions[0] == '-')
-					this->_status = 403;	// using method object as is
+					this->_status = 403;
 			}
 			else
 				this->_status = 404;
-	std::cout << "Error file: " << _errorFiles[_status].c_str() << std::endl;
-			filestream.open(_errorFiles[_status].c_str());
-			while(filestream.good()) {
-				std::getline(filestream, this->_file_content);
-				this->_body += this->_file_content;
-				this->_body += '\n';
+			int	fd_err_file = open(error_file_map[this->_status].c_str(), O_RDONLY);
+			if (fd_err_file < 0)
+			{
+				perror("Problem open error file, fd, etc.\n");
+				return ;
 			}
-	std::cout << "Error file content: " << this->_file_content << std::endl;
+			char	read_buf[2147483407];
+			read(fd_path_file, read_buf, 2147483407);
+			read_buf[2147483406] = '\0';
+			std::string	tmp_str_char = read_buf;
+			this->_file_content = tmp_str_char;
 		}
 		close(ret);
 	}
@@ -165,12 +174,14 @@ std::cout << "Body: " << _body << std::endl;
 		this->_header = "HTTP/1.1 ";
 		this->_header = this->_header + toString(this->_status) + " ";
 		this->_header = this->_header + "ERROR\r\n";
+		this->_body = this->_file_content;
 	}
 	if (this->_status >= 200 && this->_status < 300)
 	{
 		this->_header = "HTTP/1.1 ";
 		this->_header = this->_header + toString(this->_status) + " ";
 		this->_header = this->_header + "OK\r\n";
+		this->_body = this->_file_content;
 	}
 	// Content-length: xxx
 	this->_header = this->_header + "Content-Lenght: ";	// Content-length = clientSize
