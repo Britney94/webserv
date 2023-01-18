@@ -118,7 +118,11 @@ std::cout << "Body: " << _body << std::endl;
 		else if (ret > 0 && _method != "PUT")
 		{
 			filestream.open(path.c_str());
-			filestream >> this->_file_content;
+			while (filestream.good()) {
+				std::getline(filestream, this->_file_content);
+				this->_body += this->_file_content;
+				this->_body += '\n';
+			}
 			std::cout << "File content: " << this->_file_content << std::endl; 	// DEBUG
 			this->_status = 200;				// SUCCESS
 		}
@@ -142,8 +146,14 @@ std::cout << "Body: " << _body << std::endl;
 			}
 			else
 				this->_status = 404;
+	std::cout << "Error file: " << _errorFiles[_status].c_str() << std::endl;
 			filestream.open(_errorFiles[_status].c_str());
-			filestream >> this->_file_content; 
+			while(filestream.good()) {
+				std::getline(filestream, this->_file_content);
+				this->_body += this->_file_content;
+				this->_body += '\n';
+			}
+	std::cout << "Error file content: " << this->_file_content << std::endl;
 		}
 		close(ret);
 	}
@@ -155,14 +165,12 @@ std::cout << "Body: " << _body << std::endl;
 		this->_header = "HTTP/1.1 ";
 		this->_header = this->_header + toString(this->_status) + " ";
 		this->_header = this->_header + "ERROR\r\n";
-		this->_body = this->_file_content;
 	}
 	if (this->_status >= 200 && this->_status < 300)
 	{
 		this->_header = "HTTP/1.1 ";
 		this->_header = this->_header + toString(this->_status) + " ";
 		this->_header = this->_header + "OK\r\n";
-		this->_body = this->_file_content;
 	}
 	// Content-length: xxx
 	this->_header = this->_header + "Content-Lenght: ";	// Content-length = clientSize
