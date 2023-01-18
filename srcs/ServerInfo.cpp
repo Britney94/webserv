@@ -243,7 +243,11 @@ int	ServerInfo::getAllow(std::string allow) const
 
 ServerInfo::~ServerInfo()
 {
-	this->_loc.clear();
+	// while(!this->_loc.empty())
+	// {
+	// 	this->_loc.clear();
+	// 	// this->_loc = this->_loc.next;
+	// }
 	this->_serverNames.clear();
 }
 

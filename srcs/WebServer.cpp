@@ -1,10 +1,23 @@
 #include "../includes/webserv.hpp"
 
 WebServer::WebServer(void) {
+	this->isRunning = 1;
 	return ;
 }
 
+void	WebServer::setRunning(int running) {
+	this->isRunning = running;
+}
+
+int WebServer::getRunning() {
+	return this->isRunning;
+}
+
 WebServer::~WebServer(void) {
+	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		it->second->close_socket();
+	}
 	return ;
 }
 
@@ -31,12 +44,10 @@ int	WebServer::launch(void) {
 		int				ret;
 	
 	while (1) {
-		
 		pending = 0;
 		ret = 0;
 		
 		while (pending == 0) {
-
 			timeout.tv_sec = 1;
 			timeout.tv_usec = 0;
 
@@ -46,11 +57,11 @@ int	WebServer::launch(void) {
 			for (std::map<int, Server *>::iterator it = _writablefds.begin(); it != _writablefds.end(); it++) {
 				FD_SET(it->second->getSocket(), &writefds);
 			}
-
 			std::cout << "\rWaiting" << std::flush;
-
 			pending = select(_max_fd + 1, &readfds, &writefds, NULL, &timeout);
 			if (pending < 0) {
+				if (!this->isRunning)
+					return 0;
 				std::cerr << "select() failed" << std::endl;
 				this->reset();
 			}
@@ -123,10 +134,9 @@ void	WebServer::reset(void) {
 	}
 }
 
-int	WebServer::clean(void) {
+void	WebServer::clean() {
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		it->second->close_socket();
 	}
-	return 0;
 }

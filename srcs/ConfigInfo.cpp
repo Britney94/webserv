@@ -212,9 +212,10 @@ ConfigInfo::~ConfigInfo(){
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		it->second->close_socket();
-		if (it->second == NULL)
+		if (it->second != NULL)
 			delete (it->second);
 	}
+	_errorFiles.clear();
 	return ;
 }
 

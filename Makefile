@@ -1,5 +1,5 @@
 NAME = webserv 
-CC = c++ #-g #TO DELETE -g
+CC = c++ -g #TO DELETE -g
 CFLAGS = #-std=c++98 -Wall -Wextra -Werror
 INCLUDES = -I ./includes/
 
@@ -43,6 +43,6 @@ pouette: $(OBJS)
 
 
 test: all
-	@ valgrind --leak-check=full --track-origins=yes ./webserv config/default.conf
+	@ valgrind --show-leak-kinds=all --leak-check=full --track-origins=yes ./webserv config/default.conf
 
 .PHONY: all clean fclean re bonus

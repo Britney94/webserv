@@ -168,7 +168,8 @@ void	Server::parseChunked() {
 
 	while (received.size()) {
 		i = received.find("\r\n") + 2;
-		//size = std::stoi(received.substr(0, i - 2), 0, 16);
+		size = std::stoi(received.substr(0, i - 2), 0, 16);
+		std::cout << "> size : " << size << std::endl;
 		body += received.substr(i, i + size);
 		received = received.substr(i + size + 2);
 	}

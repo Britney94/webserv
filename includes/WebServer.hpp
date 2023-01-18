@@ -11,17 +11,17 @@ class Server;
 class WebServer {
 	
 	public:
-		
 		WebServer(void);
 		~WebServer(void);
-				
+		void		setRunning(int running);
+		int			getRunning();
 		int		parsefile(char *filename);
 		int		launch();
-		int		clean();
+		void		clean();
 		void	reset();
 	
 	private:
-		
+		int isRunning;
 		ConfigInfo				_config;
 		std::map<int, Server *>	_servers;
 		std::map<int, Server *>	_acceptfds;

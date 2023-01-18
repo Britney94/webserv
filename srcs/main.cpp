@@ -25,9 +25,17 @@
 // 	return 0;
 // }
 
+WebServer server;
+
+void	quit(int arg)
+{
+	(void)arg;
+	server.setRunning(0);
+}
+
 int main(int argc, char **argv)
 {
-	WebServer	server;
+	server.setRunning(1);
 	char	*filename = NULL;
 	if (argc == 1)
 		filename = ((char *)"./config/default.conf");
@@ -35,9 +43,11 @@ int main(int argc, char **argv)
 		filename = argv[1];
 	else
 		std::cerr << "Usage : ./webserv [configuration file]" << std::endl;
+	signal(SIGINT, quit);
 	if (server.parsefile(filename)) {
 		server.launch();
 	}
 	server.clean();
+	std::cout << std::endl << GREEN << "The user has stopped the program 👋" << BLANK << std::endl;
 	return 0;
 }
