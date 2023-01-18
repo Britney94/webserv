@@ -143,9 +143,11 @@ int	Server::parseRequest() {
 	ServerInfo	clientInfo(requestInfos());
 	ClientRequest	client(clientInfo, _request);
 
-	// _file_request = client.getFile();
-	// _body = client.getBody();
-	// _status = client.getStatus();
+	_file_request = client.getFile();
+	_body = client.getBody();
+	_status = client.getStatus();
+	_method = client.getMethod();
+	_cgi = client.getCGI();
 
 	return 0;
 }
@@ -177,22 +179,34 @@ void	Server::parseChunked() {
 }
 
 int	Server::sendResponse(std::map<int, std::string> errors) {
-	(void)errors;
-	// HttpResponse	response(_file_request, _status, requestInfos().getAutoIndex(), errors, body);
-	// std::string		message = response.getResponse();
-	// int	ret;
+	HttpResponse	response;
 
-	// ret = write(_socket, message, message.size());
-	// if (ret < 0) {
-	// 	// Verifier si 0 succes ou erreur
-	// 	// Gestion d'erreur
-	// }
+	response.setMethod(_method);
+	response.setClientBody(_body);
+	response.setCGI(_cgi);
+	response.setFile(_file_request);
+	response.setStatus(_status);
+	response.setErrorFiles(errors);
+	
+	response.createResponse();
 
-	// this->close_socket();
-	// _request.erase();
-	// _file_request.erase();
-	write(_socket, "Hello", 5);
+	std::string		message = response.getResponse();
+	int	ret;
+
+	ret = write(_socket, &message[0], message.size());
+	if (ret <= 0) {
+		std::cerr << "Error: Could not write response to client." << std::endl;
+	}
+	std::cout << std::endl << std::endl << PURPLE << "*** Response ***\n" << message << BLANK << std::endl;
+
 	this->close_socket();
+	_request.erase();
+	_file_request.erase();
+	_body.erase();
+	_method.erase();
+	_status = 200;
+	// write(_socket, "Hello", 5);
+	// this->close_socket();
 	
 
 	return (0);

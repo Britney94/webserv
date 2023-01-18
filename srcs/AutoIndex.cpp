@@ -47,7 +47,7 @@ std::string	autoindex::renderPage(std::string directory, std::string path, int p
 {
 	DIR *dir;
 	struct dirent *ent;
-	int size;
+//	int size;
 	std::string page;
 	char *tmp;
 	page = "<html>\n";
@@ -62,7 +62,7 @@ std::string	autoindex::renderPage(std::string directory, std::string path, int p
 		while ((ent = readdir (dir)) != NULL) {
 			if (strcmp(".", ent->d_name) != 0 && strcmp("..", ent->d_name) != 0)
 			{
-				size = strlen(ent->d_name);
+//				size = strlen(ent->d_name);
 				page.insert(page.size(), "<a href=\"");
 				page.insert(page.size(), "http://");
 				page.insert(page.size(), host);

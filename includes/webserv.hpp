@@ -13,7 +13,6 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,8 +20,8 @@
 #include <dirent.h>
 #include <sstream>
 #include <sys/wait.h>
-
-
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "AutoIndex.hpp"
 #include "CGI.hpp"
@@ -33,7 +32,7 @@
 #include "Server.hpp"
 #include "ServerInfo.hpp"
 #include "WebServer.hpp"
-// #include "HttpResponse.hpp"
+#include "HttpResponse.hpp"
 
 #define BLANK "\033[0m"
 #define RED "\033[31m"

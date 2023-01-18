@@ -98,22 +98,18 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 		}
 	}
 	this->_size = _servers.size();
-	std::map<int, Server *>::iterator it = _servers.begin();
-	// for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
-	// 	if (it->second->getSocket() > _maxFd)
-	// 		_maxFd = it->second->getSocket();
-	// 	std::vector<ServerInfo *>::iterator allow = it->second->getInfos().begin();
-	// 	for (allow = it->second->getInfos().begin(); allow != it->second->getInfos().end(); allow++) {
-	// 		if (!((*allow)->getAllow("GET")) && !((*allow)->getAllow("POST")) &&
-	// 			!((*allow)->getAllow("DELETE")) && !((*allow)->getAllow("PUT"))){
-	// 			(*allow)->setAllow("allow_methods GET POST DELETE PUT");
-	// 		}
-	// 	}
-		// for (allow = it->second->getInfos().begin(); allow != it->second->getInfos().end(); allow++) {
-		// 	if (*allow)
-		// 		delete(*allow);
-		// }
-	// }
+	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
+		if (it->second->getSocket() > _maxFd)
+			_maxFd = it->second->getSocket();
+		
+		for (size_t count = 0; count < it->second->getInfos().size(); count++) {
+			if (it->second->getInfos().at(count)->getAllow("GET") == 0 &&
+				it->second->getInfos().at(count)->getAllow("POST") == 0 &&
+				it->second->getInfos().at(count)->getAllow("PUT") == 0 &&
+				it->second->getInfos().at(count)->getAllow("DELETE") == 0)
+				it->second->getInfos().at(count)->setAllow("allow_methods GET POST DELETE PUT");
+		}
+	}
 	return (_servers);
 }
 

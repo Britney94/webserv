@@ -34,6 +34,8 @@ class Server {
 		std::string	_file_request;
 		std::string	_request;
 		std::string	_body;
+		std::string	_cgi;
+		std::string	_method;
 		int	_socket;
 		int	_status;
 		int	_size;

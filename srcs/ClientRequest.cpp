@@ -1,6 +1,6 @@
 #include "../includes/ClientRequest.hpp"
 
-ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info), _request(request), _file(""), _status(200){
+ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info), _request(request), _file(""), _status(200) {
 	checkSyntax();
 std::cout << "Syntax checked! Status: " << _status << std::endl;
 	determinateLoc();
@@ -182,8 +182,9 @@ std::cout << "URI: " << tmp_uri << " EXT: " << ext << std::endl;
 					_loc.index = tmp.index;
 				if (tmp.clientSize != _loc.clientSize)
 					_loc.clientSize = tmp.clientSize;
-				if (tmp.cgi.size())
+				if (tmp.cgi.size()) {
 					_loc.cgi = tmp.cgi;
+				}
 				if (tmp.allow[0] || tmp.allow[1] || tmp.allow[2] || tmp.allow[3]) {
 					_loc.allow[0] = tmp.allow[0];
 					_loc.allow[1] = tmp.allow[1];
@@ -216,4 +217,12 @@ std::string	ClientRequest::getFile() const {
 
 std::string	ClientRequest::getBody() const {
 	return _body;
+}
+
+std::string	ClientRequest::getMethod() const {
+	return _method;
+}
+
+std::string	ClientRequest::getCGI() const {
+	return _loc.cgi;
 }

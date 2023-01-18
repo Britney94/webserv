@@ -20,6 +20,8 @@ class	ClientRequest {
 		int			getStatus() const;
 		std::string	getFile() const;
 		std::string	getBody() const;
+		std::string	getMethod() const;
+		std::string	getCGI() const;
 
 	private:
 		ServerInfo	_info;

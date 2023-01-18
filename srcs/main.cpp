@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	else
 		std::cerr << "Usage : ./webserv [configuration file]" << std::endl;
 	if (server.parsefile(filename)) {
-	// 	server.launch();
+		server.launch();
 	}
 	server.clean();
 	return 0;

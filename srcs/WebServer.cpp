@@ -17,6 +17,7 @@ int	WebServer::parsefile(char *filename) {
 	FD_ZERO(&_sockets);
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
 		FD_SET(it->second->getSocket(), &_sockets);
+		std::cout << "Socket: " << it->second->getSocket() << std::endl;
 	}
 	return 1;
 }
