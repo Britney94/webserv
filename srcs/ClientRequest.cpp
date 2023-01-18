@@ -137,14 +137,18 @@ int	ClientRequest::checkSize() {
 
 std::string	ClientRequest::determinateFile() {
 	std::string	file_uri = _uri.substr(_loc.uri.length());
-
-	_file = _loc.root + file_uri;
-
+	_file.insert(0, _loc.root);
+	_file.insert(_file.size(), file_uri);
+	int ext_true = 0;
+	if (file_uri.find(".") != std::string::npos && file_uri.find("/") != 0)
+		ext_true = 1;
+	if (_file.at(_file.length() - 1) != '/' && !ext_true)
+		_file.insert(_file.size(), "/");
 	if (!_info.getAutoIndex() && _file.at(_file.length() - 1) == '/') {
 		if (_loc.index.size() && _loc.index != "")
 			_file += _loc.index;
 		else
-			_file += "index.html";
+			_file.insert(_file.size(), "index.html");
 	}
 	return _file;
 }
