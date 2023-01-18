@@ -37,6 +37,16 @@ Permet d'envoyé une requete GET au serveur
 
 Il suffis d'ajoutée dans la barre de recherche : `127.0.0.1:8055` (host:port) et cela nous renveras sur les pages du site (l'autoindex), ont peut donc se balader dedans.
 
+**Siege 💬**
+
+`siege 127.0.0.1:8055`
+
+Envois des requetes au serveur en boucle (ctrl C pour arrêter le programme, sa affiche aussi les stats)
+
+`siege -g 127.0.0.1:8055`
+
+Envois une seule requetes au serveur
+
 # Introduction
 
 ## Web Server / HTTP / Web Client
