@@ -21,7 +21,6 @@ class WebServer {
 		void	reset();
 	
 	private:
-		int isRunning;
 		ConfigInfo				_config;
 		std::map<int, Server *>	_servers;
 		std::map<int, Server *>	_acceptfds;
