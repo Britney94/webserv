@@ -72,14 +72,14 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
 					if (_err == 1)
 					{
-						std::cerr << RED << "Config file is incorrect: syntax error(s)" << std::endl;
+						std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 						return _servers;
 					}
 				}
 				else if (line.find("autoindex ") != std::string::npos)
 					ret = (*tmpInfo).setAutoIndex(line);
 				else if (line.size() != 0 && line != "}") {
-					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << std::endl;
+					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << BLANK << std::endl;
 					_err = 1;
 					return _servers;
 				}

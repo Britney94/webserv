@@ -61,10 +61,13 @@ int main(int argc, char **argv)
 		filename = argv[1];
 	}
 	else
-		std::cerr << "Usage : ./webserv [configuration file]" << std::endl;
+		std::cerr << RED << "Usage : ./webserv [configuration file]" << BLANK << std::endl;
 	signal(SIGINT, quit);
 	if (server.parsefile(filename))
-		server.launch();
+	{
+		if (server.launch() == 1)
+			return 1;
+	}
 	else
 		return 1;
 	server.clean();

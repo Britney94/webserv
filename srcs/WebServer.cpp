@@ -110,7 +110,8 @@ int	WebServer::launch(void) {
 
 			if (FD_ISSET(fd, &readfds)) {
 				int	new_socket = it->second->accept_fd();
-				 
+				if (new_socket == -1)
+					return 1;
 				if (new_socket > 0) {
 				 	Server	*new_fd = new Server(*(it->second), new_socket);
 					
