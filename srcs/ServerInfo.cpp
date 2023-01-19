@@ -157,6 +157,7 @@ int	ServerInfo::setClientSize(std::string line)
 	if (line.find(";") == std::string::npos)
 		return 1;
 	line.resize(line.find(";"));
+	line = trim(line);
 	std::string tmp = &line[line.find(" ") + 1];
 	int i = 0;
 	while (tmp[i])
@@ -167,7 +168,7 @@ int	ServerInfo::setClientSize(std::string line)
 	}
 	if (line.find(" ") != std::string::npos)
 		this->_clientSize = atoi(&line[line.find(" ")]);
-	if (this->_clientSize == 0){
+	if (this->_clientSize <= 0){
 		std::cerr << "Error: Parsing configuration file (clientSize)" << std::endl;
 		return 1;
 	}

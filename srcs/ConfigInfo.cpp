@@ -143,7 +143,7 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 
 	while (line.find("}") == std::string::npos) {
 		if (line.find(";") == std::string::npos && line.find("{") == std::string::npos && trim(line) != "") {
-				this->_err = 1;
+			this->_err = 1;
 			_tmp_loc = tmp;
 			return _tmp_loc;
 		}
@@ -159,7 +159,14 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 		else if (line.find("cgi_pass ") != std::string::npos)
 			tmp.cgi = line.substr(line.find(" ") + 1);
 		else if (line.find("client_body_buffer_size ") != std::string::npos)
+		{
 			tmp.clientSize = atoi(&(line.substr(line.find(" ") + 1))[0]);
+			if (tmp.clientSize <= 0){
+				this->_err = 1;
+				_tmp_loc = tmp;
+				return _tmp_loc;
+			}
+		}
 		else if (line.find("allow_methods ") != std::string::npos) {
 			if (line.find("GET") != std::string::npos)
 				tmp.allow[0] = 1;
