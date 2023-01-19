@@ -19,8 +19,6 @@ class WebServer {
 		int		launch();
 		void		clean();
 		void	reset();
-
-		void	setRunning(int num);
 	
 	private:
 		int isRunning;
