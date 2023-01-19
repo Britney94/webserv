@@ -78,6 +78,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 				}
 				line = file.getLine(); 
 			}
+			delete tmpInfo;		// DELETE
 		}
 		else if (line.find("error_page ") != std::string::npos) {
 			if (setErrorFile(line)) {
