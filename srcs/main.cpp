@@ -41,19 +41,32 @@ void	quit(int arg) {
 	server.setRunning(0);
 }
 
+int checkExt(char *filename) {
+	std::string str(filename);
+	if (str.find(".conf") == std::string::npos) {
+		std::cerr << RED << "Error: configuration file must be a .conf file" << BLANK << std::endl;
+		return 1;
+	}
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	char	*filename = NULL;
 	if (argc == 1)
 		filename = ((char *)"./config/default.conf");
-	else if (argc == 2)
+	else if (argc == 2) {
+		if (checkExt(argv[1]) == 1)
+			return 1;
 		filename = argv[1];
+	}
 	else
 		std::cerr << "Usage : ./webserv [configuration file]" << std::endl;
 	signal(SIGINT, quit);
-	if (server.parsefile(filename)) {
+	if (server.parsefile(filename))
 		server.launch();
-	}
+	else
+		return 1;
 	server.clean();
 	std::cout << std::endl << GREEN << "The user has stopped the program 👋" << BLANK << std::endl;
 	return 0;

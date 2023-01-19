@@ -25,7 +25,11 @@ ConfigInfo::ConfigInfo(char *filename){
 std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	File		file(filename);
 	int			ret = 0;
-	int		err = 0;
+	if (file.cantOpen == 1)
+	{
+		_err = 1;
+		return _servers;
+	}
 	std::string	line = file.getLine();
 	while (file.lineHistory < file.getMaxLine()){
 		if (line.find("server {") != std::string::npos){

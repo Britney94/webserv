@@ -3,11 +3,17 @@
 File::File(char *filename)
 {
 	string tmp;
+	this->cantOpen = 0;
 	this->name = filename;
 	this->lineHistory = 0;
 	this->maxLine = 0;
 	this->end = 0;
 	ifstream fd(filename);
+	if (!fd)
+	{
+		std::cerr << RED << "Error: Can't open configuration file" << BLANK << std::endl;
+		this->cantOpen = 1;
+	}
 	while (getline(fd, tmp))
 	{
 		this->content.push_back(tmp);
