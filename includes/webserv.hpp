@@ -35,6 +35,8 @@
 #include "WebServer.hpp"
 #include "HttpResponse.hpp"
 
+std::string trim(const std::string& str);
+
 #define BLANK "\033[0m"
 #define RED "\033[31m"
 #define GREEN "\033[32m"

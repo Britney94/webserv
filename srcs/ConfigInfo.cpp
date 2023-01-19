@@ -25,6 +25,7 @@ ConfigInfo::ConfigInfo(char *filename){
 std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	File		file(filename);
 	int			ret = 0;
+	int		err = 0;
 	std::string	line = file.getLine();
 	while (file.lineHistory < file.getMaxLine()){
 		if (line.find("server {") != std::string::npos){
@@ -42,7 +43,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					else if (line.find('.') == std::string::npos)
 						port = atoi(&line[line.find(" ") + 1]);
 					else {
-						std::cerr << "Error: Parsing configuration file : port" << std::endl;
+						std::cerr << RED << "Error: Parsing configuration file : port" << BLANK << std::endl;
 						_err = 1;
 						return _servers;
 					}
@@ -63,16 +64,23 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 				else if (line.find("allow_methods ") != std::string::npos)
 					ret = (*tmpInfo).setAllow(line);
 				else if (line.find("location ") != std::string::npos)
+				{
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
+					if (_err == 1)
+					{
+						std::cerr << RED << "Config file is incorrect: syntax error(s)" << std::endl;
+						return _servers;
+					}
+				}
 				else if (line.find("autoindex ") != std::string::npos)
 					ret = (*tmpInfo).setAutoIndex(line);
 				else if (line.size() != 0 && line != "}") {
-					std::cerr << "Error: Parsing configuration file : unknown directive: " << line << std::endl;
+					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << std::endl;
 					_err = 1;
 					return _servers;
 				}
 				if (ret) {
-					std::cerr << "Error: Parsing configuration file : syntax" << std::endl;
+					std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 					_err = 1;
 					return _servers;
 				}
@@ -82,7 +90,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 		}
 		else if (line.find("error_page ") != std::string::npos) {
 			if (setErrorFile(line)) {
-				std::cerr << "Error: Parsing configuration file : error_page" << std::endl;
+				std::cerr << RED << "Config file is incorrect: error_page" << BLANK << std::endl;
 				_err = 1;
 				return _servers;
 			}
@@ -92,7 +100,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 			line = file.getLine();
 		}
 		else {
-			std::cerr << "Error: Parsing configuration file : unknown directive : " << line << std::endl;
+			std::cerr << RED << "Error: Parsing configuration file : unknown directive : " << line << BLANK << std::endl;
 			_err = 1;
 			return _servers;
 		}
@@ -134,6 +142,11 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.root = "";
 
 	while (line.find("}") == std::string::npos) {
+		if (line.find(";") == std::string::npos && line.find("{") == std::string::npos && trim(line) != "") {
+				this->_err = 1;
+			_tmp_loc = tmp;
+			return _tmp_loc;
+		}
 		if (line.find("location ") != std::string::npos)
 			tmp.loc.push_back(setupLoc(file, line));
 		else if (line.find("root ") != std::string::npos) {
@@ -224,7 +237,7 @@ std::ostream	&operator<<(std::ostream &x, ConfigInfo const & inf)
 {
 	int	count = 1;
 
-	x << "**** ConfigInfo ****" << std::endl << std::endl;
+	x << "**** ConfigInfo ****" << BLANK << std::endl << std::endl;
 	std::map<int, Server *>::const_iterator it;
 	for (it = inf.getServers().begin(); count <= inf.getSize(); it++) {
 		x << "*** Server n°" << count++ << std::endl << *(it->second) << std::endl;

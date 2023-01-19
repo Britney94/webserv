@@ -67,6 +67,9 @@ ServerInfo&	ServerInfo::operator=(ServerInfo& copy) {
 
 int	ServerInfo::setServerNames(std::string names)
 {
+	if (names.find(";") == std::string::npos)
+		return 1;
+	names.resize(names.find(";"));
 	names.erase(0, names.find(' ') + 1);
 	while (names.find(' ') != std::string::npos) {
 		_serverNames.push_back(names.substr(0, names.find(' ')));
@@ -78,6 +81,11 @@ int	ServerInfo::setServerNames(std::string names)
 
 int	ServerInfo::setIp(std::string line)
 {
+	if (line.find(";") == std::string::npos)
+		return 1;
+	line.resize(line.find(";"));
+	line.erase(0, line.find(' ') + 1);
+	line = trim(line);
 	if (line.find("localhost") != std::string::npos)
 		this->_ip = "127.0.0.1";
 	else
@@ -97,13 +105,18 @@ int	ServerInfo::setIp(std::string line)
 	}
 	if (this->_ip != "127.0.0.1" && this->_ip != "0.0.0.0")
 	{
-		std::cerr << "Error: Parsing configuration file (ip address)" << std::endl;
+		// std::cerr << "Error: Parsing configuration file (ip address)" << std::endl;
 		return 1;
 	}
 	return 0;
 }
 
 int	ServerInfo::setRoot(std::string line) {
+	if (line.find(";") == std::string::npos)
+		return 1;
+	line.resize(line.find(";"));
+	line.erase(0, line.find(' ') + 1);
+	line = trim(line);
 	if (line.find(" ") != std::string::npos)
 	{
 		this->_root = &line[line.find(" ") + 1];
@@ -114,6 +127,9 @@ int	ServerInfo::setRoot(std::string line) {
 }
 
 int	ServerInfo::setIndex(std::string line) {
+	if (line.find(";") == std::string::npos)
+		return 1;
+	line.resize(line.find(";"));
 	line.erase(0, line.find(' ') + 1);
 	if (line.at(line.length() - 1) == '\n')
 		line.erase(line.at(line.length() - 1));
@@ -122,6 +138,9 @@ int	ServerInfo::setIndex(std::string line) {
 }
 
 int	ServerInfo::setAutoIndex(std::string line) {
+	if (line.find(";") == std::string::npos)
+		return 1;
+	line.resize(line.find(";"));
 	line.erase(0, line.find(' ') + 1);
 	if (line.at(line.length() - 1) == '\n')
 		line.erase(line.at(line.length() - 1));
@@ -135,6 +154,9 @@ int	ServerInfo::setAutoIndex(std::string line) {
 
 int	ServerInfo::setClientSize(std::string line)
 {
+	if (line.find(";") == std::string::npos)
+		return 1;
+	line.resize(line.find(";"));
 	std::string tmp = &line[line.find(" ") + 1];
 	int i = 0;
 	while (tmp[i])
@@ -152,9 +174,14 @@ int	ServerInfo::setClientSize(std::string line)
 	return 0;
 }
 
+
 int	ServerInfo::setAllow(std::string line)
 {
+	if (line.find(";") == std::string::npos)
+		return 1;
+	line.resize(line.find(";"));
 	line.erase(0, line.find(' ') + 1);
+	line = trim(line);
 	if (line.at(line.length() - 1) == '\n')
 		line.erase(line.at(line.length() - 1));
 	while (line.find(' ') != std::string::npos) {
