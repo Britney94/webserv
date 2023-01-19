@@ -30,6 +30,16 @@ std::vector<char>	permissions(const char *file)
 };
 
 HttpResponse::HttpResponse() {
+	_code[200] = "OK";
+	_code[201] = "Created";
+	_code[204] = "No Content";
+	_code[400] = "Bad Request";
+	_code[403] = "Forbidden";
+	_code[404] = "Not Found";
+	_code[405] = "Method Not Allowed";
+	_code[413] = "Payload Too Large";
+	_code[500] = "Internal Server Error";
+
 	return ;
 }
 
@@ -63,6 +73,31 @@ void	HttpResponse::setCGI(std::string cgi) {
 	return ;
 }
 
+void	HttpResponse::setQuery(std::string query) {
+	_query = query;
+	return ;
+}
+
+void	HttpResponse::setDir(std::string dir) {
+	_dir = dir;
+	return ;
+}
+
+void	HttpResponse::setHost(std::string host) {
+	_host = host;
+	return ;
+}
+
+void	HttpResponse::setPort(int port) {
+	_port = port;
+	return ;
+}
+
+void	HttpResponse::setAutoIndex(int autoindex) {
+	_autoindex = autoindex;
+	return ;
+}
+
 std::string toString(int num)
 {
     std::ostringstream oss;
@@ -70,23 +105,30 @@ std::string toString(int num)
     return oss.str();
 }
 
+int	isFile(std::string file) {
+	struct stat	st;
+
+	if (stat(file.c_str(), &st) == 0) {
+		if ((st.st_mode & S_IFMT) == S_IFREG)
+			return 1;
+	}
+	return 0;
+}
+
+int	isDir(std::string file) {
+	struct stat	st;
+
+	if (stat(file.c_str(), &st) == 0) {
+		if ((st.st_mode & S_IFMT) == S_IFDIR)
+			return 1;
+	}
+	return 0;
+}
+
 int	HttpResponse::createResponse()
-{
-	// Constructor
-	// PARAM : 	method = GET/POST/DELETE etc, from the request received
-	// 		file = path to file to open ("/test" for example)
-	// 		status = set to 400+ if an error occured prior to this
-	// 		conf = param file containing the map to [error_files] + [clientSize]
-	// 		autoindex = 1 or 0, indicator of auto-generation of an index
-	// 			if a folder is set as param-1 [file-to-open]
-	// 0th : Verify if status indicates an error detected somewhere else
-	// 1st : Try to open file, if impossible, search proof of 403, if none = 404
-	// 2nd : Open it and retrieve its content into a string
-	// 3rd : DEBUG, print the content in outstream,
-	// 4th : Generate a header + body according to situation (ongoing)
-	
-	std::ifstream			filestream;
-	std::filebuf			filebuf;
+{	
+		std::ifstream			filestream;
+		std::filebuf			filebuf;
 
 std::cout << "File to open: " << _file << std::endl;
 std::cout << "Status: " << _status << std::endl;
@@ -96,56 +138,7 @@ std::cout << "Body: " << _body << std::endl;
 
 	if (_status >= 400 && _status < 500)
 	{
-		// Status was already set by another feature
-		// body becomes the corresponding error file
 
-		filestream.open(_errorFiles[_status].c_str());
-		filestream >> this->_file_content; 
-		std::cout << this->_file_content << std::endl; 	// DEBUG
-	}
-	else
-	{
-		// Status must be defined here
-
-		std::string	path = _file;
-
-		int	ret = open(path.c_str(), O_RDONLY);
-		if (ret > 0 && _method == "PUT")
-		{
-			this->_status = 201;
-			// And ?
-		}
-		else if (ret > 0 && _method != "PUT")
-		{
-			filestream.open(path.c_str());
-			while (filestream.good()) {
-				std::getline(filestream, this->_file_content);
-				this->_body += this->_file_content;
-				this->_body += '\n';
-			}
-			std::cout << "File content: " << this->_file_content << std::endl; 	// DEBUG
-			this->_status = 200;				// SUCCESS
-		}
-		else if (ret < 0)
-		{
-			// Couldn't open the file
-
-			//char	*file_permissions = permissions(path.c_str());
-			std::vector<char>	file_permissions = permissions(path.c_str());
-			if (file_permissions[0] == 'e')
-				this->_status = 404;
-			else if (_method == "POST")
-			{
-				if (file_permissions[1] == '-')
-					this->_status = 403;	// using method object as is
-			}
-			else if (_method == "GET")
-			{
-				if (file_permissions[0] == '-')
-					this->_status = 403;	// using method object as is
-			}
-			else
-				this->_status = 404;
 	std::cout << "Error file: " << _errorFiles[_status].c_str() << std::endl;
 			filestream.open(_errorFiles[_status].c_str());
 			while(filestream.good()) {
@@ -154,33 +147,116 @@ std::cout << "Body: " << _body << std::endl;
 				this->_body += '\n';
 			}
 	std::cout << "Error file content: " << this->_file_content << std::endl;
+	}
+	// else if (_cgi.size() != 0) {
+	// 	CGI	handler;
+
+	// 	handler.setScript(_cgi);
+	// 	handler.setMethod(_method);
+	// 	handler.setBody(_body);
+	// 	handler.setPath(_file);
+	// 	handler.setQuery(_query);
+	// 	handler.setAddr(_host);
+	// 	handler.setPort(_port);
+
+	// 	_response = handler.execute(_cgi);
+	// 	std::cout << "Reponse CGI: " << _response << std::endl;
+
+	// 	return 0;
+	// }
+	else if (_method == "GET") {
+
+		if (isFile(_file)) {
+			filestream.open(_file.c_str());
+			
+			if (filestream.is_open() == false) {
+				_status = 403;
+				filestream.open(_errorFiles[_status].c_str());
+			}
+			while(filestream.good()) {
+				std::getline(filestream, this->_file_content);
+				this->_body += this->_file_content;
+				this->_body += '\n';
+			}
+			filestream.close();
 		}
-		close(ret);
+		else if (isDir(_file) && _autoindex) {
+			autoindex	content;
+
+			_body = content.renderPage(_dir, _file, _port, _host);
+		}
+		else {
+			_status = 404;
+			filestream.open(_errorFiles[_status].c_str());
+			while(filestream.good()) {
+				std::getline(filestream, this->_file_content);
+				this->_body += this->_file_content;
+				this->_body += '\n';
+			}
+			filestream.close();
+		}
 	}
-	// Status is now set, creating response object parts
-	// HTTP/1.1 2XX OK
-	// HTTP/1.1 4xx ERROR
-	if (this->_status >= 400)
+	else if (_method == "POST") {
+		_status = 204;
+	}
+	else if (_method == "PUT") {
+		std::ofstream	newFile;
+		
+		if (isFile(_file)) {
+			newFile.open(_file.c_str());
+			newFile << _body;
+			newFile.close();
+			_status = 204;
+		}
+		else {
+			newFile.open(_file.c_str(), std::ofstream::trunc);
+			
+			if (newFile.is_open() == false) {
+				_status = 403;
+				filestream.open(_errorFiles[_status].c_str());
+				while(filestream.good()) {
+					std::getline(filestream, this->_file_content);
+					this->_body += this->_file_content;
+					this->_body += '\n';
+				}
+				filestream.close();
+			}
+			else {
+				newFile << _body;
+				newFile.close();
+				_status = 201;
+			}
+		}
+	}
+	else if (_method == "DELETE")
 	{
-		this->_header = "HTTP/1.1 ";
-		this->_header = this->_header + toString(this->_status) + " ";
-		this->_header = this->_header + "ERROR\r\n";
+		if (isFile(_file)) {
+			if (remove(_file.c_str()) == 0)
+				_status = 204;
+			else 
+				_status = 403;
+		}
+		else
+			_status = 404;
+
+		if (_status != 204) {
+			filestream.open(_errorFiles[_status].c_str());
+			while(filestream.good()) {
+				std::getline(filestream, this->_file_content);
+				this->_body += this->_file_content;
+			}
+			filestream.close();
+		}
 	}
-	if (this->_status >= 200 && this->_status < 300)
-	{
-		this->_header = "HTTP/1.1 ";
-		this->_header = this->_header + toString(this->_status) + " ";
-		this->_header = this->_header + "OK\r\n";
+	
+	_header = "HTTP/1.1 " + toString(_status) + " ";
+	_header += _code[_status] + "\r\n";
+	
+	if (_body.size() != 0) {
+		_header += "Content-Length: " + toString(_body.size()) + "\r\n";
+		_header += "\r\n" + _body + "\r\n";
 	}
-	// Content-length: xxx
-	this->_header = this->_header + "Content-Lenght: ";	// Content-length = clientSize
-	this->_header = this->_header + toString(this->_body.length());
-	this->_header = this->_header + "\r\n";	
-	// When HEADER + BODY are generated, join both to
-	// create the response
-	this->_response = this->_header;
-	this->_response = this->_response + "\r\r\n\n";
-	this->_response = this->_response + this->_body;
+	_response = _header;
 	return 0;
 }
 

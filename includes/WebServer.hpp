@@ -19,6 +19,8 @@ class WebServer {
 		int		launch();
 		int		clean();
 		void	reset();
+
+		void	setRunning(int num);
 	
 	private:
 		
@@ -28,6 +30,7 @@ class WebServer {
 		std::map<int, Server *>	_writablefds;	
 		fd_set					_sockets;
 		int						_max_fd;
+		int						_isRunning;
 };
 
 #endif
