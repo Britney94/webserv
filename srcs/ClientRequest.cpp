@@ -31,9 +31,7 @@ std::cout << "Method: " << _method << " Allowed[GPDP]: " << _loc.allow[0] << _lo
 }
 
 int	ClientRequest::isMethod(std::string word) {
-	if (word == "GET" || word == "POST" || word == "PUT" ||
-		word == "HEAD" || word == "PATCH" || word == "DELETE" ||
-		word == "CONNECT" || word == "OPTIONS" || word == "TRACE")
+	if (word == "GET" || word == "POST" || word == "PUT" || word == "DELETE")
 			return 1;
 	return 0;
 }
@@ -58,7 +56,7 @@ int	ClientRequest::checkSyntax() {
 		if (count == 1) {
 			if (!isMethod(word)) {
 				_status = 400;
-				return _status;
+				// return _status;
 			}
 			_method = word;
 		}
@@ -68,7 +66,7 @@ int	ClientRequest::checkSyntax() {
 		if (count == 3) {
 			if (word != "HTTP/1.1\r\n") {
 				_status = 400;
-				return _status;
+				// return _status;
 			}
 		}
 		firstLine.erase(0, word.length() + 1);
@@ -184,7 +182,7 @@ std::cout << "URI: " << tmp_uri << " EXT: " << ext << std::endl;
 					_loc.root = tmp.root;
 				if (tmp.index.size())
 					_loc.index = tmp.index;
-				if (tmp.clientSize != _loc.clientSize)
+				if (tmp.clientSize != -1)
 					_loc.clientSize = tmp.clientSize;
 				if (tmp.cgi.size()) {
 					_loc.cgi = tmp.cgi;

@@ -25,17 +25,15 @@
 // 	return 0;
 // }
 
-WebServer server;
+WebServer	server;
 
-void	quit(int arg)
-{
+void	quit(int arg) {
 	(void)arg;
 	server.setRunning(0);
 }
 
 int main(int argc, char **argv)
 {
-	server.setRunning(1);
 	char	*filename = NULL;
 	if (argc == 1)
 		filename = ((char *)"./config/default.conf");

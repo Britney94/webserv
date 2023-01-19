@@ -15,7 +15,7 @@ Server::Server(ServerInfo* infos, int port)
 		perror("Error socket");
         return ;
     }
-    
+
 	this->_addr.sin_family = AF_INET;
 	this->_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     this->_addr.sin_port = htons(port); 
@@ -71,8 +71,8 @@ Server::~Server(void)
 	// Default destructor, closes the
 	// socket descriptor generated at
 	// construction.
-	if (this->_default)
-		delete(this->_default);
+	// if (this->_default)
+	// 	delete(this->_default);
 	this->_infos.clear();
 	close(this->_socket);
 }
@@ -156,6 +156,12 @@ int	Server::chunkedRequest() {
 	return 1;
 }
 
+int	Hex_to_Int(std::string hex) {
+	std::ostringstream oss;
+    oss << std::hex << hex;
+    return std::atoi((char *)&(oss.str())[0]);
+}
+
 void	Server::parseChunked() {
 	std::string		header;
 	std::string		received;
@@ -168,8 +174,7 @@ void	Server::parseChunked() {
 
 	while (received.size()) {
 		i = received.find("\r\n") + 2;
-		size = std::stoi(received.substr(0, i - 2), 0, 16);
-		std::cout << "> size : " << size << std::endl;
+		size = Hex_to_Int(received.substr(0, i - 2));
 		body += received.substr(i, i + size);
 		received = received.substr(i + size + 2);
 	}
@@ -204,9 +209,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	_body.erase();
 	_method.erase();
 	_status = 200;
-	// write(_socket, "Hello", 5);
-	// this->close_socket();
-	
+
 
 	return (0);
 }

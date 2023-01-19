@@ -21,6 +21,11 @@ WebServer::~WebServer(void) {
 	return ;
 }
 
+void	WebServer::setRunning(int num) {
+	_isRunning = num;
+	return ;
+}
+
 int	WebServer::parsefile(char *filename) {
 	_servers = _config.parse(filename);
 	if (_config.getError() == 1) {
@@ -30,20 +35,22 @@ int	WebServer::parsefile(char *filename) {
 	FD_ZERO(&_sockets);
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
 		FD_SET(it->second->getSocket(), &_sockets);
-		std::cout << "Socket: " << it->second->getSocket() << std::endl;
 	}
 	return 1;
 }
 
 int	WebServer::launch(void) {
 	
-		fd_set			readfds;
-		fd_set			writefds;
-		struct timeval	timeout;
-		int				pending;
-		int				ret;
+	fd_set			readfds;
+	fd_set			writefds;
+	struct timeval	timeout;
+	int				pending;
+	int				ret;
 	
-	while (1) {
+	_isRunning = 1;
+
+	while (_isRunning) {
+		
 		pending = 0;
 		ret = 0;
 		
@@ -59,11 +66,13 @@ int	WebServer::launch(void) {
 			}
 			std::cout << "\rWaiting" << std::flush;
 			pending = select(_max_fd + 1, &readfds, &writefds, NULL, &timeout);
-			if (pending < 0) {
-				if (!this->isRunning)
-					return 0;
+			if (pending < 0 && _isRunning != 0) {
 				std::cerr << "select() failed" << std::endl;
 				this->reset();
+			}
+			if (_isRunning == 0) {
+				this->reset();
+				return 0;
 			}
 		}
 
@@ -121,11 +130,13 @@ int	WebServer::launch(void) {
 			}
 		}
 	}
+	return 0;
 }
 
 void	WebServer::reset(void) {
-	for (std::map<int, Server *>::iterator it = _acceptfds.begin(); it != _acceptfds.end(); it++)
+	for (std::map<int, Server *>::iterator it = _acceptfds.begin(); it != _acceptfds.end(); it++) {
 		it->second->close_socket();
+	}
 	_acceptfds.clear();
 	_writablefds.clear();
 	FD_ZERO(&_sockets);
@@ -139,4 +150,5 @@ void	WebServer::clean() {
 	{
 		it->second->close_socket();
 	}
+	_servers.clear();
 }
