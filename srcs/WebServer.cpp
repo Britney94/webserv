@@ -1,16 +1,16 @@
 #include "../includes/webserv.hpp"
 
 WebServer::WebServer(void) {
-	this->isRunning = 1;
+	this->_isRunning = 1;
 	return ;
 }
 
 void	WebServer::setRunning(int running) {
-	this->isRunning = running;
+	this->_isRunning = running;
 }
 
 int WebServer::getRunning() {
-	return this->isRunning;
+	return this->_isRunning;
 }
 
 WebServer::~WebServer(void) {
