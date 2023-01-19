@@ -22,11 +22,37 @@ ConfigInfo::ConfigInfo(char *filename){
 	this->_servers = this->parse(filename);
 }
 
+static int checkBrackets(char *filename){
+	File	file(filename);
+	std::string	line;
+	int		i = 0;
+	int		j = 0;
+	while (file.lineHistory < file.getMaxLine()){
+		line = file.getLine();
+		i = 0;
+		while (line[i] != '\0'){
+			if (line[i] == '{')
+				j++;
+			else if (line[i] == '}')
+				j--;
+			i++;
+		}
+	}
+	if (j != 0)
+		return 1;
+	return 0;
+}
+
 std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	File		file(filename);
 	int			ret = 0;
 	if (file.cantOpen == 1)
 	{
+		_err = 1;
+		return _servers;
+	}
+	if (checkBrackets(filename) == 1) {
+		std::cerr << RED << "Config file is incorrect: no end brackets" << BLANK << std::endl;
 		_err = 1;
 		return _servers;
 	}
