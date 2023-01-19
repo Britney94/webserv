@@ -13,7 +13,7 @@ class WebServer {
 	public:
 		WebServer(void);
 		~WebServer(void);
-		void		setRunning(int num);
+		void		setRunning(int running);
 		int			getRunning();
 		int		parsefile(char *filename);
 		int		launch();
