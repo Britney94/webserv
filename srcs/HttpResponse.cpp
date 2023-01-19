@@ -3,7 +3,6 @@
 std::vector<char>	permissions(const char *file)
 {
 	struct stat	st;
-	//char		*modeval = (char *)malloc(sizeof(char) * 9 + 1);
 	std::vector<char>	modeval(9, 'e');
 
 	if (stat(file, &st) == 0)
@@ -11,23 +10,21 @@ std::vector<char>	permissions(const char *file)
 		mode_t perm = st.st_mode;
 		modeval[0] = (perm & S_IRUSR) ? 'r' : '-';
 		modeval[1] = (perm & S_IWUSR) ? 'w' : '-';
-	    modeval[2] = (perm & S_IXUSR) ? 'x' : '-';
+		modeval[2] = (perm & S_IXUSR) ? 'x' : '-';
 		modeval[3] = (perm & S_IRGRP) ? 'r' : '-';
 		modeval[4] = (perm & S_IWGRP) ? 'w' : '-';
 		modeval[5] = (perm & S_IXGRP) ? 'x' : '-';
 		modeval[6] = (perm & S_IROTH) ? 'r' : '-';
 		modeval[7] = (perm & S_IWOTH) ? 'w' : '-';
 		modeval[8] = (perm & S_IXOTH) ? 'x' : '-';
-		//modeval[9] = '\0';
 		return modeval;     
 	}
 	else
 	{
 		perror("Error stat call: ");
 		return modeval;     
-		//return strerror(errno);
 	}
-};
+}
 
 HttpResponse::HttpResponse() {
 	_code[200] = "OK";
@@ -39,7 +36,6 @@ HttpResponse::HttpResponse() {
 	_code[405] = "Method Not Allowed";
 	_code[413] = "Payload Too Large";
 	_code[500] = "Internal Server Error";
-
 	return ;
 }
 
@@ -126,6 +122,7 @@ int	isDir(std::string file) {
 }
 
 int	HttpResponse::createResponse()
+
 {	
 		std::ifstream			filestream;
 		std::filebuf			filebuf;
@@ -134,6 +131,7 @@ std::cout << "File to open: " << _file << std::endl;
 std::cout << "Status: " << _status << std::endl;
 std::cout << "Method: " << _method << std::endl;
 std::cout << "Body: " << _body << std::endl;
+
 
 
 	if (_status >= 400 && _status < 500)
@@ -150,6 +148,7 @@ std::cout << "Body: " << _body << std::endl;
 	}
 	// else if (_cgi.size() != 0) {
 	// 	CGI	handler;
+
 
 	// 	handler.setScript(_cgi);
 	// 	handler.setMethod(_method);
@@ -194,8 +193,10 @@ std::cout << "Body: " << _body << std::endl;
 				this->_body += '\n';
 			}
 			filestream.close();
+
 		}
 	}
+
 	else if (_method == "POST") {
 		_status = 204;
 	}
@@ -255,6 +256,7 @@ std::cout << "Body: " << _body << std::endl;
 	if (_body.size() != 0) {
 		_header += "Content-Length: " + toString(_body.size()) + "\r\n";
 		_header += "\r\n" + _body + "\r\n";
+
 	}
 	_response = _header;
 	return 0;

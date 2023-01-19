@@ -10,8 +10,7 @@ class	HttpResponse {
 	public:
 		HttpResponse();
 		~HttpResponse();
-
-        int         createResponse();
+    int         createResponse();
 		std::string	getResponse() const;
 
         void setFile(std::string file);

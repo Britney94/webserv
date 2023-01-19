@@ -49,7 +49,6 @@ Server::Server(ServerInfo* infos, int port)
 	this->_status = 200;
 }
 
-
 Server::Server(Server& copy, int new_socket)
 {
 	this->_socket = new_socket;

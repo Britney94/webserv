@@ -243,9 +243,12 @@ int	ServerInfo::getAllow(std::string allow) const
 
 ServerInfo::~ServerInfo()
 {
+	// while(!this->_loc.empty())
+	// {
+	// 	this->_loc.clear();
+	// 	// this->_loc = this->_loc.next;
+	// }
 	this->_serverNames.clear();
-	this->_loc.clear();
-	return ;
 }
 
 std::ostream	&operator<<(std::ostream &x, Location const & inf)
