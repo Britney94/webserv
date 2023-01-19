@@ -21,11 +21,6 @@ WebServer::~WebServer(void) {
 	return ;
 }
 
-void	WebServer::setRunning(int num) {
-	_isRunning = num;
-	return ;
-}
-
 int	WebServer::parsefile(char *filename) {
 	_servers = _config.parse(filename);
 	if (_config.getError() == 1) {
