@@ -25,11 +25,12 @@
 // 	return 0;
 // }
 
+WebServer server;
 
-// void	quit(int arg) {
-// 	(void)arg;
-// 	server.setRunning(0);
-// }
+void	quit(int arg) {
+	(void)arg;
+	server.setRunning(0);
+}
 
 int main(int argc, char **argv)
 {
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
 	}
 	else
 		std::cerr << RED << "Usage : ./webserv [configuration file]" << BLANK << std::endl;
-	// signal(SIGINT, quit);
+	signal(SIGINT, quit);
 	if (server.parsefile(filename))
 	{
 		if (server.launch() == 1)
