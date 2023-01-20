@@ -61,14 +61,18 @@ int	WebServer::launch(void) {
 			}
 			std::cout << "\rWaiting" << std::flush;
 			pending = select(_max_fd + 1, &readfds, &writefds, NULL, &timeout);
-			if (pending < 0 && _isRunning != 0) {
+			if (pending < 0) {
+				if (errno == EINTR) {
+					this->reset();
+					return 0;
+				}
 				std::cerr << "select() failed" << std::endl;
 				this->reset();
 			}
-			if (_isRunning == 0) {
-				this->reset();
-				return 0;
-			}
+			// if (_isRunning == 0) {
+			// 	this->reset();
+			// 	return 0;
+			// }
 		}
 
 		for (std::map<int, Server *>::iterator it = _writablefds.begin(); pending && it != _writablefds.end(); it++) {

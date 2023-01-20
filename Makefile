@@ -8,6 +8,7 @@ SRCS = srcs/Server.cpp \
        srcs/WebServer.cpp \
        srcs/AutoIndex.cpp \
        srcs/CGI.cpp \
+       srcs/utils.cpp \
        srcs/ServerInfo.cpp \
        srcs/ClientRequest.cpp \
        srcs/HttpResponse.cpp \

@@ -23,13 +23,12 @@ class Server {
 		int	chunkedRequest();
 		void	parseChunked();
 		ServerInfo	*requestInfos();
-		std::string	getError();
+		int	getError() const;
 		std::vector<ServerInfo *>	getInfos() const;
 		ServerInfo	*_default;
 		std::vector<ServerInfo *>	_infos;
 		~Server(void);
 	private:
-		std::string	_error;
 		struct sockaddr_in	_addr;
 		std::string	_file_request;
 		std::string	_request;
@@ -38,6 +37,7 @@ class Server {
 		std::string	_method;
 		int	_socket;
 		int	_status;
+		int	_error;
 		int	_size;
 };
 

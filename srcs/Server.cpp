@@ -13,7 +13,8 @@ Server::Server(ServerInfo* infos, int port)
 	if ((this->_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
 	{
 		perror("Error socket");
-        return ;
+        _error = 1;
+		return ;
     }
 
 	this->_addr.sin_family = AF_INET;
@@ -34,15 +35,17 @@ Server::Server(ServerInfo* infos, int port)
 	if (bind(this->_socket, (struct sockaddr *)&(this->_addr), sizeof(this->_addr)) < 0)
 	{
 		perror("Error bind");
-        return ;
+        _error = 1;
+		return ;
 	}
 
 	if (listen(this->_socket, MAX_FD) < 0)
 	{
 		perror("Error listen");
-        return ;
+        _error = 1;
+		return ;
 	}
-	this->_error = "";
+	this->_error = 0;
 	this->_default = infos;
 	this->_infos.push_back(infos);
 	this->_size = this->_infos.size();
@@ -242,7 +245,7 @@ ServerInfo	*Server::requestInfos() {
 	return _default;
 }
 
-std::string	Server::getError(){
+int	Server::getError() const {
 	return _error;
 }
 

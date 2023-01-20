@@ -35,8 +35,6 @@
 #include "WebServer.hpp"
 #include "HttpResponse.hpp"
 
-std::string trim(const std::string& str);
-
 #define BLANK "\033[0m"
 #define RED "\033[31m"
 #define GREEN "\033[32m"
@@ -49,5 +47,8 @@ std::string trim(const std::string& str);
 #define REQUEST_SIZE 30000
 
 
+std::string trim(const std::string& str);
+int checkExt(char *filename);
+std::string toString(int num);
 
 #endif

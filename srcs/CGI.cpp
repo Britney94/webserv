@@ -1,9 +1,7 @@
 #include "../includes/webserv.hpp"
 
-CGI::CGI()//Request &request, RequestConfig &config):
+CGI::CGI()
 {
-	// this->_body = request.getBody();
-	this->_setEnv();//request, config);
 }
 
 CGI::CGI(const CGI &src) {
@@ -22,32 +20,22 @@ CGI	&CGI::operator=(const CGI &src) {
 	return *this;
 }
 
-void	CGI::_setEnv(){//Request &request, RequestConfig &config) {
-	// std::map<std::string, std::string>	headers = request.getHeaders();
-	// if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
-	// 	this->_env["AUTH_TYPE"] = headers["Authorization"];
+void	CGI::_setEnv() {
 	this->_env["REDIRECT_STATUS"] = "200";
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	// this->_env["SCRIPT_NAME"] = config.getPath();
-	// this->_env["SCRIPT_FILENAME"] = config.getPath();
-	// this->_env["REQUEST_METHOD"] = request.getMethod();
-	// this->_env["CONTENT_LENGTH"] = to_string(this->_body.length());
-	// this->_env["CONTENT_TYPE"] = headers["Content-Type"];
-	// this->_env["PATH_INFO"] = request.getPath();
-	// this->_env["PATH_TRANSLATED"] = request.getPath();
-	// this->_env["QUERY_STRING"] = request.getQuery();
-	// this->_env["REMOTEaddr"] = to_string(config.getHostPort().host);
-	// this->_env["REMOTE_IDENT"] = headers["Authorization"];
-	// this->_env["REMOTE_USER"] = headers["Authorization"];
-	// this->_env["REQUEST_URI"] = request.getPath() + request.getQuery();
-	// if (headers.find("Hostname") != headers.end())
-	// 	this->_env["SERVER_NAME"] = headers["Hostname"];
-	// else
-	// 	this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
-	// this->_env["SERVER_PORT"] = to_string(config.getHostPort().port);
+	this->_env["SCRIPT_NAME"] = _cgi;
+	this->_env["SCRIPT_FILENAME"] = _cgi;
+	this->_env["REQUEST_METHOD"] = _method;
+	this->_env["CONTENT_LENGTH"] = toString(this->_body.length());
+	this->_env["CONTENT_TYPE"] = _type;
+	this->_env["PATH_INFO"] = _file;
+	this->_env["QUERY_STRING"] = _query;
+	this->_env["REMOTEaddr"] = _host;
+	this->_env["REQUEST_URI"] = _file + _query;
+	this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
+	this->_env["SERVER_PORT"] = toString(_port);
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
-	// this->_env.insert(config.getCgiParam().begin(), config.getCgiParam().end());
 }
 
 char	**CGI::_convertEnv() const {
@@ -63,7 +51,7 @@ char	**CGI::_convertEnv() const {
 	return env;
 }
 
-std::string	CGI::execute(const std::string& scriptName) { //ScriptName = path to script (cgi_pass test_us/cgi_tester)
+std::string	CGI::execute(const std::string& scriptName) {
 	pid_t	pid;
 	int	tmpStdin;
 	int	tmpStdout;
@@ -122,3 +110,43 @@ std::string	CGI::execute(const std::string& scriptName) { //ScriptName = path to
 		exit(0);
 	return (tmpBody);
 }
+
+void	CGI::setScript(std::string cgi) {
+	_cgi = cgi;
+	return ;
+}
+void	CGI::setMethod(std::string method) {
+	_method = method;
+	return ;
+}
+
+void	CGI::setBody(std::string body) {
+	_body = body;
+	return ;
+}
+
+void	CGI::setPath(std::string file) {
+	_file = file;
+	return ;
+}
+
+void	CGI::setQuery(std::string query) {
+	_query = query;
+	return ;
+}
+
+void	CGI::setAddr(std::string host) {
+	_host = host;
+	return ;
+}
+
+void	CGI::setType(std::string type) {
+	_type = type;
+	return ;
+}
+
+void	CGI::setPort(int	port) {
+	_port = port;
+	return ;
+}
+

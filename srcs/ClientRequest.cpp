@@ -18,20 +18,18 @@ ClientRequest::~ClientRequest() {
 }
 
 int	ClientRequest::checkMethod() {
-std::cout << "Method: " << _method << " Allowed[GPDP]: " << _loc.allow[0] << _loc.allow[1] << _loc.allow[2] << _loc.allow[3] << std::endl;
+std::cout << "Method: " << _method << " Allowed[GPDP]: " << _loc.allow[0] << _loc.allow[1] << _loc.allow[2] << std::endl;
 	if (_method == "GET" && !_loc.allow[0])
 		_status = 405;
 	if (_method == "POST" && !_loc.allow[1])
 		_status = 405;
 	if (_method == "DELETE" && !_loc.allow[2])
 		_status = 405;
-	if (_method == "PUT" && !_loc.allow[3])
-		_status = 405;
 	return _status;
 }
 
 int	ClientRequest::isMethod(std::string word) {
-	if (word == "GET" || word == "POST" || word == "PUT" || word == "DELETE")
+	if (word == "GET" || word == "POST" || word == "DELETE")
 			return 1;
 	return 0;
 }
@@ -162,7 +160,6 @@ int	ClientRequest::determinateLoc() {
 	_loc.allow[0] = _info.getAllow("GET");
 	_loc.allow[1] = _info.getAllow("POST");
 	_loc.allow[2] = _info.getAllow("DELETE");
-	_loc.allow[3] = _info.getAllow("PUT");
 	_loc.clientSize = _info.getClientSize();
 
 	tmp_uri = _uri;
@@ -187,11 +184,10 @@ std::cout << "URI: " << tmp_uri << " EXT: " << ext << std::endl;
 				if (tmp.cgi.size()) {
 					_loc.cgi = tmp.cgi;
 				}
-				if (tmp.allow[0] || tmp.allow[1] || tmp.allow[2] || tmp.allow[3]) {
+				if (tmp.allow[0] || tmp.allow[1] || tmp.allow[2]) {
 					_loc.allow[0] = tmp.allow[0];
 					_loc.allow[1] = tmp.allow[1];
 					_loc.allow[2] = tmp.allow[2];
-					_loc.allow[3] = tmp.allow[3];
 				}
 				if (ext == tmp.uri)
 					return _status;

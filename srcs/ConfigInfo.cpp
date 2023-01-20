@@ -82,6 +82,11 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					}
 					catch (std::out_of_range& e) {
 						Server	*new_server = new Server(tmpInfo, port);
+
+						if (new_server->getError() == 1) {
+							_err = 1;
+							return _servers;
+						}
 						_servers.insert(std::make_pair(port, new_server));
 					}
 				}
@@ -116,7 +121,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 				}
 				line = file.getLine(); 
 			}
-			delete tmpInfo;		// DELETE
 		}
 		else if (line.find("error_page ") != std::string::npos) {
 			if (setErrorFile(line)) {
@@ -143,9 +147,8 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 		for (size_t count = 0; count < it->second->getInfos().size(); count++) {
 			if (it->second->getInfos().at(count)->getAllow("GET") == 0 &&
 				it->second->getInfos().at(count)->getAllow("POST") == 0 &&
-				it->second->getInfos().at(count)->getAllow("PUT") == 0 &&
 				it->second->getInfos().at(count)->getAllow("DELETE") == 0)
-				it->second->getInfos().at(count)->setAllow("allow_methods GET POST DELETE PUT");
+				it->second->getInfos().at(count)->setAllow("allow_methods GET POST DELETE");
 		}
 	}
 	return (_servers);
@@ -165,7 +168,6 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.allow[0] = 0;
 	tmp.allow[1] = 0;
 	tmp.allow[2] = 0;
-	tmp.allow[3] = 0;
 	tmp.cgi = "";
 	tmp.clientSize = -1;
 	tmp.index = "";
@@ -204,8 +206,6 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 				tmp.allow[1] = 1;
 			if (line.find("DELETE") != std::string::npos)
 				tmp.allow[2] = 1;
-			if (line.find("PUT") != std::string::npos)
-				tmp.allow[3] = 1;
 		}
 		line = file.getLine();
 	}
@@ -220,7 +220,6 @@ int	ConfigInfo::setErrorFile(std::string line) {
 		return 1;
 	else {
 		line.erase(0, line.find_last_of(" ") + 1);
-		line.erase(line.length() - 1);
 		_errorFiles[error] = line;
 	}
 	return 0;
@@ -231,6 +230,7 @@ void	ConfigInfo::setErrorFiles(){
 	_errorFiles[403] = "./data/error_files/403.html";
 	_errorFiles[404] = "./data/error_files/404.html";
 	_errorFiles[405] = "./data/error_files/405.html";
+	_errorFiles[413] = "./data/error_files/413.html";
 	_errorFiles[500] = "./data/error_files/500.html";
 }
 

@@ -11,7 +11,6 @@ ServerInfo::ServerInfo(void)
 	this->_allow[0] = 0;
 	this->_allow[1] = 0;
 	this->_allow[2] = 0;
-	this->_allow[3] = 0;
 	// this->_loc = NULL;
 }
 
@@ -19,7 +18,6 @@ ServerInfo::ServerInfo(ServerInfo* copy) {
 	this->_allow[0] = copy->_allow[0];
 	this->_allow[1] = copy->_allow[1];
 	this->_allow[2] = copy->_allow[2];
-	this->_allow[3] = copy->_allow[3];
 	this->_index = copy->_index;
 	this->_root = copy->_root;
 	this->_clientSize = copy->_clientSize;
@@ -35,7 +33,6 @@ ServerInfo::ServerInfo(ServerInfo& copy) {
 	this->_allow[0] = copy._allow[0];
 	this->_allow[1] = copy._allow[1];
 	this->_allow[2] = copy._allow[2];
-	this->_allow[3] = copy._allow[3];
 	this->_index = copy._index;
 	this->_root = copy._root;
 	this->_clientSize = copy._clientSize;
@@ -51,7 +48,6 @@ ServerInfo&	ServerInfo::operator=(ServerInfo& copy) {
 	this->_allow[0] = copy._allow[0];
 	this->_allow[1] = copy._allow[1];
 	this->_allow[2] = copy._allow[2];
-	this->_allow[3] = copy._allow[3];
 	this->_index = copy._index;
 	this->_root = copy._root;
 	this->_clientSize = copy._clientSize;
@@ -192,8 +188,6 @@ int	ServerInfo::setAllow(std::string line)
 			_allow[1] = 1;
 		else if (line.substr(0, line.find(' ')) == "DELETE")
 			_allow[2] = 1;
-		else if (line.substr(0, line.find(' ')) == "PUT")
-			_allow[3] = 1;
 		else {
 			std::cerr << "Error: Parsing configuration file (allow_methods)" << std::endl;
 			return 1;
@@ -206,8 +200,6 @@ int	ServerInfo::setAllow(std::string line)
 		_allow[1] = 1;
 	else if (line.substr(0, line.find(' ')) == "DELETE")
 		_allow[2] = 1;
-	else if (line.substr(0, line.find(' ')) == "PUT")
-		_allow[3] = 1;
 	else {
 		std::cerr << "Error: Parsing configuration file (allow_methods)" << std::endl;
 		return 1;
@@ -264,8 +256,6 @@ int	ServerInfo::getAllow(std::string allow) const
 		return (this->_allow[1]);
 	if (allow == "DELETE")
 		return (this->_allow[2]);
-	if (allow == "PUT")
-		return (this->_allow[3]);
 	return (-1);
 }
 

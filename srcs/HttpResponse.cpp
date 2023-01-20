@@ -1,31 +1,5 @@
 #include "../includes/webserv.hpp"
 
-std::vector<char>	permissions(const char *file)
-{
-	struct stat	st;
-	std::vector<char>	modeval(9, 'e');
-
-	if (stat(file, &st) == 0)
-	{
-		mode_t perm = st.st_mode;
-		modeval[0] = (perm & S_IRUSR) ? 'r' : '-';
-		modeval[1] = (perm & S_IWUSR) ? 'w' : '-';
-		modeval[2] = (perm & S_IXUSR) ? 'x' : '-';
-		modeval[3] = (perm & S_IRGRP) ? 'r' : '-';
-		modeval[4] = (perm & S_IWGRP) ? 'w' : '-';
-		modeval[5] = (perm & S_IXGRP) ? 'x' : '-';
-		modeval[6] = (perm & S_IROTH) ? 'r' : '-';
-		modeval[7] = (perm & S_IWOTH) ? 'w' : '-';
-		modeval[8] = (perm & S_IXOTH) ? 'x' : '-';
-		return modeval;     
-	}
-	else
-	{
-		perror("Error stat call: ");
-		return modeval;     
-	}
-}
-
 HttpResponse::HttpResponse() {
 	_code[200] = "OK";
 	_code[201] = "Created";
@@ -92,13 +66,6 @@ void	HttpResponse::setPort(int port) {
 void	HttpResponse::setAutoIndex(int autoindex) {
 	_autoindex = autoindex;
 	return ;
-}
-
-std::string toString(int num)
-{
-    std::ostringstream oss;
-    oss << num;
-    return oss.str();
 }
 
 int	isFile(std::string file) {
@@ -196,38 +163,8 @@ std::cout << "Body: " << _body << std::endl;
 
 		}
 	}
-
 	else if (_method == "POST") {
 		_status = 204;
-	}
-	else if (_method == "PUT") {
-		std::ofstream	newFile;
-		
-		if (isFile(_file)) {
-			newFile.open(_file.c_str());
-			newFile << _body;
-			newFile.close();
-			_status = 204;
-		}
-		else {
-			newFile.open(_file.c_str(), std::ofstream::trunc);
-			
-			if (newFile.is_open() == false) {
-				_status = 403;
-				filestream.open(_errorFiles[_status].c_str());
-				while(filestream.good()) {
-					std::getline(filestream, this->_file_content);
-					this->_body += this->_file_content;
-					this->_body += '\n';
-				}
-				filestream.close();
-			}
-			else {
-				newFile << _body;
-				newFile.close();
-				_status = 201;
-			}
-		}
 	}
 	else if (_method == "DELETE")
 	{

@@ -49,7 +49,7 @@ class ServerInfo {
 		std::string					_ip;
 		std::string					_root;
 		std::string					_index;
-		int							_allow[4]; // GET POST DELETE PUT: 0 si interdit, 1 si autorise
+		int							_allow[3]; // GET POST DELETE: 0 si interdit, 1 si autorise
 		long						_clientSize;
 		int							_autoIndex; //0 si off, 1 si on
 		std::vector<Location>		_loc;
