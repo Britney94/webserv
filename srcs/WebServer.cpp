@@ -14,6 +14,9 @@ int WebServer::getRunning() {
 }
 
 WebServer::~WebServer(void) {
+	while (_acceptfds.size() > 0) {
+		_acceptfds.erase(_acceptfds.begin());
+	}
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		it->second->close_socket();
@@ -146,6 +149,9 @@ void	WebServer::reset(void) {
 }
 
 void	WebServer::clean() {
+	for (std::map<int, Server *>::iterator it = _acceptfds.begin(); it != _acceptfds.end(); it++) {
+		it->second->close_socket();
+	}
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		it->second->close_socket();

@@ -82,7 +82,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					}
 					catch (std::out_of_range& e) {
 						Server	*new_server = new Server(tmpInfo, port);
-
 						if (new_server->getError() == 1) {
 							_err = 1;
 							return _servers;

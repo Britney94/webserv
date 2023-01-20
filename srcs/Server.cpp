@@ -71,13 +71,12 @@ Server& Server::operator=(Server& copy)
 
 Server::~Server(void)
 {
-	// Default destructor, closes the
-	// socket descriptor generated at
-	// construction.
-	// if (this->_default)
-	// 	delete(this->_default);
-	this->_infos.clear();
-	close(this->_socket);
+	while(this->_infos.size() > 0)
+		this->_infos.clear();
+	if (this->_default)
+		delete(this->_default);
+	if (this->_socket)
+		close(this->_socket);
 }
 
 
@@ -131,7 +130,7 @@ int	Server::parseRequest() {
 		return -1;
 	}
 
-	_request += std::string(buffer);
+	_request.insert(_request.size(), buffer);
 	if (_request.find("Transfer-Encoding: chunked") != std::string::npos) {
 		if (this->chunkedRequest())
 			return 1;
