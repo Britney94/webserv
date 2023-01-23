@@ -81,6 +81,7 @@ int	WebServer::launch(void) {
 					delete tmp;
 				}
 				pending--;
+				it = _writablefds.begin()
 				break;
 			}
 		}

@@ -51,6 +51,4 @@ class Server {
 		int	_size;
 };
 
-std::ostream	&operator<<(std::ostream &x, Server const & serv);
-
 #endif
