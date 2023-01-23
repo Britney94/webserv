@@ -2,6 +2,11 @@
 
 Server::Server(ServerInfo* infos, int port)
 {
+	this->_error = 0;
+	this->_default = infos;
+	this->_infos.push_back(infos);
+	this->_size = this->_infos.size();
+	this->_status = 200;
 
 	// Generating socket file descriptor
 	// DOMAIN	= Ipv4 Internet protocol
@@ -45,26 +50,27 @@ Server::Server(ServerInfo* infos, int port)
         _error = 1;
 		return ;
 	}
-	this->_error = 0;
-	this->_default = infos;
-	this->_infos.push_back(infos);
-	this->_size = this->_infos.size();
-	this->_status = 200;
 }
 
 Server::Server(Server& copy, int new_socket)
-{
+{	
 	this->_socket = new_socket;
-	this->_default = copy._default;
-	this->_infos = copy._infos;
+	for (size_t count = 0; count < copy._infos.size(); count++) {
+		ServerInfo * new_info = new ServerInfo(*(copy._infos.at(count)));
+		this->_infos.push_back(new_info);
+	}
+	this->_default = this->_infos[0];
 	this->_size = this->_infos.size();
 }
 
 Server& Server::operator=(Server& copy)
 {
-	this->_socket = copy._socket;
-	this->_default = copy._default;
-	this->_infos = copy._infos;
+	this->_socket = dup(copy._socket);
+	for (size_t count = 0; count < copy._infos.size(); count++) {
+		ServerInfo * new_info = new ServerInfo(*(copy._infos.at(count)));
+		this->_infos.push_back(new_info);
+	}
+	this->_default = this->_infos[0];
 	this->_size = this->_infos.size();
 	return (*this);
 }
@@ -126,7 +132,10 @@ int	Server::parseRequest() {
 
 	if (ret <= 0) {
 		this->close_socket();
-		std::cerr << "Error : Could not read from the socket.\n" << std::endl;
+		if (!ret)
+			std::cerr << "\nConnection closed by client.\n" << std::endl;
+		else
+			std::cerr << "\nError: Could not read request.\n" << std::endl;
 		return -1;
 	}
 
@@ -202,6 +211,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	ret = write(_socket, &message[0], message.size());
 	if (ret <= 0) {
 		std::cerr << "Error: Could not write response to client." << std::endl;
+		return ret;
 	}
 	std::cout << std::endl << std::endl << PURPLE << "*** Response ***\n" << message << BLANK << std::endl;
 
