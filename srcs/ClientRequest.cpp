@@ -135,12 +135,8 @@ std::string	ClientRequest::determinateFile() {
 	std::string	file_uri = _uri.substr(_loc.uri.length());
 	_file.insert(0, _loc.root);
 	_file.insert(_file.size(), file_uri);
-	int ext_true = 0;
-	if (file_uri.find(".") != std::string::npos && file_uri.find("/") != 0)
-		ext_true = 1;
-	if (_file.at(_file.length() - 1) != '/' && !ext_true)
-		_file.insert(_file.size(), "/");
-	if (!_info.getAutoIndex() && _file.at(_file.length() - 1) == '/') {
+std::cout << "Autoindex: " << _info.getAutoIndex() << std::endl;
+	if (_info.getAutoIndex() == 0 && _file.at(_file.length() - 1) == '/') {
 		if (_loc.index.size() && _loc.index != "")
 			_file += _loc.index;
 		else

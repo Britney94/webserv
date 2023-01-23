@@ -1,16 +1,7 @@
 #include "../includes/webserv.hpp"
 
 WebServer::WebServer(void) {
-	this->_isRunning = 1;
 	return ;
-}
-
-void	WebServer::setRunning(int running) {
-	this->_isRunning = running;
-}
-
-int WebServer::getRunning() {
-	return this->_isRunning;
 }
 
 WebServer::~WebServer(void) {
@@ -44,10 +35,9 @@ int	WebServer::launch(void) {
 	struct timeval	timeout;
 	int				pending;
 	int				ret;
-	
-	_isRunning = 1;
 
-	while (_isRunning) {
+
+	while (1) {
 		
 		pending = 0;
 		ret = 0;
@@ -81,12 +71,12 @@ int	WebServer::launch(void) {
 				Server	*tmp = it->second;
 				ret = it->second->sendResponse(_config.getErrors());
 
-				_writablefds.erase(it);
 				if (ret == -1) {
 					FD_CLR(fd, &_sockets);
 					FD_CLR(fd, &readfds);
 					_acceptfds.erase(it);
 				}
+				_writablefds.erase(it);
 				if (tmp) {
 					delete tmp;
 				}

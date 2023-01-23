@@ -5,11 +5,11 @@
 
 #include "webserv.hpp"
 
-class autoindex{
+class AutoIndex{
 	public:
-		autoindex(){};
+		AutoIndex(){};
 		std::string	renderPage(std::string directory, std::string path, int port, std::string host);
-		~autoindex(){};	
+		~AutoIndex(){};	
 };
 
 #endif

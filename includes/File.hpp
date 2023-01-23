@@ -8,19 +8,24 @@
 using namespace std;
 
 class File {
+	
 	public:
 		File(char *filename);
+		~File(){};
+	
 		std::string	getName();
+		std::string	getLine();
+	
 		int	getMaxLine();
 		int	getEnd();
-		std::string	getLine();
-		~File(){};
-		std::string name;
+	
 		vector<std::string>	content;
-		int	lineHistory;
-		int	maxLine;
-		int	end;
-		int	cantOpen;
+		
+		std::string	name;
+		int			lineHistory;
+		int			maxLine;
+		int			end;
+		int			cantOpen;
 };
 
 #endif

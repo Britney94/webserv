@@ -48,7 +48,7 @@
 
 
 std::string trim(const std::string& str);
-int checkExt(char *filename);
 std::string toString(int num);
+int 		checkExt(char *filename);
 
 #endif

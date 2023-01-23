@@ -13,11 +13,10 @@ class WebServer {
 	public:
 		WebServer(void);
 		~WebServer(void);
-		void		setRunning(int running);
-		int			getRunning();
+		
 		int		parsefile(char *filename);
 		int		launch();
-		void		clean();
+		void	clean();
 		void	reset();
 	
 	private:
@@ -27,7 +26,6 @@ class WebServer {
 		std::map<int, Server *>	_writablefds;	
 		fd_set					_sockets;
 		int						_max_fd;
-		int						_isRunning;
 };
 
 #endif

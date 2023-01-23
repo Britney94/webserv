@@ -296,15 +296,3 @@ ConfigInfo::~ConfigInfo(){
 	_errorFiles.clear();
 	return ;
 }
-
-std::ostream	&operator<<(std::ostream &x, ConfigInfo const & inf)
-{
-	int	count = 1;
-
-	x << "**** ConfigInfo ****" << BLANK << std::endl << std::endl;
-	std::map<int, Server *>::const_iterator it;
-	for (it = inf.getServers().begin(); count <= inf.getSize(); it++) {
-		x << "*** Server n°" << count++ << std::endl << *(it->second) << std::endl;
-	}
-	return (x);
-}

@@ -147,7 +147,7 @@ std::cout << "Body: " << _body << std::endl;
 			filestream.close();
 		}
 		else if (isDir(_file) && _autoindex) {
-			autoindex	content;
+			AutoIndex	content;
 
 			_body = content.renderPage(_dir, _file, _port, _host);
 		}

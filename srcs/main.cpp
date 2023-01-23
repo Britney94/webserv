@@ -29,7 +29,6 @@ WebServer server;
 
 void	quit(int arg) {
 	(void)arg;
-	server.setRunning(0);
 }
 
 int main(int argc, char **argv)
