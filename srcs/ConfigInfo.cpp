@@ -46,6 +46,9 @@ static int checkBrackets(char *filename){
 std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	File		file(filename);
 	int			ret = 0;
+	size_t		count = 0;
+	std::vector<ServerInfo *>	tmp;
+
 	if (file.cantOpen == 1)
 	{
 		_err = 1;
@@ -60,6 +63,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	while (file.lineHistory < file.getMaxLine()){
 		if (line.find("server {") != std::string::npos){
 			ServerInfo	*tmpInfo = new ServerInfo();
+			tmp.push_back(tmpInfo);
 			line = file.getLine();
 			while (line.find("server {") == std::string::npos && file.lineHistory < file.getMaxLine()) {
 				if (line.find("server_name ") != std::string::npos)
@@ -75,16 +79,20 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					else {
 						std::cerr << RED << "Error: Parsing configuration file : port" << BLANK << std::endl;
 						_err = 1;
-			//Verifier la taille de _servers pour savoir s'il faut delete tmpInfo ou non
+						if (tmp.size() != count) {
+							delete tmp.at(tmp.size() - 1);
+						}
 						return _servers;
 					}
 					try {
 						_servers.at(port)->addNewInfo(tmpInfo);
+						count++;
 					}
 					catch (std::out_of_range& e) {
 						Server	*new_server = new Server(tmpInfo, port);
 
 						_servers.insert(std::make_pair(port, new_server));
+						count++;
 						if (new_server->getError() == 1) {
 							_err = 1;
 							return _servers;
@@ -105,7 +113,9 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					if (_err == 1)
 					{
 						std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
-			//Verifier la taille de _servers pour savoir s'il faut delete tmpInfo ou non
+						if (tmp.size() != count) {
+							delete tmp.at(tmp.size() - 1);
+						}
 						return _servers;
 					}
 				}
@@ -114,23 +124,32 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 				else if (line.size() != 0 && line != "}") {
 					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << BLANK << std::endl;
 					_err = 1;
-			//Verifier la taille de _servers pour savoir s'il faut delete tmpInfo ou non
+					if (tmp.size() != count) {
+						delete tmp.at(tmp.size() - 1);
+					}
 					return _servers;
 				}
 				if (ret) {
 					std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 					_err = 1;
-			//Verifier la taille de _servers pour savoir s'il faut delete tmpInfo ou non
+					if (tmp.size() != count) {
+						delete tmp.at(tmp.size() - 1);
+					}
 					return _servers;
 				}
 				line = file.getLine(); 
 			}
-			//Verifier la taille de _servers pour savoir s'il faut delete tmpInfo ou non
+			if (tmp.size() != count) {
+				delete tmp.at(tmp.size() - 1);
+			}
 		}
 		else if (line.find("error_page ") != std::string::npos) {
 			if (setErrorFile(line)) {
 				std::cerr << RED << "Config file is incorrect: error_page" << BLANK << std::endl;
 				_err = 1;
+				if (tmp.size() != count) {
+					delete tmp.at(tmp.size() - 1);
+				}
 				return _servers;
 			}
 			line = file.getLine();
@@ -141,6 +160,9 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 		else {
 			std::cerr << RED << "Error: Parsing configuration file : unknown directive : " << line << BLANK << std::endl;
 			_err = 1;
+			if (tmp.size() != count) {
+				delete tmp.at(tmp.size() - 1);
+			}
 			return _servers;
 		}
 	}
