@@ -43,7 +43,7 @@ static char	*ft_itoa(int n)
 	return (itoa);
 }
 
-std::string	autoindex::renderPage(std::string directory, std::string path, int port, std::string host)
+std::string	AutoIndex::renderPage(std::string directory, std::string path, int port, std::string host)
 {
 	DIR *dir;
 	struct dirent *ent;

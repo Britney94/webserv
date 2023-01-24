@@ -2,6 +2,11 @@
 
 Server::Server(ServerInfo* infos, int port)
 {
+	this->_error = 0;
+	this->_default = infos;
+	this->_infos.push_back(infos);
+	this->_size = this->_infos.size();
+	this->_status = 200;
 
 	// Generating socket file descriptor
 	// DOMAIN	= Ipv4 Internet protocol
@@ -45,39 +50,39 @@ Server::Server(ServerInfo* infos, int port)
         _error = 1;
 		return ;
 	}
-	this->_error = 0;
-	this->_default = infos;
-	this->_infos.push_back(infos);
-	this->_size = this->_infos.size();
-	this->_status = 200;
 }
 
 Server::Server(Server& copy, int new_socket)
-{
+{	
 	this->_socket = new_socket;
-	this->_default = copy._default;
-	this->_infos = copy._infos;
+	for (size_t count = 0; count < copy._infos.size(); count++) {
+		ServerInfo * new_info = new ServerInfo(*(copy._infos.at(count)));
+		this->_infos.push_back(new_info);
+	}
+	this->_default = this->_infos[0];
 	this->_size = this->_infos.size();
 }
 
 Server& Server::operator=(Server& copy)
 {
-	this->_socket = copy._socket;
-	this->_default = copy._default;
-	this->_infos = copy._infos;
+	this->_socket = dup(copy._socket);
+	for (size_t count = 0; count < copy._infos.size(); count++) {
+		ServerInfo * new_info = new ServerInfo(*(copy._infos.at(count)));
+		this->_infos.push_back(new_info);
+	}
+	this->_default = this->_infos[0];
 	this->_size = this->_infos.size();
 	return (*this);
 }
 
 Server::~Server(void)
 {
-	// Default destructor, closes the
-	// socket descriptor generated at
-	// construction.
-	// if (this->_default)
-	// 	delete(this->_default);
-	this->_infos.clear();
-	close(this->_socket);
+	while(this->_infos.size() > 0)
+		this->_infos.clear();
+	if (this->_default)
+		delete(this->_default);
+	if (this->_socket)
+		close(this->_socket);
 }
 
 
@@ -127,11 +132,14 @@ int	Server::parseRequest() {
 
 	if (ret <= 0) {
 		this->close_socket();
-		std::cerr << "Error : Could not read from the socket.\n" << std::endl;
+		if (!ret)
+			std::cerr << "\nConnection closed by client.\n" << std::endl;
+		else
+			std::cerr << "\nError: Could not read request.\n" << std::endl;
 		return -1;
 	}
 
-	_request += std::string(buffer);
+	_request.insert(_request.size(), buffer);
 	if (_request.find("Transfer-Encoding: chunked") != std::string::npos) {
 		if (this->chunkedRequest())
 			return 1;
@@ -203,6 +211,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	ret = write(_socket, &message[0], message.size());
 	if (ret <= 0) {
 		std::cerr << "Error: Could not write response to client." << std::endl;
+		return ret;
 	}
 	std::cout << std::endl << std::endl << PURPLE << "*** Response ***\n" << message << BLANK << std::endl;
 
@@ -251,17 +260,4 @@ int	Server::getError() const {
 
 std::vector<ServerInfo *>	Server::getInfos() const {
 	return _infos;
-}
-
-std::ostream	&operator<<(std::ostream &x, Server const & serv)
-{
-	int	count = 1;
-
-	x << "Socket: " << serv.getSocket() << std::endl;
-	std::vector<ServerInfo *>::iterator it;
-	for (it = serv.getInfos().begin(); count <= (int)serv.getInfos().size(); it++) {
-		x << "ServerInfo n°" << count++ << std::endl << (*it) << std::endl; 
-	}
-	x << std::endl;
-	return (x);
 }

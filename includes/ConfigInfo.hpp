@@ -22,12 +22,16 @@ class ConfigInfo {
 		void	setErrorFiles();
 		int		setErrorFile(std::string line);
 		void	setSize(int size);
+		
+		Location&	setupLoc(File& file, std::string curr_line);
+	
 		std::map<int, std::string>	getErrors() const;
 		std::map<int, Server *>		getServers() const;
+		
 		int getError() const;
 		int	getSize() const;
 		int	getMaxFd() const;
-		Location&	setupLoc(File& file, std::string curr_line);
+	
 	private:
 		std::map<int, Server *>		_servers;
 		std::map<int, std::string>	_errorFiles;
@@ -38,7 +42,5 @@ class ConfigInfo {
 
 		Location	_tmp_loc;
 };
-
-std::ostream	&operator<<(std::ostream &x, ConfigInfo const & inf);
 
 #endif

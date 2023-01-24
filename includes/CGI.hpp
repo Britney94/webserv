@@ -21,6 +21,7 @@ class CGI{
 		void	setPort(int	port);
 
 		~CGI(){};
+	
 	private:
 		std::string	_body;
 		std::string	_cgi;

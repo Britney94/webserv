@@ -29,7 +29,6 @@ WebServer server;
 
 void	quit(int arg) {
 	(void)arg;
-	server.setRunning(0);
 }
 
 int main(int argc, char **argv)
@@ -52,8 +51,10 @@ int main(int argc, char **argv)
 		if (server.launch() == 1)
 			return 1;
 	}
-	else
+	else {
+		server.clean();
 		return 1;
+	}
 	server.clean();
 	std::cout << std::endl << GREEN << "The user has stopped the program 👋" << BLANK << std::endl;
 	return 0;

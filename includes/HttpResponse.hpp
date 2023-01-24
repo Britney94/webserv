@@ -6,24 +6,25 @@
 #include "webserv.hpp"
 
 class	HttpResponse {
-
 	public:
 		HttpResponse();
 		~HttpResponse();
-    int         createResponse();
-		std::string	getResponse() const;
+		
+		int	createResponse();
 
-        void setFile(std::string file);
-        void setStatus(int status);
-        void setAutoIndex(int autoindex);
-        void setPort(int port);
-        void setDir(std::string dir);
-        void setHost(std::string host);
-        void setCGI(std::string cgi);
-        void setQuery(std::string query);
-        void setMethod(std::string method);
-        void setClientBody(std::string clientBody);
-        void setErrorFiles(std::map<int, std::string> errorFiles);
+		void	setFile(std::string file);
+		void	setStatus(int status);
+		void	setAutoIndex(int autoindex);
+		void	setPort(int port);
+		void	setDir(std::string dir);
+		void	setHost(std::string host);
+		void	setCGI(std::string cgi);
+		void	setQuery(std::string query);
+		void	setMethod(std::string method);
+		void	setClientBody(std::string clientBody);
+		void	setErrorFiles(std::map<int, std::string> errorFiles);
+		
+		std::string	getResponse() const;
 
 	private:
 		int			_status;

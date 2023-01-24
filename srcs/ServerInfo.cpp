@@ -113,9 +113,9 @@ int	ServerInfo::setRoot(std::string line) {
 	line.resize(line.find(";"));
 	line.erase(0, line.find(' ') + 1);
 	line = trim(line);
-	if (line.find(" ") != std::string::npos)
+	if (line.size())
 	{
-		this->_root = &line[line.find(" ") + 1];
+		this->_root = line;
 		if (this->_root[this->_root.size() - 1] != '/')
 			this->_root.push_back('/');
 	}
@@ -140,7 +140,8 @@ int	ServerInfo::setAutoIndex(std::string line) {
 	line.erase(0, line.find(' ') + 1);
 	if (line.at(line.length() - 1) == '\n')
 		line.erase(line.at(line.length() - 1));
-	_autoIndex = (line == "on");
+	if (line == "on")
+		_autoIndex = 1;
 	if (line != "on" && line != "off") {
 		std::cerr << "Error: Parsing configuration file (autoindex)" << std::endl;
 		return 1;
@@ -267,43 +268,4 @@ ServerInfo::~ServerInfo()
 	// 	// this->_loc = this->_loc.next;
 	// }
 	this->_serverNames.clear();
-}
-
-std::ostream	&operator<<(std::ostream &x, Location const & inf)
-{
-	x << "URI: " << inf.uri << std::endl;
-	x << "Root: " << inf.root << std::endl;
-	x << "Index: " << inf.index << std::endl;
-	x << "ClientSize: " << inf.clientSize << std::endl;
-	x << "CGI: " << inf.cgi << std::endl;
-	x << "Allow_methods: " << inf.allow[0] << inf.allow[1] << inf.allow[2] << inf.allow[3] << std::endl;
-	for (std::vector<Location>::const_iterator in = inf.loc.begin(); in != inf.loc.end(); in++) {
-		x << *in << std::endl;
-	}
-	x << std::endl;
-	return (x);
-}
-
-std::ostream	&operator<<(std::ostream &x, ServerInfo const & inf)
-{
-	x << "Server_names: ";
-	std::cout << "Server_names: ";
-	std::vector<std::string>::iterator name;
-	for (name = inf.getServerNames().begin(); name != inf.getServerNames().end(); name++) {
-		x << *name << " ";
-		std::cout << *name << " ";
-	}
-	x << std::endl;
-	x << "Ip address: " << inf.getIp() << std::endl;
-	x << "Root: " << inf.getRoot() << std::endl;
-	x << "Index: " << inf.getIndex() << std::endl;
-	x << "Allow: " << inf.getAllow("GET") << inf.getAllow("POST") << inf.getAllow("DELETE") << inf.getAllow("PUT") << std::endl;
-	x << "ClientSize: " << inf.getClientSize() << std::endl;
-	x << "Autoindex: " << inf.getAutoIndex() << std::endl;
-	std::vector<Location>::iterator loc;
-	for (loc = inf.getLoc().begin(); loc != inf.getLoc().end(); loc++) {
-		x << *loc << std::endl;
-	}
-	x << std::endl;
-	return (x);
 }

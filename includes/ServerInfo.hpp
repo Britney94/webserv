@@ -55,7 +55,4 @@ class ServerInfo {
 		std::vector<Location>		_loc;
 };
 
-std::ostream	&operator<<(std::ostream &x, Location const & inf);
-std::ostream	&operator<<(std::ostream &x, ServerInfo const & inf);
-
 #endif

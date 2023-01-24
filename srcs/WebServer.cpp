@@ -1,19 +1,13 @@
 #include "../includes/webserv.hpp"
 
 WebServer::WebServer(void) {
-	this->_isRunning = 1;
 	return ;
 }
 
-void	WebServer::setRunning(int running) {
-	this->_isRunning = running;
-}
-
-int WebServer::getRunning() {
-	return this->_isRunning;
-}
-
 WebServer::~WebServer(void) {
+	while (_acceptfds.size() > 0) {
+		_acceptfds.erase(_acceptfds.begin());
+	}
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		it->second->close_socket();
@@ -41,10 +35,9 @@ int	WebServer::launch(void) {
 	struct timeval	timeout;
 	int				pending;
 	int				ret;
-	
-	_isRunning = 1;
 
-	while (_isRunning) {
+
+	while (1) {
 		
 		pending = 0;
 		ret = 0;
@@ -69,22 +62,26 @@ int	WebServer::launch(void) {
 				std::cerr << "select() failed" << std::endl;
 				this->reset();
 			}
-			// if (_isRunning == 0) {
-			// 	this->reset();
-			// 	return 0;
-			// }
 		}
 
 		for (std::map<int, Server *>::iterator it = _writablefds.begin(); pending && it != _writablefds.end(); it++) {
 			int	fd = it->second->getSocket();
 
 			if (FD_ISSET(fd, &writefds)) {
-				std::map<int, Server *>::iterator tmp;
-				it->second->sendResponse(_config.getErrors());
+				Server	*tmp = it->second;
+				ret = it->second->sendResponse(_config.getErrors());
 
-				tmp = it++;
-				_writablefds.erase(tmp);
+				if (ret == -1) {
+					FD_CLR(fd, &_sockets);
+					FD_CLR(fd, &readfds);
+					_acceptfds.erase(it);
+				}
+				_writablefds.erase(it);
+				if (tmp) {
+					delete tmp;
+				}
 				pending--;
+				it = _writablefds.begin()
 				break;
 			}
 		}
@@ -93,7 +90,6 @@ int	WebServer::launch(void) {
 		for (std::map<int, Server *>::iterator it = _acceptfds.begin(); pending && it != _acceptfds.end(); it++) {
 			int	fd = it->second->getSocket();
 			if (FD_ISSET(fd, &readfds)) {
-				std::map<int, Server *>::iterator tmp;
 				ret = it->second->parseRequest();
 
 				if (ret <= 0) {
@@ -101,8 +97,9 @@ int	WebServer::launch(void) {
 						_writablefds.insert(std::make_pair(it->first, it->second));
 					FD_CLR(fd, &_sockets);
 					FD_CLR(fd, &readfds);
-					tmp = it++;
-					_acceptfds.erase(tmp);
+					_acceptfds.erase(it);
+
+					it = _acceptfds.begin();
 				}
 				pending--;
 				break;
@@ -146,6 +143,11 @@ void	WebServer::reset(void) {
 }
 
 void	WebServer::clean() {
+	for (std::map<int, Server *>::iterator it = _acceptfds.begin(); it != _acceptfds.end(); it++) {
+		it->second->close_socket();
+	}
+	_acceptfds.clear();
+	_writablefds.clear();
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		it->second->close_socket();
