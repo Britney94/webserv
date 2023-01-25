@@ -1,7 +1,6 @@
 #include "../includes/webserv.hpp"
 
-static int	ft_count_digits(long n)
-{
+static int	ft_count_digits(long n) {
 	int	count = 0;
 	if (n < 0)
 	{
@@ -16,8 +15,7 @@ static int	ft_count_digits(long n)
 	return (count);
 }
 
-static char	*ft_itoa(int n)
-{
+static char	*ft_itoa(int n) {
 	int		i;
 	long	nb;
 	char	*itoa;
@@ -43,11 +41,9 @@ static char	*ft_itoa(int n)
 	return (itoa);
 }
 
-std::string	AutoIndex::renderPage(std::string directory, std::string path, int port, std::string host)
-{
+std::string	AutoIndex::renderPage(std::string directory, std::string path, int port, std::string host) {
 	DIR *dir;
 	struct dirent *ent;
-//	int size;
 	std::string page;
 	char *tmp;
 	page = "<html>\n";
@@ -62,7 +58,6 @@ std::string	AutoIndex::renderPage(std::string directory, std::string path, int p
 		while ((ent = readdir (dir)) != NULL) {
 			if (strcmp(".", ent->d_name) != 0 && strcmp("..", ent->d_name) != 0)
 			{
-//				size = strlen(ent->d_name);
 				page.insert(page.size(), "<a href=\"");
 				page.insert(page.size(), "http://");
 				page.insert(page.size(), host);
@@ -85,7 +80,7 @@ std::string	AutoIndex::renderPage(std::string directory, std::string path, int p
 		}
 		closedir (dir);
 	} 
-	else { // CANNOT OPEN DIRECTORY
+	else {
 		perror ("Autoindex");
 		page.clear();
 		return "";

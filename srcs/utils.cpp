@@ -2,8 +2,7 @@
 #include <sstream>
 #include <string>
 
-#define BLANK "\033[0m"
-#define RED "\033[31m"
+#include "../includes/webserv.hpp"
 
 int checkExt(char *filename) {
 	std::string str(filename);
@@ -23,8 +22,7 @@ std::string trim(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
-std::string toString(int num)
-{
+std::string toString(int num) {
     std::ostringstream oss;
     oss << num;
     return oss.str();

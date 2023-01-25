@@ -1,12 +1,12 @@
 #include "../includes/webserv.hpp"
 
-ConfigInfo::ConfigInfo(){
+ConfigInfo::ConfigInfo() {
 	this->_maxFd = 0;
 	this->_err = 0;
 	this->setErrorFiles();
 }
 
-ConfigInfo::ConfigInfo(ConfigInfo& copy){
+ConfigInfo::ConfigInfo(ConfigInfo& copy) {
 	(void)copy;
 	this->_err = 0;
 	this->_maxFd = 0;
@@ -14,7 +14,7 @@ ConfigInfo::ConfigInfo(ConfigInfo& copy){
 	this->setErrorFiles();
 }
 
-ConfigInfo::ConfigInfo(char *filename){
+ConfigInfo::ConfigInfo(char *filename) {
 	this->_err = 0;
 	this->setSize(0);
 	this->_maxFd = 0;
@@ -22,12 +22,12 @@ ConfigInfo::ConfigInfo(char *filename){
 	this->_servers = this->parse(filename);
 }
 
-static int checkBrackets(char *filename){
+static int checkBrackets(char *filename) {
 	File	file(filename);
 	std::string	line;
 	int		i = 0;
 	int		j = 0;
-	while (file.lineHistory < file.getMaxLine()){
+	while (file.lineHistory < file.getMaxLine()) {
 		line = file.getLine();
 		i = 0;
 		while (line[i] != '\0'){
@@ -43,14 +43,12 @@ static int checkBrackets(char *filename){
 	return 0;
 }
 
-std::map<int, Server *>	ConfigInfo::parse(char *filename){
+std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 	File		file(filename);
 	int			ret = 0;
 	size_t		count = 0;
 	std::vector<ServerInfo *>	tmp;
-
-	if (file.cantOpen == 1)
-	{
+	if (file.cantOpen == 1) {
 		_err = 1;
 		return _servers;
 	}
@@ -79,9 +77,8 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					else {
 						std::cerr << RED << "Error: Parsing configuration file : port" << BLANK << std::endl;
 						_err = 1;
-						if (tmp.size() != count) {
+						if (tmp.size() != count)
 							delete tmp.at(tmp.size() - 1);
-						}
 						return _servers;
 					}
 					try {
@@ -90,7 +87,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					}
 					catch (std::out_of_range& e) {
 						Server	*new_server = new Server(tmpInfo, port);
-
 						_servers.insert(std::make_pair(port, new_server));
 						count++;
 						if (new_server->getError() == 1) {
@@ -113,9 +109,8 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 					if (_err == 1)
 					{
 						std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
-						if (tmp.size() != count) {
+						if (tmp.size() != count)
 							delete tmp.at(tmp.size() - 1);
-						}
 						return _servers;
 					}
 				}
@@ -124,45 +119,39 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 				else if (line.size() != 0 && line != "}") {
 					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << BLANK << std::endl;
 					_err = 1;
-					if (tmp.size() != count) {
+					if (tmp.size() != count)
 						delete tmp.at(tmp.size() - 1);
-					}
 					return _servers;
 				}
 				if (ret) {
 					std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 					_err = 1;
-					if (tmp.size() != count) {
+					if (tmp.size() != count)
 						delete tmp.at(tmp.size() - 1);
-					}
 					return _servers;
 				}
 				line = file.getLine(); 
 			}
-			if (tmp.size() != count) {
+			if (tmp.size() != count)
 				delete tmp.at(tmp.size() - 1);
-			}
 		}
 		else if (line.find("error_page ") != std::string::npos) {
 			if (setErrorFile(line)) {
 				std::cerr << RED << "Config file is incorrect: error_page" << BLANK << std::endl;
 				_err = 1;
-				if (tmp.size() != count) {
+				if (tmp.size() != count)
 					delete tmp.at(tmp.size() - 1);
-				}
 				return _servers;
 			}
 			line = file.getLine();
 		}
-		else if (line.size() == 0) {
+		else if (line.size() == 0)
 			line = file.getLine();
-		}
 		else {
 			std::cerr << RED << "Error: Parsing configuration file : unknown directive : " << line << BLANK << std::endl;
 			_err = 1;
-			if (tmp.size() != count) {
+			if (tmp.size() != count)
 				delete tmp.at(tmp.size() - 1);
-			}
 			return _servers;
 		}
 	}
@@ -170,7 +159,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
 		if (it->second->getSocket() > _maxFd)
 			_maxFd = it->second->getSocket();
-		
 		for (size_t count = 0; count < it->second->getInfos().size(); count++) {
 			if (it->second->getInfos().at(count)->getAllow("GET") == 0 &&
 				it->second->getInfos().at(count)->getAllow("POST") == 0 &&
@@ -184,7 +172,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename){
 Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	Location	tmp;
 	std::string	line = file.getLine();
-
 	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.find("{") - (curr_line.find("location ") + 9));
 	while (tmp.uri.at(tmp.uri.length() - 1) == ' ')
 		tmp.uri.erase(tmp.uri.length() - 1);
@@ -199,7 +186,6 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.clientSize = -1;
 	tmp.index = "";
 	tmp.root = "";
-
 	while (line.find("}") == std::string::npos) {
 		if (line.find(";") == std::string::npos && line.find("{") == std::string::npos && trim(line) != "") {
 			this->_err = 1;
@@ -217,10 +203,9 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 			tmp.index = line.substr(line.find(" ") + 1);
 		else if (line.find("cgi_pass ") != std::string::npos)
 			tmp.cgi = line.substr(line.find(" ") + 1);
-		else if (line.find("client_body_buffer_size ") != std::string::npos)
-		{
+		else if (line.find("client_body_buffer_size ") != std::string::npos) {
 			tmp.clientSize = atoi(&(line.substr(line.find(" ") + 1))[0]);
-			if (tmp.clientSize <= 0){
+			if (tmp.clientSize <= 0) {
 				this->_err = 1;
 				_tmp_loc = tmp;
 				return _tmp_loc;
@@ -242,7 +227,6 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 
 int	ConfigInfo::setErrorFile(std::string line) {
 	int error = atoi(&(line.substr(line.find(" ") + 1))[0]);
-
 	if (error < 400 || error >= 600)
 		return 1;
 	else {
@@ -261,16 +245,16 @@ void	ConfigInfo::setErrorFiles(){
 	_errorFiles[500] = "./data/error_files/500.html";
 }
 
-void ConfigInfo::setSize(int size){
-		this->_size = size;
+void ConfigInfo::setSize(int size) {
+	this->_size = size;
 }
 
 int ConfigInfo::getError() const {
-		return (this->_err);
+	return (this->_err);
 }
 
 std::map<int, std::string>	ConfigInfo::getErrors() const {
-		return (this->_errorFiles);
+	return (this->_errorFiles);
 }
 
 std::map<int, Server *>	ConfigInfo::getServers() const {
@@ -279,14 +263,14 @@ std::map<int, Server *>	ConfigInfo::getServers() const {
 
 
 int ConfigInfo::getSize() const {
-		return (this->_size);
+	return (this->_size);
 }
 
 int ConfigInfo::getMaxFd() const {
-    return (this->_maxFd);
+  return (this->_maxFd);
 }
 
-ConfigInfo::~ConfigInfo(){
+ConfigInfo::~ConfigInfo() {
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		it->second->close_socket();

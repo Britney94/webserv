@@ -70,7 +70,6 @@ void	HttpResponse::setAutoIndex(int autoindex) {
 
 int	isFile(std::string file) {
 	struct stat	st;
-
 	if (stat(file.c_str(), &st) == 0) {
 		if ((st.st_mode & S_IFMT) == S_IFREG)
 			return 1;
@@ -80,7 +79,6 @@ int	isFile(std::string file) {
 
 int	isDir(std::string file) {
 	struct stat	st;
-
 	if (stat(file.c_str(), &st) == 0) {
 		if ((st.st_mode & S_IFMT) == S_IFDIR)
 			return 1;
@@ -88,53 +86,26 @@ int	isDir(std::string file) {
 	return 0;
 }
 
-int	HttpResponse::createResponse()
-
-{	
-		std::ifstream			filestream;
-		std::filebuf			filebuf;
-
-std::cout << "File to open: " << _file << std::endl;
-std::cout << "Status: " << _status << std::endl;
-std::cout << "Method: " << _method << std::endl;
-std::cout << "Body: " << _body << std::endl;
-
-
-
-	if (_status >= 400 && _status < 500)
-	{
-
-	std::cout << "Error file: " << _errorFiles[_status].c_str() << std::endl;
-			filestream.open(_errorFiles[_status].c_str());
-			while(filestream.good()) {
-				std::getline(filestream, this->_file_content);
-				this->_body += this->_file_content;
-				this->_body += '\n';
-			}
-	std::cout << "Error file content: " << this->_file_content << std::endl;
+int	HttpResponse::createResponse() {	
+	std::ifstream		filestream;
+	std::filebuf		filebuf;
+	std::cout << std::endl << BLUE << "File to open: " << _file << std::endl;
+	std::cout << "Status: " << _status << std::endl;
+	std::cout << "Method: " << _method << std::endl;
+	std::cout << "Body: " << _body << BLANK << std::endl;
+	if (_status >= 400 && _status < 500) {
+		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
+		filestream.open(_errorFiles[_status].c_str());
+		while(filestream.good()) {
+			std::getline(filestream, this->_file_content);
+			this->_body += this->_file_content;
+			this->_body += '\n';
+		}
+		std::cout << RED << "Error file content: " << this->_file_content << BLANK << std::endl;
 	}
-	// else if (_cgi.size() != 0) {
-	// 	CGI	handler;
-
-
-	// 	handler.setScript(_cgi);
-	// 	handler.setMethod(_method);
-	// 	handler.setBody(_body);
-	// 	handler.setPath(_file);
-	// 	handler.setQuery(_query);
-	// 	handler.setAddr(_host);
-	// 	handler.setPort(_port);
-
-	// 	_response = handler.execute(_cgi);
-	// 	std::cout << "Reponse CGI: " << _response << std::endl;
-
-	// 	return 0;
-	// }
 	else if (_method == "GET") {
-
 		if (isFile(_file)) {
 			filestream.open(_file.c_str());
-			
 			if (filestream.is_open() == false) {
 				_status = 403;
 				filestream.open(_errorFiles[_status].c_str());
@@ -148,7 +119,6 @@ std::cout << "Body: " << _body << std::endl;
 		}
 		else if (isDir(_file) && _autoindex) {
 			AutoIndex	content;
-
 			_body = content.renderPage(_dir, _file, _port, _host);
 		}
 		else {
@@ -160,14 +130,12 @@ std::cout << "Body: " << _body << std::endl;
 				this->_body += '\n';
 			}
 			filestream.close();
-
 		}
 	}
 	else if (_method == "POST") {
 		_status = 204;
 	}
-	else if (_method == "DELETE")
-	{
+	else if (_method == "DELETE") {
 		if (isFile(_file)) {
 			if (remove(_file.c_str()) == 0)
 				_status = 204;
@@ -176,7 +144,6 @@ std::cout << "Body: " << _body << std::endl;
 		}
 		else
 			_status = 404;
-
 		if (_status != 204) {
 			filestream.open(_errorFiles[_status].c_str());
 			while(filestream.good()) {
@@ -186,25 +153,20 @@ std::cout << "Body: " << _body << std::endl;
 			filestream.close();
 		}
 	}
-	
 	_header = "HTTP/1.1 " + toString(_status) + " ";
 	_header += _code[_status] + "\r\n";
-	
 	if (_body.size() != 0) {
 		_header += "Content-Length: " + toString(_body.size()) + "\r\n";
 		_header += "\r\n" + _body + "\r\n";
-
 	}
 	_response = _header;
 	return 0;
 }
 
-HttpResponse::~HttpResponse(void)
-{
+HttpResponse::~HttpResponse(void) {
 	return ;
 }
 
-std::string	HttpResponse::getResponse(void) const
-{
+std::string	HttpResponse::getResponse(void) const {
 	return (this->_response);
 }

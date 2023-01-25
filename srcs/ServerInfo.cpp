@@ -1,8 +1,6 @@
 #include "../includes/webserv.hpp"
 
-ServerInfo::ServerInfo(void)
-{
-	// Default constructor arbitrary values set
+ServerInfo::ServerInfo(void) {
 	this->_ip = "0.0.0.0";
 	this->_clientSize = 1000;
 	this->_root = "./data/my_website/";
@@ -11,7 +9,6 @@ ServerInfo::ServerInfo(void)
 	this->_allow[0] = 0;
 	this->_allow[1] = 0;
 	this->_allow[2] = 0;
-	// this->_loc = NULL;
 }
 
 ServerInfo::ServerInfo(ServerInfo* copy) {
@@ -60,9 +57,7 @@ ServerInfo&	ServerInfo::operator=(ServerInfo& copy) {
 	return *this;
 }
 
-
-int	ServerInfo::setServerNames(std::string names)
-{
+int	ServerInfo::setServerNames(std::string names) {
 	if (names.find(";") == std::string::npos)
 		return 1;
 	names.resize(names.find(";"));
@@ -75,8 +70,7 @@ int	ServerInfo::setServerNames(std::string names)
 	return 0;
 }
 
-int	ServerInfo::setIp(std::string line)
-{
+int	ServerInfo::setIp(std::string line) {
 	if (line.find(";") == std::string::npos)
 		return 1;
 	line.resize(line.find(";"));
@@ -143,14 +137,13 @@ int	ServerInfo::setAutoIndex(std::string line) {
 	if (line == "on")
 		_autoIndex = 1;
 	if (line != "on" && line != "off") {
-		std::cerr << "Error: Parsing configuration file (autoindex)" << std::endl;
+		std::cerr << RED << "Error: Parsing configuration file (autoindex)" << BLANK << std::endl;
 		return 1;
 	}
 	return 0;
 }
 
-int	ServerInfo::setClientSize(std::string line)
-{
+int	ServerInfo::setClientSize(std::string line) {
 	if (line.find(";") == std::string::npos)
 		return 1;
 	line.resize(line.find(";"));
@@ -166,15 +159,14 @@ int	ServerInfo::setClientSize(std::string line)
 	if (line.find(" ") != std::string::npos)
 		this->_clientSize = atoi(&line[line.find(" ")]);
 	if (this->_clientSize <= 0){
-		std::cerr << "Error: Parsing configuration file (clientSize)" << std::endl;
+		std::cerr << RED << "Error: Parsing configuration file (clientSize)" << BLANK << std::endl;
 		return 1;
 	}
 	return 0;
 }
 
 
-int	ServerInfo::setAllow(std::string line)
-{
+int	ServerInfo::setAllow(std::string line) {
 	if (line.find(";") == std::string::npos)
 		return 1;
 	line.resize(line.find(";"));
@@ -190,7 +182,7 @@ int	ServerInfo::setAllow(std::string line)
 		else if (line.substr(0, line.find(' ')) == "DELETE")
 			_allow[2] = 1;
 		else {
-			std::cerr << "Error: Parsing configuration file (allow_methods)" << std::endl;
+			std::cerr << RED << "Error: Parsing configuration file (allow_methods)" << BLANK << std::endl;
 			return 1;
 		}
 		line.erase(0, line.find(' ') + 1);
@@ -202,45 +194,38 @@ int	ServerInfo::setAllow(std::string line)
 	else if (line.substr(0, line.find(' ')) == "DELETE")
 		_allow[2] = 1;
 	else {
-		std::cerr << "Error: Parsing configuration file (allow_methods)" << std::endl;
+		std::cerr << RED << "Error: Parsing configuration file (allow_methods)" << BLANK << std::endl;
 		return 1;
 	}
 	return 0;
 }
 
-int	ServerInfo::setLoc(Location& loc)
-{
+int	ServerInfo::setLoc(Location& loc) {
 	this->_loc.push_back(loc);
 	return 0;
 }
 
-std::vector<std::string> ServerInfo::getServerNames() const
-{
+std::vector<std::string> ServerInfo::getServerNames() const {
 	return(this->_serverNames);
 }
 
-std::string ServerInfo::getIp() const
-{
+std::string ServerInfo::getIp() const {
 	return (this->_ip);
 }
 
-std::string ServerInfo::getRoot() const
-{
+std::string ServerInfo::getRoot() const {
 	return (this->_root);
 }
 
-std::string ServerInfo::getIndex() const
-{
+std::string ServerInfo::getIndex() const {
 	return (this->_index);
 }
 
-long int	ServerInfo::getClientSize() const
-{
+long int	ServerInfo::getClientSize() const {
 	return (this->_clientSize);
 }
 
-int	ServerInfo::getAutoIndex() const
-{
+int	ServerInfo::getAutoIndex() const {
 	return(this->_autoIndex);
 }
 
@@ -248,10 +233,9 @@ std::vector<Location>	ServerInfo::getLoc() const {
 	return _loc;
 }
 
-int	ServerInfo::getAllow(std::string allow) const
-// GET POST DELETE : 0 si interdit, 1 si autorise, return -1 if not found
-{
-	if (allow == "GET")
+int	ServerInfo::getAllow(std::string allow) const {
+    // GET POST DELETE : 0 si interdit, 1 si autorise, return -1 if not found
+    if (allow == "GET")
 		return (this->_allow[0]);
 	if (allow == "POST")
 		return (this->_allow[1]);
@@ -262,10 +246,5 @@ int	ServerInfo::getAllow(std::string allow) const
 
 ServerInfo::~ServerInfo()
 {
-	// while(!this->_loc.empty())
-	// {
-	// 	this->_loc.clear();
-	// 	// this->_loc = this->_loc.next;
-	// }
 	this->_serverNames.clear();
 }
