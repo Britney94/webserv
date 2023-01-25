@@ -94,10 +94,7 @@ int	ServerInfo::setIp(std::string line) {
 		i++;
 	}
 	if (this->_ip != "127.0.0.1" && this->_ip != "0.0.0.0")
-	{
-		// std::cerr << "Error: Parsing configuration file (ip address)" << std::endl;
 		return 1;
-	}
 	return 0;
 }
 
