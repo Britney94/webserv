@@ -1,7 +1,6 @@
 #include "../includes/webserv.hpp"
 
-File::File(char *filename)
-{
+File::File(char *filename) {
 	string tmp;
 	this->cantOpen = 0;
 	this->name = filename;
@@ -9,36 +8,30 @@ File::File(char *filename)
 	this->maxLine = 0;
 	this->end = 0;
 	ifstream fd(filename);
-	if (!fd)
-	{
+	if (!fd) {
 		std::cerr << RED << "Error: Can't open configuration file" << BLANK << std::endl;
 		this->cantOpen = 1;
 	}
-	while (getline(fd, tmp))
-	{
+	while (getline(fd, tmp)) {
 		this->content.push_back(tmp);
 		maxLine++;
 	}
 	fd.close(); 
 }
 
-std::string	File::getName()
-{
+std::string	File::getName() {
 	return (this->name);
 }
 
-int	File::getMaxLine()
-{
+int	File::getMaxLine() {
 	return (this->maxLine);
 }
 
-int	File::getEnd()
-{
+int	File::getEnd() {
 	return (this->end);
 }
 
-std::string File::getLine()
-{
+std::string File::getLine() {
 	std::string line;
 	if (lineHistory >= maxLine)
 		return line;
@@ -51,4 +44,3 @@ std::string File::getLine()
 		this->end = 1;
 	return line;
 }
-

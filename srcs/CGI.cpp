@@ -149,4 +149,3 @@ void	CGI::setPort(int	port) {
 	_port = port;
 	return ;
 }
-
