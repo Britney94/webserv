@@ -89,10 +89,10 @@ int	isDir(std::string file) {
 int	HttpResponse::createResponse() {	
 	std::ifstream		filestream;
 	std::filebuf		filebuf;
-	std::cout << std::endl << BLUE << "File to open: " << _file << std::endl;
+	std::cout << std::endl << std::endl << BLUE << "File to open: " << _file << std::endl;
 	std::cout << "Status: " << _status << std::endl;
 	std::cout << "Method: " << _method << std::endl;
-	std::cout << "Body: " << _body << BLANK << std::endl;
+	std::cout << "Body: " << _body << BLANK;
 	if (_status >= 400 && _status < 500) {
 		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
 		filestream.open(_errorFiles[_status].c_str());

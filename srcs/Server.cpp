@@ -118,7 +118,7 @@ int	Server::parseRequest() {
 		else
 			parseChunked(); 
 	}
-	std::cout << std::endl << std::endl << GREEN << "*** Request ***\n" << _request << BLANK << std::endl;
+	std::cout << std::endl << std::endl << GREEN << "*** Request ***\n" << _request << BLANK;
 	ServerInfo	clientInfo(requestInfos());
 	ClientRequest	client(clientInfo, _request);
 	_file_request = client.getFile();
