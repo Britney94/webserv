@@ -21,4 +21,6 @@ class Location
 		Location& operator=(const Location &copy);
 };
 
+/* Class for parse everything can be in a location part */
+
 #endif

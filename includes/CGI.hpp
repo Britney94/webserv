@@ -37,4 +37,6 @@ class CGI{
 		char	**_convertEnv() const;
 };
 
+/* Class for calling the CGI program */
+
 #endif

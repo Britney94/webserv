@@ -12,4 +12,6 @@ class AutoIndex{
 		~AutoIndex(){};	
 };
 
+/* Fonction d'automatisation de l'indexing */
+
 #endif

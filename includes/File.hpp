@@ -28,4 +28,6 @@ class File {
 		int			cantOpen;
 };
 
+/* Function that allows to manage files (get what is inside the file) */
+
 #endif

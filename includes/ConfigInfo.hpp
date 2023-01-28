@@ -43,4 +43,6 @@ class ConfigInfo {
 		Location	_tmp_loc;
 };
 
+/* Function that allows you to index the error logs on both the client and server side */
+
 #endif

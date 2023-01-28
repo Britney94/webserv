@@ -35,4 +35,6 @@ class	ClientRequest {
 
 };
 
+/* Function that manages client requests between the server and the browser */
+
 #endif

@@ -48,4 +48,6 @@ class	HttpResponse {
 
 };
 
+/* Function that allows to manage response query */
+
 #endif

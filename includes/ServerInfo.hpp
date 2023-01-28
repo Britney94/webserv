@@ -55,4 +55,6 @@ class ServerInfo {
 		std::vector<Location>		_loc;
 };
 
+/* Class who stock everything who can be in the .conf file */
+
 #endif

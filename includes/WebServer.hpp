@@ -28,4 +28,6 @@ class WebServer {
 		int						_max_fd;
 };
 
+/* Principal class who stock others classes */
+
 #endif

@@ -51,4 +51,6 @@ class Server {
 		int	_size;
 };
 
+/* Management function of the server settings: web socket, imap; error and status */
+
 #endif
