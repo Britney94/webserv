@@ -49,6 +49,7 @@
 
 std::string trim(const std::string& str);
 std::string toString(int num);
-int 		checkExt(char *filename);
+int checkExt(char *filename);
+int has(std::string to_search, std::string to_find);
 
 #endif

@@ -59,6 +59,12 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 	}
 	std::string	line = file.getLine();
 	while (file.lineHistory < file.getMaxLine()){
+	    /*
+	    ** Here
+	    ** Change find == or != npos to my own has function (less ugly)
+	    ** == is has(line, "find")
+	    ** != is !has(line, "find")
+	    */
 		if (line.find("server {") != std::string::npos){
 			ServerInfo	*tmpInfo = new ServerInfo();
 			tmp.push_back(tmpInfo);
@@ -130,7 +136,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 						delete tmp.at(tmp.size() - 1);
 					return _servers;
 				}
-				line = file.getLine(); 
+				line = file.getLine();
 			}
 			if (tmp.size() != count)
 				delete tmp.at(tmp.size() - 1);
