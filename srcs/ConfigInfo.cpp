@@ -64,6 +64,8 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 			tmp.push_back(tmpInfo);
 			line = file.getLine();
 			while (line.find("server {") == std::string::npos && file.lineHistory < file.getMaxLine()) {
+				if (line.find("autoindex") != std::string::npos)
+                	ret = (*tmpInfo).setAutoIndex(line);
 				if (line.find("server_name ") != std::string::npos)
 					ret = (*tmpInfo).setServerNames(line);
 				else if (line.find("listen ") != std::string::npos){
@@ -114,8 +116,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 						return _servers;
 					}
 				}
-				else if (line.find("autoindex ") != std::string::npos)
-					ret = (*tmpInfo).setAutoIndex(line);
 				else if (line.size() != 0 && line != "}") {
 					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << BLANK << std::endl;
 					_err = 1;
