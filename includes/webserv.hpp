@@ -46,7 +46,6 @@
 #define MAX_FD 2048
 #define REQUEST_SIZE 30000
 
-
 std::string trim(const std::string& str);
 std::string toString(int num);
 int checkExt(char *filename);

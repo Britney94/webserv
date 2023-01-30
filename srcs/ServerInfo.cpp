@@ -85,8 +85,7 @@ int	ServerInfo::setIp(std::string line) {
 		this->_ip.erase(this->_ip.find(":"));
 	int point = 0;
 	int	i = 0;
-	while(this->_ip[i])
-	{
+	while(this->_ip[i]) {
 		if (this->_ip[i] == '.')
 			point++;
 		if (point > 3)
@@ -104,8 +103,7 @@ int	ServerInfo::setRoot(std::string line) {
 	line.resize(line.find(";"));
 	line.erase(0, line.find(' ') + 1);
 	line = trim(line);
-	if (line.size())
-	{
+	if (line.size()) {
 		this->_root = line;
 		if (this->_root[this->_root.size() - 1] != '/')
 			this->_root.push_back('/');
@@ -147,8 +145,7 @@ int	ServerInfo::setClientSize(std::string line) {
 	line = trim(line);
 	std::string tmp = &line[line.find(" ") + 1];
 	int i = 0;
-	while (tmp[i])
-	{
+	while (tmp[i]) {
 		if (tmp[i] < '0' || tmp[i] > '9')
 			return 1;
 		i++;

@@ -87,8 +87,8 @@ int	isDir(std::string file) {
 }
 
 int	HttpResponse::createResponse() {	
-	std::ifstream		filestream;
-	std::filebuf		filebuf;
+	std::ifstream   filestream;
+	std::filebuf    filebuf;
 	std::cout << std::endl << std::endl << BLUE << "File to open: " << _file << std::endl;
 	std::cout << "Status: " << _status << std::endl;
 	std::cout << "Method: " << _method << std::endl;

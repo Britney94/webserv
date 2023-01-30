@@ -56,18 +56,17 @@ std::string	AutoIndex::renderPage(std::string directory, std::string path, int p
 	page.insert(page.size(), "</h1><body><pre><hr>\n");
 	if ((dir = opendir (path.c_str())) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
-			if (strcmp(".", ent->d_name) != 0 && strcmp("..", ent->d_name) != 0)
-			{
+			if (strcmp(".", ent->d_name) != 0 && strcmp("..", ent->d_name) != 0) {
 				page.insert(page.size(), "<a href=\"");
 				page.insert(page.size(), "http://");
 				page.insert(page.size(), host);
 				tmp = ft_itoa(port);
-				if (strcmp(tmp, "0") != 0){
+				if (strcmp(tmp, "0") != 0) {
 					page.insert(page.size(), ":");
 					page.insert(page.size(), tmp);
 				}
 				free(tmp);
-				if (directory != ""){
+				if (directory != "") {
 					page.insert(page.size(), "/");
 					page.insert(page.size(), directory);
 				}

@@ -12,8 +12,7 @@ Server::Server(ServerInfo* infos, int port) {
 	this->_infos.push_back(infos);
 	this->_size = this->_infos.size();
 	this->_status = 200;
-	if ((this->_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-	{
+	if ((this->_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
 		perror("Error socket");
         _error = 1;
 		return ;
@@ -27,14 +26,12 @@ Server::Server(ServerInfo* infos, int port) {
 	// socket-address struct parameters
 	// +
 	// Start listening on the socket
-	if (bind(this->_socket, (struct sockaddr *)&(this->_addr), sizeof(this->_addr)) < 0)
-	{
+	if (bind(this->_socket, (struct sockaddr *)&(this->_addr), sizeof(this->_addr)) < 0) {
 		perror("Error bind");
         _error = 1;
 		return ;
 	}
-	if (listen(this->_socket, MAX_FD) < 0)
-	{
+	if (listen(this->_socket, MAX_FD) < 0) {
 		perror("Error listen");
         _error = 1;
 		return ;

@@ -5,7 +5,7 @@
 
 #include "webserv.hpp"
 
-class AutoIndex{
+class AutoIndex {
 	public:
 		AutoIndex(){};
 		std::string	renderPage(std::string directory, std::string path, int port, std::string host);
