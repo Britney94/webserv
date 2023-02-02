@@ -139,11 +139,11 @@ int	Hex_to_Int(std::string hex) {
 }
 
 void	Server::parseChunked() {
-	std::string		header;
-	std::string		received;
-	std::string		body = "";
-	int				size = 0;
-	int				i;
+	std::string header;
+	std::string received;
+	std::string body = "";
+	int size = 0;
+	int i;
 	header = _request.substr(0, _request.find("\r\n\r\n") + 4);
 	received = _request.substr(_request.find("\r\n\r\n") + 4);
 	while (received.size()) {
@@ -156,7 +156,9 @@ void	Server::parseChunked() {
 }
 
 int	Server::sendResponse(std::map<int, std::string> errors) {
-	HttpResponse	response;
+	HttpResponse    response;
+	std::cout << "Port: " << _default->getPort() << std::endl;
+	response.setHost(_default->getIp());
 	response.setMethod(_method);
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
@@ -164,7 +166,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	response.setStatus(_status);
 	response.setErrorFiles(errors);
 	response.createResponse();
-	std::string		message = response.getResponse();
+	std::string message = response.getResponse();
 	int	ret;
 	ret = write(_socket, &message[0], message.size());
 	if (ret <= 0) {
@@ -183,7 +185,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 
 ServerInfo	*Server::requestInfos() {
 	std::string	serv_name;
-	size_t		found;
+	size_t  found;
 	found = _request.find("HOST:");
 	if (found == std::string::npos)
 		found = _request.find("Host:");

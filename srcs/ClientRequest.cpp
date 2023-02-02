@@ -112,6 +112,7 @@ std::string	ClientRequest::determinateFile() {
 		else
 			_file.insert(_file.size(), "index.html");
 	}
+	std::cout << "File: " << _file << std::endl;
 	return _file;
 }
 

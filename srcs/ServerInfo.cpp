@@ -71,6 +71,7 @@ int	ServerInfo::setServerNames(std::string names) {
 }
 
 int	ServerInfo::setIp(std::string line) {
+    std::string port;
 	if (line.find(";") == std::string::npos)
 		return 1;
 	line.resize(line.find(";"));
@@ -79,10 +80,12 @@ int	ServerInfo::setIp(std::string line) {
 	if (line.find("localhost") != std::string::npos)
 		this->_ip = "127.0.0.1";
 	else
-		if (line.find(" ") != std::string::npos)
-			this->_ip = &line[line.find(" ") + 1];
-	if (this->_ip.find(":") != std::string::npos)
+		this->_ip = &line[line.find(" ") + 1];
+	this->_port = 0;
+	if (has(this->_ip, ":")) {
+	    port = &this->_ip[this->_ip.find(":")];
 		this->_ip.erase(this->_ip.find(":"));
+	}
 	int point = 0;
 	int	i = 0;
 	while(this->_ip[i]) {
@@ -94,6 +97,7 @@ int	ServerInfo::setIp(std::string line) {
 	}
 	if (this->_ip != "127.0.0.1" && this->_ip != "0.0.0.0")
 		return 1;
+	this->_ip += port;
 	return 0;
 }
 
@@ -205,6 +209,10 @@ std::vector<std::string> ServerInfo::getServerNames() const {
 
 std::string ServerInfo::getIp() const {
 	return (this->_ip);
+}
+
+int ServerInfo::getPort() const {
+    return (this->_port);
 }
 
 std::string ServerInfo::getRoot() const {

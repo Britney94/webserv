@@ -29,15 +29,17 @@ class ServerInfo {
 		int	setAllow(std::string line);
 		int	setLoc(Location& loc);
 		std::string	getIp() const;
+		int getPort() const;
 		std::string	getRoot() const;
 		std::string	getIndex() const;
-		long		getClientSize() const;
-		int			getAutoIndex() const;
-		int			getAllow(std::string allow) const;
+		long    getClientSize() const;
+		int getAutoIndex() const;
+		int getAllow(std::string allow) const;
 		std::vector<std::string>	getServerNames() const;
 		std::vector<Location>		getLoc() const;
 	private:
 		std::vector<std::string>    _serverNames;
+		int _port;
 		std::string _ip;
 		std::string _root;
 		std::string _index;

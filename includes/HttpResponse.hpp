@@ -13,7 +13,6 @@ class	HttpResponse {
 		void	setFile(std::string file);
 		void	setStatus(int status);
 		void	setAutoIndex(int autoindex);
-		void	setPort(int port);
 		void	setDir(std::string dir);
 		void	setHost(std::string host);
 		void	setCGI(std::string cgi);
@@ -24,7 +23,6 @@ class	HttpResponse {
 		std::string	getResponse() const;
 	private:
 		int _status;
-		int _port;
 		int _autoindex;
 		std::string	_cgi;
 		std::string	_query;

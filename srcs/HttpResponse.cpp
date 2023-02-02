@@ -58,11 +58,6 @@ void	HttpResponse::setHost(std::string host) {
 	return ;
 }
 
-void	HttpResponse::setPort(int port) {
-	_port = port;
-	return ;
-}
-
 void	HttpResponse::setAutoIndex(int autoindex) {
 	_autoindex = autoindex;
 	return ;
@@ -119,7 +114,7 @@ int	HttpResponse::createResponse() {
 		}
 		else if (isDir(_file) && _autoindex) {
 			AutoIndex	content;
-			_body = content.renderPage(_dir, _file, _port, _host);
+			_body = content.renderPage(_dir, _file, _host);
 		}
 		else {
 			_status = 404;
