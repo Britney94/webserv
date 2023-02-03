@@ -10,6 +10,7 @@ HttpResponse::HttpResponse() {
 	_code[405] = "Method Not Allowed";
 	_code[413] = "Payload Too Large";
 	_code[500] = "Internal Server Error";
+	this->_autoindex = 0;
 	return ;
 }
 
@@ -59,7 +60,7 @@ void	HttpResponse::setHost(std::string host) {
 }
 
 void	HttpResponse::setAutoIndex(int autoindex) {
-	_autoindex = autoindex;
+	this->_autoindex = autoindex;
 	return ;
 }
 
@@ -112,8 +113,8 @@ int	HttpResponse::createResponse() {
 			}
 			filestream.close();
 		}
-		else if (isDir(_file) && _autoindex) {
-			AutoIndex	content;
+		else if (isDir(_file)) {
+			AutoIndex   content;
 			_body = content.renderPage(_dir, _file, _host);
 		}
 		else {

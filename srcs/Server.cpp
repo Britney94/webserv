@@ -157,7 +157,6 @@ void	Server::parseChunked() {
 
 int	Server::sendResponse(std::map<int, std::string> errors) {
 	HttpResponse    response;
-	std::cout << "Port: " << _default->getPort() << std::endl;
 	response.setHost(_default->getIp());
 	response.setMethod(_method);
 	response.setClientBody(_body);
