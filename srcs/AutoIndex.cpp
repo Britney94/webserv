@@ -1,73 +1,26 @@
 #include "../includes/webserv.hpp"
 
-static int	ft_count_digits(long n) {
-	int	count = 0;
-	if (n < 0)
-	{
-		count++;
-		n *= -1;
-	}
-	while (n > 0)
-	{
-		count++;
-		n = n / 10;
-	}
-	return (count);
-}
-
-static char	*ft_itoa(int n) {
-	int		i;
-	long	nb;
-	char	*itoa;
-	if (n == 0)
-		return (strdup("0"));
-	nb = n;
-	i = ft_count_digits(nb);
-	itoa = (char *)malloc(sizeof (char) * (i + 1));
-	if (itoa == NULL)
-		return (NULL);
-	itoa[i--] = '\0';
-	if (n < 0)
-	{
-		itoa[0] = '-';
-		nb *= -1;
-	}
-	while (n > 0)
-	{
-		itoa[i] = '0' + (n % 10);
-		n /= 10;
-		i--;
-	}
-	return (itoa);
-}
-
-std::string	AutoIndex::renderPage(std::string directory, std::string path, int port, std::string host) {
+std::string	AutoIndex::renderPage(std::string directory, std::string path, std::string host) {
 	DIR *dir;
 	struct dirent *ent;
 	std::string page;
-	char *tmp;
-	page = "<html>\n";
-	page.insert(page.size(), "<head><title>Index of ");
+	std::string port = &host[host.find(":") + 1];
+	host.erase(host.find(":"));
+	page.insert(page.size(), "<html>\n<head><title>Index of ");
 	page.insert(page.size(), host);
-	page.insert(page.size(), "</title></head>\n");
-	page.insert(page.size(), "<body bgcolor=\"white\">\n");
-	page.insert(page.size(), "<h1>Index of ");
+	page.insert(page.size(), "</title></head>\n<body bgcolor=\"white\">\n<h1>Index of ");
 	page.insert(page.size(), host);
 	page.insert(page.size(), "</h1><body><pre><hr>\n");
 	if ((dir = opendir (path.c_str())) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
-			if (strcmp(".", ent->d_name) != 0 && strcmp("..", ent->d_name) != 0)
-			{
-				page.insert(page.size(), "<a href=\"");
-				page.insert(page.size(), "http://");
+			if (strcmp(".", ent->d_name) != 0 && strcmp("..", ent->d_name) != 0) {
+				page.insert(page.size(), "<a href=\"http://");
 				page.insert(page.size(), host);
-				tmp = ft_itoa(port);
-				if (strcmp(tmp, "0") != 0){
+				if (strcmp(port.c_str(), "0") != 0) {
 					page.insert(page.size(), ":");
-					page.insert(page.size(), tmp);
+					page.insert(page.size(), port.c_str());
 				}
-				free(tmp);
-				if (directory != ""){
+				if (directory != "") {
 					page.insert(page.size(), "/");
 					page.insert(page.size(), directory);
 				}

@@ -29,7 +29,7 @@ int	ClientRequest::checkMethod() {
 
 int	ClientRequest::isMethod(std::string word) {
 	if (word == "GET" || word == "POST" || word == "DELETE")
-			return 1;
+	    return 1;
 	return 0;
 }
 
@@ -62,7 +62,7 @@ int	ClientRequest::checkSyntax() {
 	std::string	bodyLine;
 	std::string	header_field;
 	std::string	value;
-	int			body_size = 0;
+	int body_size = 0;
 	copy_request.erase(0, copy_request.find("\r\n") + 2);
 	bodyLine = copy_request.substr(0, copy_request.find("\r\n") + 2);
 	while (bodyLine.length() && bodyLine != "\r\n") {
@@ -112,6 +112,7 @@ std::string	ClientRequest::determinateFile() {
 		else
 			_file.insert(_file.size(), "index.html");
 	}
+	std::cout << "File: " << _file << std::endl;
 	return _file;
 }
 

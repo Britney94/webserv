@@ -12,8 +12,7 @@ Server::Server(ServerInfo* infos, int port) {
 	this->_infos.push_back(infos);
 	this->_size = this->_infos.size();
 	this->_status = 200;
-	if ((this->_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-	{
+	if ((this->_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
 		perror("Error socket");
         _error = 1;
 		return ;
@@ -27,14 +26,12 @@ Server::Server(ServerInfo* infos, int port) {
 	// socket-address struct parameters
 	// +
 	// Start listening on the socket
-	if (bind(this->_socket, (struct sockaddr *)&(this->_addr), sizeof(this->_addr)) < 0)
-	{
+	if (bind(this->_socket, (struct sockaddr *)&(this->_addr), sizeof(this->_addr)) < 0) {
 		perror("Error bind");
         _error = 1;
 		return ;
 	}
-	if (listen(this->_socket, MAX_FD) < 0)
-	{
+	if (listen(this->_socket, MAX_FD) < 0) {
 		perror("Error listen");
         _error = 1;
 		return ;
@@ -142,11 +139,11 @@ int	Hex_to_Int(std::string hex) {
 }
 
 void	Server::parseChunked() {
-	std::string		header;
-	std::string		received;
-	std::string		body = "";
-	int				size = 0;
-	int				i;
+	std::string header;
+	std::string received;
+	std::string body = "";
+	int size = 0;
+	int i;
 	header = _request.substr(0, _request.find("\r\n\r\n") + 4);
 	received = _request.substr(_request.find("\r\n\r\n") + 4);
 	while (received.size()) {
@@ -159,7 +156,8 @@ void	Server::parseChunked() {
 }
 
 int	Server::sendResponse(std::map<int, std::string> errors) {
-	HttpResponse	response;
+	HttpResponse    response;
+	response.setHost(_default->getIp());
 	response.setMethod(_method);
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
@@ -167,7 +165,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	response.setStatus(_status);
 	response.setErrorFiles(errors);
 	response.createResponse();
-	std::string		message = response.getResponse();
+	std::string message = response.getResponse();
 	int	ret;
 	ret = write(_socket, &message[0], message.size());
 	if (ret <= 0) {
@@ -186,7 +184,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 
 ServerInfo	*Server::requestInfos() {
 	std::string	serv_name;
-	size_t		found;
+	size_t  found;
 	found = _request.find("HOST:");
 	if (found == std::string::npos)
 		found = _request.find("Host:");

@@ -24,11 +24,11 @@ int	WebServer::parsefile(char *filename) {
 }
 
 int	WebServer::launch(void) {
-	fd_set			readfds;
-	fd_set			writefds;
+	fd_set  readfds;
+	fd_set  writefds;
 	struct timeval	timeout;
-	int				pending;
-	int				ret;
+	int pending;
+	int ret;
 	while (1) {
 		pending = 0;
 		ret = 0;

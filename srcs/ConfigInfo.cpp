@@ -44,10 +44,10 @@ static int checkBrackets(char *filename) {
 }
 
 std::map<int, Server *>	ConfigInfo::parse(char *filename) {
-	File		file(filename);
-	int			ret = 0;
-	size_t		count = 0;
-	std::vector<ServerInfo *>	tmp;
+	File    file(filename);
+	int ret = 0;
+	size_t  count = 0;
+	std::vector<ServerInfo *>   tmp;
 	if (file.cantOpen == 1) {
 		_err = 1;
 		return _servers;
@@ -58,21 +58,23 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 		return _servers;
 	}
 	std::string	line = file.getLine();
-	while (file.lineHistory < file.getMaxLine()){
-		if (line.find("server {") != std::string::npos){
+	while (file.lineHistory < file.getMaxLine()) {
+		if (!has(line, "server {")) {
 			ServerInfo	*tmpInfo = new ServerInfo();
 			tmp.push_back(tmpInfo);
 			line = file.getLine();
 			while (line.find("server {") == std::string::npos && file.lineHistory < file.getMaxLine()) {
-				if (line.find("server_name ") != std::string::npos)
+				if (has(line, "autoindex "))
+                	ret = (*tmpInfo).setAutoIndex(line);
+				if (has(line, "server_name "))
 					ret = (*tmpInfo).setServerNames(line);
-				else if (line.find("listen ") != std::string::npos){
+				else if (has(line, "listen ")) {
 					int	port;
-					if (line.find(":") != std::string::npos) {
+					if (has(line, ":")) {
 						port = atoi(&line[line.find(":") + 1]);
 						ret = (*tmpInfo).setIp(line);
 					}
-					else if (line.find('.') == std::string::npos)
+					else if (has(line, "."))
 						port = atoi(&line[line.find(" ") + 1]);
 					else {
 						std::cerr << RED << "Error: Parsing configuration file : port" << BLANK << std::endl;
@@ -95,27 +97,23 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 						}
 					}
 				}
-				else if (line.find("root ") != std::string::npos)
+				else if (has(line, "root "))
 					ret = (*tmpInfo).setRoot(line);
-				else if (line.find("index ") != std::string::npos)
+				else if (has(line, "index "))
 					ret = (*tmpInfo).setIndex(line);
-				else if (line.find("client_body_buffer_size ") != std::string::npos)
+				else if (has(line, "client_body_buffer_size "))
 					ret = (*tmpInfo).setClientSize(line);
-				else if (line.find("allow_methods ") != std::string::npos)
+				else if (has(line, "allow_methods "))
 					ret = (*tmpInfo).setAllow(line);
-				else if (line.find("location ") != std::string::npos)
-				{
+				else if (has(line, "location ")) {
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
-					if (_err == 1)
-					{
+					if (_err == 1) {
 						std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 						if (tmp.size() != count)
 							delete tmp.at(tmp.size() - 1);
 						return _servers;
 					}
 				}
-				else if (line.find("autoindex ") != std::string::npos)
-					ret = (*tmpInfo).setAutoIndex(line);
 				else if (line.size() != 0 && line != "}") {
 					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << BLANK << std::endl;
 					_err = 1;
@@ -130,12 +128,12 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 						delete tmp.at(tmp.size() - 1);
 					return _servers;
 				}
-				line = file.getLine(); 
+				line = file.getLine();
 			}
 			if (tmp.size() != count)
 				delete tmp.at(tmp.size() - 1);
 		}
-		else if (line.find("error_page ") != std::string::npos) {
+		else if (has(line, "error_page ") > 0) {
 			if (setErrorFile(line)) {
 				std::cerr << RED << "Config file is incorrect: error_page" << BLANK << std::endl;
 				_err = 1;
@@ -175,9 +173,9 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.find("{") - (curr_line.find("location ") + 9));
 	while (tmp.uri.at(tmp.uri.length() - 1) == ' ')
 		tmp.uri.erase(tmp.uri.length() - 1);
-	if (tmp.uri.find(".") == std::string::npos && tmp.uri.at(tmp.uri.length() - 1) != '/')
+	if (!has(tmp.uri, ".") && tmp.uri.at(tmp.uri.length() - 1) != '/')
 		tmp.uri += "/";
-	if (tmp.uri.find("*") != std::string::npos)
+	if (has(tmp.uri, "*"))
 		tmp.uri.erase(0, 1);
 	tmp.allow[0] = 0;
 	tmp.allow[1] = 0;
@@ -186,37 +184,37 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.clientSize = -1;
 	tmp.index = "";
 	tmp.root = "";
-	while (line.find("}") == std::string::npos) {
-		if (line.find(";") == std::string::npos && line.find("{") == std::string::npos && trim(line) != "") {
+	while (!has(line, "}")) {
+		if (!has(line, ";") && !has(line, "{") && trim(line) != "") {
 			this->_err = 1;
 			_tmp_loc = tmp;
 			return _tmp_loc;
 		}
-		if (line.find("location ") != std::string::npos)
+		if (has(line, "location "))
 			tmp.loc.push_back(setupLoc(file, line));
-		else if (line.find("root ") != std::string::npos) {
+		else if (has(line, "root ")) {
 			tmp.root = line.substr(line.find(" ") + 1);
 			if (tmp.root.at(tmp.root.length() - 1) != '/')
 				tmp.root += "/";
 		}
-		else if (line.find("index ") != std::string::npos)
+		else if (has(line, "index "))
 			tmp.index = line.substr(line.find(" ") + 1);
-		else if (line.find("cgi_pass ") != std::string::npos)
+		else if (has(line, "cgi_pass "))
 			tmp.cgi = line.substr(line.find(" ") + 1);
-		else if (line.find("client_body_buffer_size ") != std::string::npos) {
-			tmp.clientSize = atoi(&(line.substr(line.find(" ") + 1))[0]);
+		else if (has(line, "client_body_buffer_size ")) {
+			tmp.clientSize = atoi(&(line.substr(has(line, " ") + 1))[0]);
 			if (tmp.clientSize <= 0) {
 				this->_err = 1;
 				_tmp_loc = tmp;
 				return _tmp_loc;
 			}
 		}
-		else if (line.find("allow_methods ") != std::string::npos) {
-			if (line.find("GET") != std::string::npos)
+		else if (has(line, "allow_methods ")) {
+			if (has(line, "GET"))
 				tmp.allow[0] = 1;
-			if (line.find("POST") != std::string::npos)
+			if (has(line, "POST"))
 				tmp.allow[1] = 1;
-			if (line.find("DELETE") != std::string::npos)
+			if (has(line, "DELETE"))
 				tmp.allow[2] = 1;
 		}
 		line = file.getLine();
@@ -226,7 +224,7 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 }
 
 int	ConfigInfo::setErrorFile(std::string line) {
-	int error = atoi(&(line.substr(line.find(" ") + 1))[0]);
+	int error = atoi(&(line.substr(has(line, " ") + 1))[0]);
 	if (error < 400 || error >= 600)
 		return 1;
 	else {
@@ -261,7 +259,6 @@ std::map<int, Server *>	ConfigInfo::getServers() const {
 	return _servers;
 }
 
-
 int ConfigInfo::getSize() const {
 	return (this->_size);
 }
@@ -271,8 +268,7 @@ int ConfigInfo::getMaxFd() const {
 }
 
 ConfigInfo::~ConfigInfo() {
-	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
-	{
+	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++) {
 		it->second->close_socket();
 		if (it->second != NULL)
 			delete (it->second);

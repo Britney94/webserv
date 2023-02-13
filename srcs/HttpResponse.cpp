@@ -10,6 +10,7 @@ HttpResponse::HttpResponse() {
 	_code[405] = "Method Not Allowed";
 	_code[413] = "Payload Too Large";
 	_code[500] = "Internal Server Error";
+	this->_autoindex = 0;
 	return ;
 }
 
@@ -58,13 +59,8 @@ void	HttpResponse::setHost(std::string host) {
 	return ;
 }
 
-void	HttpResponse::setPort(int port) {
-	_port = port;
-	return ;
-}
-
 void	HttpResponse::setAutoIndex(int autoindex) {
-	_autoindex = autoindex;
+	this->_autoindex = autoindex;
 	return ;
 }
 
@@ -87,8 +83,8 @@ int	isDir(std::string file) {
 }
 
 int	HttpResponse::createResponse() {	
-	std::ifstream		filestream;
-	std::filebuf		filebuf;
+	std::ifstream   filestream;
+	std::filebuf    filebuf;
 	std::cout << std::endl << std::endl << BLUE << "File to open: " << _file << std::endl;
 	std::cout << "Status: " << _status << std::endl;
 	std::cout << "Method: " << _method << std::endl;
@@ -117,9 +113,9 @@ int	HttpResponse::createResponse() {
 			}
 			filestream.close();
 		}
-		else if (isDir(_file) && _autoindex) {
-			AutoIndex	content;
-			_body = content.renderPage(_dir, _file, _port, _host);
+		else if (isDir(_file)) {
+			AutoIndex   content;
+			_body = content.renderPage(_dir, _file, _host);
 		}
 		else {
 			_status = 404;

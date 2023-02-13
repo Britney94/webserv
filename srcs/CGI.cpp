@@ -68,13 +68,11 @@ std::string	CGI::execute(const std::string& scriptName) {
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
 	pid = fork();
-	if (pid == -1)
-	{
+	if (pid == -1) {
 		std::cerr << "Error: fork() in execute" << std::endl;
 		return ("Status: 500\r\n\r\n");
 	}
-	else if (!pid)
-	{
+	else if (!pid) {
 		char * const * nll = NULL;
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
@@ -82,14 +80,12 @@ std::string	CGI::execute(const std::string& scriptName) {
 		std::cerr << "Error: execve() in execute" << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 	}
-	else
-	{
+	else {
 		char	buffer[65536] = {0};
 		waitpid(-1, NULL, 0);
 		lseek(fdOut, 0, SEEK_SET);
 		ret = 1;
-		while (ret > 0)
-		{
+		while (ret > 0) {
 			memset(buffer, 0, 65536);
 			ret = read(fdOut, buffer, 65536 - 1);
 			tmpBody += buffer;

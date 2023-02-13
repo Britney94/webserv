@@ -27,3 +27,18 @@ std::string toString(int num) {
     oss << num;
     return oss.str();
 }
+
+int has(std::string to_search, std::string to_find) {
+    for (int pos = 0; pos < (int)to_search.length(); pos++) {
+        if (to_search[pos] == to_find[0]) {
+            int i = 0;
+            while (to_find[i] && to_search[pos + i] == to_find[i]) {
+                i++;
+            }
+            if (to_find[i] == '\0') {
+                return pos;
+            }
+        }
+    }
+    return 0;
+}
