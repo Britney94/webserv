@@ -2,7 +2,7 @@
 
 ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info), _request(request), _file(""), _status(200) {
 	checkSyntax();
-    std::cout << BLUE << "Syntax checked! Status: " << _status << std::endl;
+    std::cout << "Syntax checked! Status: " << _status << std::endl;
 	determinateLoc();
     std::cout << "Location found! Root is: " << _loc.root << std::endl;
 	checkMethod();
@@ -10,7 +10,7 @@ ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info)
 	checkSize();
     std::cout << "Size of body checked! Status: " << _status << std::endl;
 	determinateFile();
-    std::cout << "File requested: " << _file << " Status: " << _status << BLANK << std::endl << std::endl;
+    std::cout << "File requested: " << _file << " Status: " << _status << BLANK << std::endl;
 }
 
 ClientRequest::~ClientRequest() {
