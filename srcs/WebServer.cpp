@@ -39,7 +39,7 @@ int	WebServer::launch(void) {
 			FD_ZERO(&writefds);
 			for (std::map<int, Server *>::iterator it = _writablefds.begin(); it != _writablefds.end(); it++)
 				FD_SET(it->second->getSocket(), &writefds);
-			std::cout << "\rWaiting..." << std::flush;
+			std::cout << "\r" << std::flush;
 			pending = select(_max_fd + 1, &readfds, &writefds, NULL, &timeout);
 			if (pending < 0) {
 				if (errno == EINTR) {

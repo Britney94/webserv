@@ -172,6 +172,10 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 		std::cerr << "Error: Could not write response to client." << std::endl;
 		return ret;
 	}
+	if (message.size() > 125) {
+        message.resize(125);
+        message += "\n[...]";
+    }
 	std::cout << std::endl << std::endl << PURPLE << "*** Response ***\n" << message << BLANK << std::endl;
 	this->close_socket();
 	_request.erase();
