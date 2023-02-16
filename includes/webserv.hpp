@@ -36,12 +36,15 @@
 #include "HttpResponse.hpp"
 
 #define BLANK "\033[0m"
-#define RED "\033[31m"
-#define GREEN "\033[32m"
+#define GREEN "\033[1;32m"
+#define LGREEN "\033[0;32m"
+#define RED "\033[0;31m"
 #define YELLOW "\033[33m"
-#define BLUE "\033[34m"
-#define PURPLE "\033[35m"
+#define BLUE "\033[1;34m"
+#define PURPLE "\033[0;35m"
 #define CYAN "\033[36m"
+#define BHGRN "\033[1;92m"
+#define BHBLU "\033[1;94m"
 
 #define MAX_FD 2048
 #define REQUEST_SIZE 30000

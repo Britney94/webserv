@@ -29,6 +29,6 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 	server.clean();
-	std::cout << std::endl << GREEN << "The user has stopped the program" << BLANK << std::endl;
+	std::cout << std::endl << BHGRN << "The user has stopped the program." << BLANK << std::endl;
 	return 0;
 }

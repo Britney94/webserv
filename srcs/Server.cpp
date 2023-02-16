@@ -115,7 +115,7 @@ int	Server::parseRequest() {
 		else
 			parseChunked(); 
 	}
-	std::cout << std::endl << std::endl << GREEN << "*** Request ***\n" << _request << BLANK;
+	std::cout << std::endl << std::endl << BHBLU << "*** Request ***\n" << BLUE << _request << BLANK;
 	ServerInfo	clientInfo(requestInfos());
 	ClientRequest	client(clientInfo, _request);
 	_file_request = client.getFile();
@@ -167,12 +167,20 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	response.createResponse();
 	std::string message = response.getResponse();
 	int	ret;
+	int max_size = 0;
 	ret = write(_socket, &message[0], message.size());
 	if (ret <= 0) {
 		std::cerr << "Error: Could not write response to client." << std::endl;
 		return ret;
 	}
-	std::cout << std::endl << std::endl << PURPLE << "*** Response ***\n" << message << BLANK << std::endl;
+	if (message.size() > 125) {
+        message.resize(125);
+        max_size = 1;
+    }
+	std::cout << std::endl << std::endl << BHGRN << "*** Response ***" << BLANK << std::endl;
+	std::cout << GREEN << message << BLANK << std::endl;
+	if (max_size)
+        std::cout << LGREEN << "[...]" << BLANK << std::endl;
 	this->close_socket();
 	_request.erase();
 	_file_request.erase();
