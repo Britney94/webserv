@@ -112,6 +112,8 @@ std::string	ClientRequest::determinateFile() {
 		else
 			_file.insert(_file.size(), "index.html");
 	}
+	if (_file.find("?") != std::string::npos)
+        _file.erase(_file.find("?"));
 	std::cout << "File: " << _file << std::endl;
 	return _file;
 }
@@ -130,6 +132,8 @@ int	ClientRequest::determinateLoc() {
 	tmp_uri = _uri;
 	if (tmp_uri.find(".") != std::string::npos)
 		ext = tmp_uri.substr(tmp_uri.find("."));
+	if (ext.find("?") != std::string::npos)
+        ext.erase(ext.find("?"));
 	tmp_uri.erase(tmp_uri.find_last_of('/') + 1);
     std::cout << "URI: " << tmp_uri << " EXT: " << ext << std::endl;
 	while (tmp_vec.size() != 0) {
