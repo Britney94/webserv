@@ -53,8 +53,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 		return _servers;
 	}
 	if (checkBrackets(filename) == 1) {
-		std::cerr << RED << "Config file is incorrect: no end brackets" << BLANK << std::endl;
-		_err = 1;
+		std::cerr << RED << "Config file is incorrect: no end brackets" << BLANK << std::endl, _err = 1;
 		return _servers;
 	}
 	std::string	line = file.getLine();
@@ -77,8 +76,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 					else if (has(line, "."))
 						port = atoi(&line[line.find(" ") + 1]);
 					else {
-						std::cerr << RED << "Error: Parsing configuration file : port" << BLANK << std::endl;
-						_err = 1;
+						std::cerr << RED << "Error: Parsing configuration file : port" << BLANK << std::endl, _err = 1;
 						if (tmp.size() != count)
 							delete tmp.at(tmp.size() - 1);
 						return _servers;
@@ -115,8 +113,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 					}
 				}
 				if (ret) {
-					std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
-					_err = 1;
+					std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl, _err = 1;
 					if (tmp.size() != count)
 						delete tmp.at(tmp.size() - 1);
 					return _servers;
@@ -128,8 +125,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 		}
 		else if (has(line, "error_page ") > 0) {
 			if (setErrorFile(line)) {
-				std::cerr << RED << "Config file is incorrect: error_page" << BLANK << std::endl;
-				_err = 1;
+				std::cerr << RED << "Config file is incorrect: error_page" << BLANK << std::endl, _err = 1;
 				if (tmp.size() != count)
 					delete tmp.at(tmp.size() - 1);
 				return _servers;
@@ -139,8 +135,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 		else if (line.size() == 0)
 			line = file.getLine();
 		else {
-			std::cerr << RED << "Error: Parsing configuration file : unknown directive : " << line << BLANK << std::endl;
-			_err = 1;
+			std::cerr << RED << "Error: Parsing configuration file : unknown directive : " << line << BLANK << std::endl, _err = 1;
 			if (tmp.size() != count)
 				delete tmp.at(tmp.size() - 1);
 			return _servers;
@@ -192,8 +187,11 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 		}
 		else if (has(line, "index "))
 			tmp.index = line.substr(line.find(" ") + 1);
-		else if (has(line, "cgi_pass "))
+		else if (has(line, "cgi_pass ")) {
+		    std::cout << ">>>CGI OK !!!<<<" << std::endl;
 			tmp.cgi = line.substr(line.find(" ") + 1);
+			std::cout << "Cgi line : " << tmp.cgi << std::endl;
+		}
 		else if (has(line, "client_body_buffer_size ")) {
 			tmp.clientSize = atoi(&(line.substr(has(line, " ") + 1))[0]);
 			if (tmp.clientSize <= 0) {
