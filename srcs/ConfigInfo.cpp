@@ -114,13 +114,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 						return _servers;
 					}
 				}
-				else if (line.size() != 0 && line != "}") {
-					std::cerr << RED << "Config file is incorrect: unknown directive: " << line << BLANK << std::endl;
-					_err = 1;
-					if (tmp.size() != count)
-						delete tmp.at(tmp.size() - 1);
-					return _servers;
-				}
 				if (ret) {
 					std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 					_err = 1;
