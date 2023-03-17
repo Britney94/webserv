@@ -9,6 +9,9 @@ form = cgi.FieldStorage()
 name = form.getvalue("name")
 email = form.getvalue("email")
 
+print(name)
+print(email)
+
 # Process the data and return an HTML response
 if name and email:
     print("<h2>Welcome, {}!</h2>".format(name))

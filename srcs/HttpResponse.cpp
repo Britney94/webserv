@@ -144,7 +144,9 @@ int	HttpResponse::createResponse() {
 	else if (_method == "POST") {
 	    if (isCGI(_file) == 1) {
 	        std::cout << "C'est un script CGI." << std::endl;
-
+            CGI cgi;
+            cgi.setBody(_clientBody);
+            std::cout << cgi.execute("cgi-bin/webform.cgi") << std::endl;
 	    }
 		_status = 204;
 	}
