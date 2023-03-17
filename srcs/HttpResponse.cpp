@@ -82,6 +82,19 @@ int	isDir(std::string file) {
 	return 0;
 }
 
+/* Return 1 if the request is CGI and 0 if not */
+
+static int  isCGI(std::string file) {
+    if (file.find(".cgi") == std::string::npos)
+            return 0;
+    std::string tmp = &file.c_str()[file.find("./") + 2];
+    std::string script = &tmp.c_str()[tmp.find("/") + 1];
+    std::ifstream infile(script.c_str());
+    if (infile.good() == false)
+        return 0;
+    return 1;
+}
+
 int	HttpResponse::createResponse() {	
 	std::ifstream   filestream;
 	std::filebuf    filebuf;
@@ -89,7 +102,6 @@ int	HttpResponse::createResponse() {
 	std::cout << "Status: " << _status << std::endl;
 	std::cout << "Method: " << _method << std::endl;
 	std::cout << "Body: " << _body << BLANK << std::endl;
-	std::cout << "Cgi line in createResponse : " << _cgi << std::endl;
 	if (_status >= 400 && _status < 500) {
 		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
 		filestream.open(_errorFiles[_status].c_str());
@@ -130,6 +142,10 @@ int	HttpResponse::createResponse() {
 		}
 	}
 	else if (_method == "POST") {
+	    if (isCGI(_file) == 1) {
+	        std::cout << "C'est un script CGI." << std::endl;
+
+	    }
 		_status = 204;
 	}
 	else if (_method == "DELETE") {
