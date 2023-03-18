@@ -102,7 +102,7 @@ int	HttpResponse::createResponse() {
 	std::cout << "Status: " << _status << std::endl;
 	std::cout << "Method: " << _method << std::endl;
 	std::cout << "Body: " << _body << BLANK << std::endl;
-	int isCGI;
+	int isCGI = 0;
 	if (_status >= 400 && _status < 500) {
 		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
 		filestream.open(_errorFiles[_status].c_str());
