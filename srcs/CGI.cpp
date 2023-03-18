@@ -65,7 +65,6 @@ std::string	CGI::execute(const std::string& scriptName) {
 	long	fdIn = fileno(fileIn);
 	long	fdOut = fileno(fileOut);
 	int	ret = 1;
-	std::cout << "Je vais executé" << std::endl;
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
 	pid = fork();
@@ -76,8 +75,7 @@ std::string	CGI::execute(const std::string& scriptName) {
 	else if (!pid) {
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-//		const char arg[2][2] = {{"te", "st"}, {NULL, NULL}};
-        char* const arg[] = { const_cast<char*>(scriptName.c_str()), const_cast<char*>("name=agatocherry&email=agatocherry%40gmail.com"), NULL };
+        char* const arg[] = {const_cast<char*>(scriptName.c_str()), const_cast<char*>(_body.c_str()), NULL};
         execve(scriptName.c_str(), arg, env);
 		std::cerr << "Error: execve() in execute" << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);

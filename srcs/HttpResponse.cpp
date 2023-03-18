@@ -87,9 +87,7 @@ int	isDir(std::string file) {
 static int  isCGIRequest(std::string file) {
     if (file.find(".cgi") == std::string::npos)
             return 0;
-    std::string tmp = &file.c_str()[file.find("./") + 2];
-    std::string script = &tmp.c_str()[tmp.find("/") + 1];
-    std::ifstream infile(script.c_str());
+    std::ifstream infile(file.c_str());
     if (infile.good() == false)
         return 0;
     return 1;
@@ -148,7 +146,7 @@ int	HttpResponse::createResponse() {
 	    if (isCGI == 1) {
             CGI cgi;
             cgi.setBody(_clientBody);
-            this->_body = cgi.execute("cgi-bin/webform.cgi");
+            this->_body = cgi.execute(_file);
 			_status = 200;
 	    }
 	}
