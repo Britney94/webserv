@@ -188,9 +188,7 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 		else if (has(line, "index "))
 			tmp.index = line.substr(line.find(" ") + 1);
 		else if (has(line, "cgi_pass ")) {
-		    std::cout << ">>>CGI OK !!!<<<" << std::endl;
 			tmp.cgi = line.substr(line.find(" ") + 1);
-			std::cout << "Cgi line : " << tmp.cgi << std::endl;
 		}
 		else if (has(line, "client_body_buffer_size ")) {
 			tmp.clientSize = atoi(&(line.substr(has(line, " ") + 1))[0]);

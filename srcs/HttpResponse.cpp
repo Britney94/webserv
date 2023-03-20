@@ -164,6 +164,16 @@ int	HttpResponse::createResponse() {
             this->_body = cgi.execute(_file);
 			_status = 200;
 	    }
+        else {
+			_status = 404;
+			filestream.open(_errorFiles[_status].c_str());
+			while(filestream.good()) {
+				std::getline(filestream, this->_file_content);
+				this->_body += this->_file_content;
+				this->_body += '\n';
+			}
+			filestream.close();
+		}
 	}
 	else if (_method == "DELETE") {
 		if (isFile(_file)) {
