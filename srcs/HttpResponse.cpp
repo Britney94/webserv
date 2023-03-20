@@ -101,6 +101,11 @@ int	HttpResponse::createResponse() {
 	std::cout << "Method: " << _method << std::endl;
 	std::cout << "Body: " << _body << BLANK << std::endl;
 	int isCGI = 0;
+	std::string getCGI;
+	if (_file.find("?") != std::string::npos) {
+	    getCGI = _file.substr(_file.find("?") + 1);
+        _file.erase(_file.find("?"));
+    }
 	if (_status >= 400 && _status < 500) {
 		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
 		filestream.open(_errorFiles[_status].c_str());
@@ -112,7 +117,17 @@ int	HttpResponse::createResponse() {
 		std::cout << RED << "Error file content: " << this->_file_content << BLANK << std::endl;
 	}
 	else if (_method == "GET") {
-		if (isFile(_file)) {
+		isCGI = isCGIRequest(_file);
+	    if (isCGI == 1) {
+            CGI cgi;
+            if (getCGI.size() == 0)
+                cgi.setBody("?");
+            else
+                cgi.setBody(getCGI);
+            this->_body = cgi.execute(_file);
+			_status = 200;
+	    }
+		else if (isFile(_file)) {
 			filestream.open(_file.c_str());
 			if (filestream.is_open() == false) {
 				_status = 403;

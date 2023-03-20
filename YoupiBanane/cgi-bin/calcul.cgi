@@ -25,7 +25,7 @@ print(f"""
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Calculator Result</title>
+    <title>CGI Calculator Result</title>
 </head>
 <body>
     <h1>Calculator</h1>
