@@ -3,15 +3,18 @@
 
 #include "webserv.hpp"
 
+/*
+ * CGI class for executing CGI scripts
+ */
 class CGI {
 	public:
 		CGI();
 		CGI(const CGI &src);
 		CGI &operator=(const CGI &src);
 		std::string	execute(const std::string& scriptName);
+		void	setBody(std::string body);
 		void	setScript(std::string cgi);
 		void	setMethod(std::string method);
-		void	setBody(std::string body);
 		void	setPath(std::string file);
 		void	setType(std::string type);
 		void	setQuery(std::string query);
@@ -28,10 +31,7 @@ class CGI {
 		std::string	_host;
 		int _port;
 		std::map<std::string, std::string>	_env;
-		void    _setEnv();
 		char    **_convertEnv() const;
 };
-
-/* Class for calling the CGI program */
 
 #endif

@@ -1,7 +1,6 @@
 #include "../includes/webserv.hpp"
 
-CGI::CGI()
-{
+CGI::CGI() {
 }
 
 CGI::CGI(const CGI &src) {
@@ -20,24 +19,9 @@ CGI	&CGI::operator=(const CGI &src) {
 	return *this;
 }
 
-void	CGI::_setEnv() {
-	this->_env["REDIRECT_STATUS"] = "200";
-	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_env["SCRIPT_NAME"] = _cgi;
-	this->_env["SCRIPT_FILENAME"] = _cgi;
-	this->_env["REQUEST_METHOD"] = _method;
-	this->_env["CONTENT_LENGTH"] = toString(this->_body.length());
-	this->_env["CONTENT_TYPE"] = _type;
-	this->_env["PATH_INFO"] = _file;
-	this->_env["QUERY_STRING"] = _query;
-	this->_env["REMOTEaddr"] = _host;
-	this->_env["REQUEST_URI"] = _file + _query;
-	this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
-	this->_env["SERVER_PORT"] = toString(_port);
-	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
-}
-
+/*
+ * Convert the env (map) to a char** for execve
+ */
 char	**CGI::_convertEnv() const {
 	char	**env = new char*[this->_env.size() + 1];
 	int	j = 0;
@@ -51,15 +35,16 @@ char	**CGI::_convertEnv() const {
 	return env;
 }
 
+/*
+ * Execute the CGI program
+ * Take an argument which is the path to the CGI program
+ * Return the body of the response
+ */
 std::string	CGI::execute(const std::string& scriptName) {
-	pid_t	pid;
-	int	tmpStdin;
-	int	tmpStdout;
-	char	**env;
 	std::string	tmpBody;
-	env = this->_convertEnv();
-	tmpStdin = dup(STDIN_FILENO);
-	tmpStdout = dup(STDOUT_FILENO);
+	char	**env = this->_convertEnv();
+	int tmpStdin = dup(STDIN_FILENO);
+	int tmpStdout = dup(STDOUT_FILENO);
 	FILE	*fileIn = tmpfile();
 	FILE	*fileOut = tmpfile();
 	long	fdIn = fileno(fileIn);
@@ -67,7 +52,7 @@ std::string	CGI::execute(const std::string& scriptName) {
 	int	ret = 1;
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
-	pid = fork();
+	pid_t   pid = fork();
 	if (pid == -1) {
 		std::cerr << "Error: fork() in execute" << std::endl;
 		return ("Status: 500\r\n\r\n");
@@ -75,7 +60,9 @@ std::string	CGI::execute(const std::string& scriptName) {
 	else if (!pid) {
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
+		// Create the arg array for execve
         char* const arg[] = {const_cast<char*>(scriptName.c_str()), const_cast<char*>(_body.c_str()), NULL};
+        // Call the CGI script with the script and the arguments (variables)
         execve(scriptName.c_str(), arg, env);
 		std::cerr << "Error: execve() in execute" << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
@@ -107,17 +94,18 @@ std::string	CGI::execute(const std::string& scriptName) {
 	return (tmpBody);
 }
 
+void	CGI::setBody(std::string body) {
+	_body = body;
+	return ;
+}
+
 void	CGI::setScript(std::string cgi) {
 	_cgi = cgi;
 	return ;
 }
+
 void	CGI::setMethod(std::string method) {
 	_method = method;
-	return ;
-}
-
-void	CGI::setBody(std::string body) {
-	_body = body;
 	return ;
 }
 
@@ -141,7 +129,7 @@ void	CGI::setType(std::string type) {
 	return ;
 }
 
-void	CGI::setPort(int	port) {
+void	CGI::setPort(int    port) {
 	_port = port;
 	return ;
 }
