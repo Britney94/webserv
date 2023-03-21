@@ -1,6 +1,8 @@
 #include "../includes/webserv.hpp"
 
 CGI::CGI() {
+	this->_query = "";
+	this->_body = "";
 }
 
 CGI::CGI(const CGI &src) {
@@ -21,7 +23,7 @@ CGI	&CGI::operator=(const CGI &src) {
 
 /*
  * Create the env array for the CGI program from envp
- * Take the envp array as argument
+ * Take the envp array as argument and the pathInfo and query string if needed
  * Return the new env array with PATH_INFO variable
  */
 char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
@@ -29,10 +31,14 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
     int sizeEnvp = 0;
     while (envp[sizeEnvp])
         sizeEnvp++;
+    (void)pathInfo;
+    // Check if the query string is not empty
+    if (this->_query.size() > 1)
+        sizeEnvp++;
     // Set the new array
 	char	**env = new char*[sizeEnvp + 2];
     int i = 0;
-    while (i < sizeEnvp) {
+    while (i < sizeEnvp - 1) {
         env[i] = new char[strlen(envp[i]) + 1];
         env[i] = strcpy(env[i], envp[i]);
         i++;
@@ -42,6 +48,13 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
     env[i] = new char[element.size() + 1];
     env[i] = strcpy(env[i], (const char*)element.c_str());
     i++;
+    // Add the QUERY variable in env if needed
+    if (this->_query.size()) {
+        std::string element = "QUERY_STRING=" + this->_query;
+        env[i] = new char[element.size() + 1];
+        env[i] = strcpy(env[i], (const char*)element.c_str());
+        i++;
+    }
     // Set the last element to NULL
     env[i] = NULL;
 	return env;
@@ -54,8 +67,10 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
  */
 std::string	CGI::execute(const std::string& scriptName, char **envp) {
 	std::string	tmpBody;
-	std::cout << "call env convert" << std::endl;
-	char	**env = this->_createEnv(envp, scriptName);
+
+	char **env = this->_createEnv(envp, scriptName);
+	if (this->_query.size())
+	    this->setBody(this->_query);
 	int tmpStdin = dup(STDIN_FILENO);
 	int tmpStdout = dup(STDOUT_FILENO);
 	FILE	*fileIn = tmpfile();

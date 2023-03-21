@@ -126,9 +126,9 @@ int	HttpResponse::createResponse(char **envp) {
 	    if (isCGI == 1) {
             CGI cgi;
             if (query.size() == 0)
-                cgi.setBody("?");
+                cgi.setQuery("");
             else
-                cgi.setBody(query);
+                cgi.setQuery(query);
             this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }
