@@ -82,8 +82,9 @@ int	isDir(std::string file) {
 	return 0;
 }
 
-/* Return 1 if the request is CGI and 0 if not */
-
+/*
+ * Check if the file is a CGI script
+ */
 static int  isCGIRequest(std::string file) {
     if (file.find(".cgi") == std::string::npos)
             return 0;
@@ -93,7 +94,7 @@ static int  isCGIRequest(std::string file) {
     return 1;
 }
 
-int	HttpResponse::createResponse() {	
+int	HttpResponse::createResponse(char **envp) {
 	std::ifstream   filestream;
 	std::filebuf    filebuf;
 	std::cout << std::endl << std::endl << "File to open: " << _file << std::endl;
@@ -101,9 +102,10 @@ int	HttpResponse::createResponse() {
 	std::cout << "Method: " << _method << std::endl;
 	std::cout << "Body: " << _body << BLANK << std::endl;
 	int isCGI = 0;
-	std::string getCGI;
+	std::string query;
+	// Check the URI for a query string
 	if (_file.find("?") != std::string::npos) {
-	    getCGI = _file.substr(_file.find("?") + 1);
+	    query = _file.substr(_file.find("?") + 1);
         _file.erase(_file.find("?"));
     }
 	if (_status >= 400 && _status < 500) {
@@ -117,16 +119,20 @@ int	HttpResponse::createResponse() {
 		std::cout << RED << "Error file content: " << this->_file_content << BLANK << std::endl;
 	}
 	else if (_method == "GET") {
+	    // Check if the file is a CGI script
 		isCGI = isCGIRequest(_file);
+		std::cout << isCGI << std::endl;
+		// Execute the CGI script if it is
 	    if (isCGI == 1) {
             CGI cgi;
-            if (getCGI.size() == 0)
+            if (query.size() == 0)
                 cgi.setBody("?");
             else
-                cgi.setBody(getCGI);
-            this->_body = cgi.execute(_file);
+                cgi.setBody(query);
+            this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }
+	    // If this is a valid file, open it and read its content
 		else if (isFile(_file)) {
 			filestream.open(_file.c_str());
 			if (filestream.is_open() == false) {
@@ -140,10 +146,12 @@ int	HttpResponse::createResponse() {
 			}
 			filestream.close();
 		}
+		// If this is a valid directory, create an index of its content
 		else if (isDir(_file)) {
 			AutoIndex   content;
 			_body = content.renderPage(_dir, _file, _host);
 		}
+		// In other case, return a 404 status code
 		else {
 			_status = 404;
 			filestream.open(_errorFiles[_status].c_str());
@@ -157,13 +165,16 @@ int	HttpResponse::createResponse() {
 	}
 	else if (_method == "POST") {
 		_status = 204;
+		// Check if the file is a CGI script
 		isCGI = isCGIRequest(_file);
+		// Execute the CGI script if it is
 	    if (isCGI == 1) {
             CGI cgi;
             cgi.setBody(_clientBody);
-            this->_body = cgi.execute(_file);
+            this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }
+	    // In other case, return a 204 status code
         else {
 			_status = 404;
 			filestream.open(_errorFiles[_status].c_str());

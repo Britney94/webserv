@@ -13,7 +13,7 @@ class WebServer {
 		WebServer(void);
 		~WebServer(void);
 		int parsefile(char *filename);
-        int launch();
+        int launch(char **envp);
 		void	clean();
 		void	reset();
 	private:

@@ -20,29 +20,42 @@ CGI	&CGI::operator=(const CGI &src) {
 }
 
 /*
- * Convert the env (map) to a char** for execve
+ * Create the env array for the CGI program from envp
+ * Take the envp array as argument
+ * Return the new env array with PATH_INFO variable
  */
-char	**CGI::_convertEnv() const {
-	char	**env = new char*[this->_env.size() + 1];
-	int	j = 0;
-	for (std::map<std::string, std::string>::const_iterator i = this->_env.begin(); i != this->_env.end(); i++) {
-		std::string	element = i->first + "=" + i->second;
-		env[j] = new char[element.size() + 1];
-		env[j] = strcpy(env[j], (const char*)element.c_str());
-		j++;
-	}
-	env[j] = NULL;
+char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
+    // Calculate the size of the envp array
+    int sizeEnvp = 0;
+    while (envp[sizeEnvp])
+        sizeEnvp++;
+    // Set the new array
+	char	**env = new char*[sizeEnvp + 2];
+    int i = 0;
+    while (i < sizeEnvp) {
+        env[i] = new char[strlen(envp[i]) + 1];
+        env[i] = strcpy(env[i], envp[i]);
+        i++;
+    }
+    // Add PATH_INFO variable in env
+    std::string element = "PATH_INFO=" + pathInfo;
+    env[i] = new char[element.size() + 1];
+    env[i] = strcpy(env[i], (const char*)element.c_str());
+    i++;
+    // Set the last element to NULL
+    env[i] = NULL;
 	return env;
 }
 
 /*
  * Execute the CGI program
- * Take an argument which is the path to the CGI program
+ * Take two argument: the path to the CGI program and the envp arrays
  * Return the body of the response
  */
-std::string	CGI::execute(const std::string& scriptName) {
+std::string	CGI::execute(const std::string& scriptName, char **envp) {
 	std::string	tmpBody;
-	char	**env = this->_convertEnv();
+	std::cout << "call env convert" << std::endl;
+	char	**env = this->_createEnv(envp, scriptName);
 	int tmpStdin = dup(STDIN_FILENO);
 	int tmpStdout = dup(STDOUT_FILENO);
 	FILE	*fileIn = tmpfile();

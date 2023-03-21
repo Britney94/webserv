@@ -11,7 +11,7 @@ class CGI {
 		CGI();
 		CGI(const CGI &src);
 		CGI &operator=(const CGI &src);
-		std::string	execute(const std::string& scriptName);
+		std::string	execute(const std::string& scriptName, char **envp);
 		void	setBody(std::string body);
 		void	setScript(std::string cgi);
 		void	setMethod(std::string method);
@@ -31,7 +31,7 @@ class CGI {
 		std::string	_host;
 		int _port;
 		std::map<std::string, std::string>	_env;
-		char    **_convertEnv() const;
+		char    **_createEnv(char **envp, std::string pathInfo) const;
 };
 
 #endif

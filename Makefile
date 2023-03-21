@@ -39,11 +39,10 @@ fclean: clean
 
 re: fclean all
 
-pouette: $(OBJS)
-	@ $(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
-
-
 test: all
+	@ ./webserv config/default.conf
+
+vtest: all
 	@ valgrind --show-leak-kinds=all --leak-check=full --track-origins=yes ./webserv config/default.conf
 
 .PHONY: all clean fclean re bonus

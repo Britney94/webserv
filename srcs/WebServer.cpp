@@ -23,7 +23,7 @@ int	WebServer::parsefile(char *filename) {
 	return 1;
 }
 
-int	WebServer::launch(void) {
+int	WebServer::launch(char **envp) {
 	fd_set  readfds;
 	fd_set  writefds;
 	struct timeval	timeout;
@@ -54,7 +54,7 @@ int	WebServer::launch(void) {
 			int	fd = it->second->getSocket();
 			if (FD_ISSET(fd, &writefds)) {
 				Server	*tmp = it->second;
-				ret = it->second->sendResponse(_config.getErrors());
+				ret = it->second->sendResponse(_config.getErrors(), envp);
 				if (ret == -1) {
 					FD_CLR(fd, &_sockets);
 					FD_CLR(fd, &readfds);
