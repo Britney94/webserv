@@ -155,7 +155,7 @@ void	Server::parseChunked() {
 	_request = header + body + "\r\n";
 }
 
-int	Server::sendResponse(std::map<int, std::string> errors) {
+int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
 	HttpResponse    response;
 	response.setHost(_default->getIp());
 	response.setMethod(_method);
@@ -164,7 +164,7 @@ int	Server::sendResponse(std::map<int, std::string> errors) {
 	response.setFile(_file_request);
 	response.setStatus(_status);
 	response.setErrorFiles(errors);
-	response.createResponse();
+	response.createResponse(envp);
 	std::string message = response.getResponse();
 	int	ret;
 	int max_size = 0;

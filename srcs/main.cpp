@@ -6,7 +6,7 @@ void	quit(int arg) {
 	(void)arg;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv, char **envp) {
 	WebServer	server;
 	char	*filename = NULL;
 	
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 		std::cerr << RED << "Usage : ./webserv [configuration file]" << BLANK << std::endl;
 	signal(SIGINT, quit);
 	if (server.parsefile(filename)) {
-		if (server.launch() == 1)
+		if (server.launch(envp) == 1)
 			return 1;
 	}
 	else {

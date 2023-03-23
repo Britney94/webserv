@@ -9,7 +9,7 @@ class	HttpResponse {
 	public:
 		HttpResponse();
 		~HttpResponse();
-		int	createResponse();
+		int	createResponse(char **envp);
 		void	setFile(std::string file);
 		void	setStatus(int status);
 		void	setAutoIndex(int autoindex);
