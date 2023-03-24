@@ -25,6 +25,7 @@ class Server {
 		int	sendResponse(std::map<int, std::string> errors, char **envp);
 		int	chunkedRequest();
 		void    parseChunked();
+		int checkContentRequest();
 		ServerInfo	*requestInfos();
 	private:
 		struct sockaddr_in	_addr;
@@ -35,6 +36,7 @@ class Server {
 		std::string	_body;
 		std::string	_cgi;
 		std::string	_method;
+		std::fstream _tmpBody;
 		int	_socket;
 		int	_status;
 		int	_error;

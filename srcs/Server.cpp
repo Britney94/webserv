@@ -96,6 +96,28 @@ void	Server::close_socket() {
 		close(this->_socket);
 }
 
+/*
+ * Compare the length of the request with the content-length
+ * Return 1 if the request is good
+ */
+int Server::checkContentRequest() {
+    // Get the body of the request and write it in a file
+    std::string body = _request.substr(_request.find("\r\n\r\n") + 4);
+    _tmpBody.open(toString(_socket).c_str(), std::ios::out | std::ios::trunc);
+    // Check the content length of the request
+    if (_request.find("Content-Length") == std::string::npos) {
+        size_t	n = std::atoi(&(_request.substr(_request.find("Content-Length: ") + 16))[0]);
+        _tmpBody << body;
+        _tmpBody.seekg(0, _tmpBody.end);
+        int	size = _tmpBody.tellg();
+        if (size == (int)n) {
+        	return 0;
+        }
+    }
+	_tmpBody.close();
+    return 1;
+}
+
 int	Server::parseRequest() {
 	int		ret;
 	char	buffer[REQUEST_SIZE] = {0};
@@ -115,6 +137,8 @@ int	Server::parseRequest() {
 		else
 			parseChunked(); 
 	}
+	if (!this->checkContentRequest())
+        return 1;
 	std::cout << std::endl << std::endl << BHBLU << "*** Request ***\n" << BLUE << _request << BLANK;
 	ServerInfo	clientInfo(requestInfos());
 	ClientRequest	client(clientInfo, _request);
