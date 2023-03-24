@@ -24,6 +24,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
+	@ mkdir -p tmp
 
 client:
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(CLIE) -o client
@@ -33,16 +34,19 @@ client:
 
 clean:
 	@ rm -f $(OBJS)
+	@ rm -rf tmp
 
 fclean: clean
 	@ rm -f $(NAME)
 
 re: fclean all
 
+# Compile everything properly and run the server
 test: all
 	@ sed -i 's/\r//' www/cgi-bin/*
 	@ ./webserv config/default.conf
 
+# Compile everything properly and run the server with valgrind
 vtest: all
 	@ sed -i 's/\r//' www/cgi-bin/*
 	@ valgrind --show-leak-kinds=all --leak-check=full --track-origins=yes ./webserv config/default.conf

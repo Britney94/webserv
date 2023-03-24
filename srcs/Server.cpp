@@ -103,7 +103,7 @@ void	Server::close_socket() {
 int Server::checkContentRequest() {
     // Get the body of the request and write it in a file
     std::string body = _request.substr(_request.find("\r\n\r\n") + 4);
-    _tmpBody.open(toString(_socket).c_str(), std::ios::out | std::ios::trunc);
+    _tmpBody.open("tmp/length", std::ios::out | std::ios::trunc);
     // Check the content length of the request
     if (_request.find("Content-Length") == std::string::npos) {
         size_t	n = std::atoi(&(_request.substr(_request.find("Content-Length: ") + 16))[0]);
@@ -111,6 +111,7 @@ int Server::checkContentRequest() {
         _tmpBody.seekg(0, _tmpBody.end);
         int	size = _tmpBody.tellg();
         if (size == (int)n) {
+	        _tmpBody.close();
         	return 0;
         }
     }
