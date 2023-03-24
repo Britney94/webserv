@@ -4,6 +4,7 @@ HttpResponse::HttpResponse() {
 	_code[200] = "OK";
 	_code[201] = "Created";
 	_code[204] = "No Content";
+	_code[301] = "Redirection";
 	_code[400] = "Bad Request";
 	_code[403] = "Forbidden";
 	_code[404] = "Not Found";

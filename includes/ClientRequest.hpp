@@ -6,7 +6,7 @@
 
 class	ClientRequest {
 	public:
-		ClientRequest(ServerInfo info, std::string request = "");
+		ClientRequest(ServerInfo info, std::string request = "", int status = 200);
 		~ClientRequest(void);
 		int checkSyntax();
 		int checkMethod();

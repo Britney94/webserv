@@ -40,9 +40,11 @@ fclean: clean
 re: fclean all
 
 test: all
+	@ sed -i 's/\r//' www/cgi-bin/*
 	@ ./webserv config/default.conf
 
 vtest: all
+	@ sed -i 's/\r//' www/cgi-bin/*
 	@ valgrind --show-leak-kinds=all --leak-check=full --track-origins=yes ./webserv config/default.conf
 
 .PHONY: all clean fclean re bonus
