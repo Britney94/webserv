@@ -110,7 +110,8 @@ int Server::checkContentRequest() {
         _tmpBody << body;
         _tmpBody.seekg(0, _tmpBody.end);
         int	size = _tmpBody.tellg();
-        if (size == (int)n) {
+        // Error if size is different
+        if (size != (int)n) {
 	        _tmpBody.close();
         	return 0;
         }
