@@ -103,9 +103,15 @@ void	Server::close_socket() {
 int Server::checkContentRequest() {
     // Get the body of the request and write it in a file
     std::string body = _request.substr(_request.find("\r\n\r\n") + 4);
-    _tmpBody.open("tmp/length", std::ios::out | std::ios::trunc);
-    // Check the content length of the request
-    if (_request.find("Content-Length") == std::string::npos) {
+    std::string tmpFile = "tmp/" + toString(_socket);
+    _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
+    // Check if the request is a multipart/form-data
+    if (_request.find("Content-Type: multipart/form-data") != std::string::npos) {
+        std::cout << "MULTIPART" << std::endl;
+        return 1;
+    }
+    // Check the content length of the request (if not multipart)
+    else if (_request.find("Content-Length") != std::string::npos) {
         size_t	n = std::atoi(&(_request.substr(_request.find("Content-Length: ") + 16))[0]);
         _tmpBody << body;
         _tmpBody.seekg(0, _tmpBody.end);
