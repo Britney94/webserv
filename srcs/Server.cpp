@@ -191,10 +191,14 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
 	HttpResponse    response;
 	response.setHost(_default->getIp());
 	response.setMethod(_method);
+    if (_request.find("Content-Type: multipart") != std::string::npos) {
+	    std::string tmp = _request.substr(_request.find("Content-Type: "), _request.size());
+	    tmp = tmp.substr(0, tmp.find("\n"));
+        response.setContentType(tmp);
+    }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
 	response.setFile(_file_request);
-	// To delete :  Ici status à 400 ???
 	response.setStatus(_status);
 	response.setErrorFiles(errors);
 	response.createResponse(envp);

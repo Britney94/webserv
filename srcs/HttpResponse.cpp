@@ -12,6 +12,7 @@ HttpResponse::HttpResponse() {
 	_code[413] = "Payload Too Large";
 	_code[500] = "Internal Server Error";
 	this->_autoindex = 0;
+	this->_contentType = "";
 	return ;
 }
 
@@ -63,6 +64,11 @@ void	HttpResponse::setHost(std::string host) {
 void	HttpResponse::setAutoIndex(int autoindex) {
 	this->_autoindex = autoindex;
 	return ;
+}
+
+void    HttpResponse::setContentType(std::string contentType) {
+    this->_contentType = contentType;
+    return ;
 }
 
 int	isFile(std::string file) {
@@ -172,6 +178,8 @@ int	HttpResponse::createResponse(char **envp) {
 	    if (isCGI == 1) {
             CGI cgi;
             cgi.setBody(_clientBody);
+            if (_contentType != "")
+                cgi.setContentType(_contentType);
             this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }

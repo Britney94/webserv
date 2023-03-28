@@ -20,6 +20,7 @@ class	HttpResponse {
 		void	setMethod(std::string method);
 		void	setClientBody(std::string clientBody);
 		void	setErrorFiles(std::map<int, std::string> errorFiles);
+		void    setContentType(std::string contentType);
 		std::string	getResponse() const;
 	private:
 		int _status;
@@ -37,6 +38,7 @@ class	HttpResponse {
         std::string _body;
         std::string _response;
         std::string _file_content;
+        std::string _contentType;
 };
 
 /* Function that allows to manage response query */

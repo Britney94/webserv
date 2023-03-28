@@ -31,7 +31,8 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
     int sizeEnvp = 0;
     while (envp[sizeEnvp])
         sizeEnvp++;
-    (void)pathInfo;
+    if (_contentType != "")
+        sizeEnvp += 1;
     // Check if the query string is not empty
     if (this->_query.size() > 1)
         sizeEnvp++;
@@ -55,6 +56,14 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
         env[i] = strcpy(env[i], (const char*)element.c_str());
         i++;
     }
+    if (_contentType != "") {
+        std::cout << "CONTENT_TYPE: " << _contentType << std::endl;
+        std::string element = "CONTENT_TYPE=" + _contentType;
+        env[i] = new char[element.size() + 1];
+        env[i] = strcpy(env[i], (const char*)element.c_str());
+        i++;
+
+    }
     // Set the last element to NULL
     env[i] = NULL;
 	return env;
@@ -67,7 +76,6 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
  */
 std::string	CGI::execute(const std::string& scriptName, char **envp) {
 	std::string	tmpBody;
-
 	char **env = this->_createEnv(envp, scriptName);
 	if (this->_query.size())
 	    this->setBody(this->_query);
@@ -160,4 +168,9 @@ void	CGI::setType(std::string type) {
 void	CGI::setPort(int    port) {
 	_port = port;
 	return ;
+}
+
+void    CGI::setContentType(std::string contentType) {
+    _contentType = contentType;
+    return ;
 }
