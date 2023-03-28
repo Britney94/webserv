@@ -88,7 +88,7 @@ int	ClientRequest::checkSyntax() {
 		return _status;
 	copy_request.erase(0, 2);
 	_body = copy_request;
-	if ((long)copy_request.size() != (long)body_size) {
+	if ((long)copy_request.size() != (long)body_size && _request.find("Content-Type: multipart") == std::string::npos) {
 		_status = 400;
 		return _status;
 	}

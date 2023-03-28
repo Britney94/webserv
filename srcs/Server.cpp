@@ -106,7 +106,7 @@ int Server::checkContentRequest() {
     std::string tmpFile = "tmp/" + toString(_socket);
     _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
     // Check if the request is a multipart/form-data
-    if (_request.find("Content-Type: multipart/form-data") != std::string::npos) {
+    if (_request.find("Content-Type: multipart") != std::string::npos) {
         std::cout << "MULTIPART" << std::endl;
         return 1;
     }
@@ -194,6 +194,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
 	response.setFile(_file_request);
+	// To delete :  Ici status à 400 ???
 	response.setStatus(_status);
 	response.setErrorFiles(errors);
 	response.createResponse(envp);
