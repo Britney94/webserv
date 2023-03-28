@@ -3,6 +3,7 @@
 CGI::CGI() {
 	this->_query = "";
 	this->_body = "";
+	this->_contentType = "";
 }
 
 CGI::CGI(const CGI &src) {
@@ -32,14 +33,16 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
     while (envp[sizeEnvp])
         sizeEnvp++;
     if (_contentType != "")
-        sizeEnvp += 1;
+        sizeEnvp += 2;
+    // --- up to here
     // Check if the query string is not empty
     if (this->_query.size() > 1)
         sizeEnvp++;
     // Set the new array
 	char	**env = new char*[sizeEnvp + 2];
     int i = 0;
-    while (i < sizeEnvp - 1) {
+    // --- add here
+    while (i < sizeEnvp - 3) {
         env[i] = new char[strlen(envp[i]) + 1];
         env[i] = strcpy(env[i], envp[i]);
         i++;
@@ -57,12 +60,15 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
         i++;
     }
     if (_contentType != "") {
-        std::cout << "CONTENT_TYPE: " << _contentType << std::endl;
         std::string element = "CONTENT_TYPE=" + _contentType;
         env[i] = new char[element.size() + 1];
         env[i] = strcpy(env[i], (const char*)element.c_str());
         i++;
-
+        element = "CONTENT_LENGTH=" + _contentLength.substr(_contentLength.find(":") + 2);
+        env[i] = new char[element.size() + 1];
+        env[i] = strcpy(env[i], (const char*)element.c_str());
+        i++;
+        // --- add here
     }
     // Set the last element to NULL
     env[i] = NULL;
@@ -172,5 +178,10 @@ void	CGI::setPort(int    port) {
 
 void    CGI::setContentType(std::string contentType) {
     _contentType = contentType;
+    return ;
+}
+
+void    CGI::setContentLength(std::string contentLength) {
+    _contentLength = contentLength;
     return ;
 }

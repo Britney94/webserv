@@ -192,9 +192,12 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
 	response.setHost(_default->getIp());
 	response.setMethod(_method);
     if (_request.find("Content-Type: multipart") != std::string::npos) {
-	    std::string tmp = _request.substr(_request.find("Content-Type: "), _request.size());
-	    tmp = tmp.substr(0, tmp.find("\n"));
-        response.setContentType(tmp);
+	    std::string tmpType = _request.substr(_request.find("Content-Type: "));
+	    tmpType = tmpType.substr(0, tmpType.find("\n"));
+        response.setContentType(tmpType);
+        std::string tmpLength = _request.substr(_request.find("Content-Length: "));
+        tmpLength = tmpLength.substr(0, tmpLength.find("\n"));
+        response.setContentLength(tmpLength);
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);

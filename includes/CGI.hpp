@@ -21,6 +21,7 @@ class CGI {
 		void	setAddr(std::string host);
 		void	setPort(int	port);
 		void    setContentType(std::string contentType);
+		void    setContentLength(std::string contentLength);
 		~CGI(){};
 	private:
 		std::string	_body;
@@ -31,6 +32,7 @@ class CGI {
 		std::string	_query;
 		std::string	_host;
 		std::string _contentType;
+		std::string _contentLength;
 		int _port;
 		std::map<std::string, std::string>	_env;
 		char    **_createEnv(char **envp, std::string pathInfo) const;

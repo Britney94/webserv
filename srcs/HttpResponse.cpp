@@ -71,6 +71,11 @@ void    HttpResponse::setContentType(std::string contentType) {
     return ;
 }
 
+void    HttpResponse::setContentLength(std::string contentLength) {
+    this->_contentLength = contentLength;
+    return ;
+}
+
 int	isFile(std::string file) {
 	struct stat	st;
 	if (stat(file.c_str(), &st) == 0) {
@@ -178,8 +183,10 @@ int	HttpResponse::createResponse(char **envp) {
 	    if (isCGI == 1) {
             CGI cgi;
             cgi.setBody(_clientBody);
-            if (_contentType != "")
+            if (_contentType != "") {
                 cgi.setContentType(_contentType);
+                cgi.setContentLength(_contentLength);
+            }
             this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }
