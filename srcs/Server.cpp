@@ -118,9 +118,12 @@ static void extractFileData(const string& body, const string& boundary, const st
 static std::string saveFiles(std::string body, std::string boundary, std::string directory) {
     std::string pathTranslated = "";
     std::string delimiter = "\r\n--" + boundary + "\r\n";
+    std::string dataFiles;
     // Browse each part of the body
-    while (body.find(boundary) != std::string::npos) {
-        std::string dataFiles = body.substr(0, body.find(delimiter));
+    while (body.find(delimiter) != std::string::npos) {
+        std::cout << "Body : " << body << std::endl;
+        dataFiles = body.substr(0, body.find(delimiter));
+        std::cout << "DataFiles : " << dataFiles << std::endl;
         // Check if the part is a file
         if (dataFiles.find("filename=") != std::string::npos) {
             std::string filename = dataFiles.substr(dataFiles.find("filename=") + 10);
@@ -128,7 +131,7 @@ static std::string saveFiles(std::string body, std::string boundary, std::string
             if (dataFiles.find(boundary + "--") != std::string::npos)
                 dataFiles = dataFiles.substr(0, dataFiles.find(boundary + "--"));
             dataFiles = dataFiles.substr(0, dataFiles.find_last_of("\n"));
-            extractFileData(dataFiles, boundary, directory + "/" + filename);
+            extractFileData(body, boundary, directory + "/" + filename);
             pathTranslated += directory + filename + "\n";
         }
         body = body.substr(body.find(boundary) + boundary.size());

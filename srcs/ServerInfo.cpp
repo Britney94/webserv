@@ -2,7 +2,7 @@
 
 ServerInfo::ServerInfo(void) {
 	this->_ip = "0.0.0.0";
-	this->_clientSize = 10000;
+	this->_clientSize = 100000000;
 	this->_root = "./data/my_website/";
 	this->_index = "index.html";
 	this->_autoIndex = 0; 
