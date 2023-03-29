@@ -97,6 +97,46 @@ void	Server::close_socket() {
 }
 
 /*
+ * Create the file with the body of the multipart request
+ */
+static void extractFileData(const string& body, const string& boundary, const string& filename) {
+    string data = body.substr(body.find("Content-Type:"));
+    data = data.substr(data.find("\n") + 1);
+    data = data.substr(data.find("\n") + 1, data.find("\r\n--"));
+    string delimiter = "\r\n--" + boundary + "\r\n";
+    ofstream file(filename.c_str(), ios::binary);
+    if (file) {
+        file.write(data.data(), data.size() - 1);
+        file.close();
+    }
+}
+
+/*
+ * Save the files in the directory (when multipart request)
+ * Return pathTranslated which is the environment variable with the path(s) of the file(s)
+ */
+static std::string saveFiles(std::string body, std::string boundary, std::string directory) {
+    std::string pathTranslated = "";
+    std::string delimiter = "\r\n--" + boundary + "\r\n";
+    // Browse each part of the body
+    while (body.find(boundary) != std::string::npos) {
+        std::string dataFiles = body.substr(0, body.find(delimiter));
+        // Check if the part is a file
+        if (dataFiles.find("filename=") != std::string::npos) {
+            std::string filename = dataFiles.substr(dataFiles.find("filename=") + 10);
+            filename = filename.substr(0, filename.find("\""));
+            if (dataFiles.find(boundary + "--") != std::string::npos)
+                dataFiles = dataFiles.substr(0, dataFiles.find(boundary + "--"));
+            dataFiles = dataFiles.substr(0, dataFiles.find_last_of("\n"));
+            extractFileData(dataFiles, boundary, directory + "/" + filename);
+            pathTranslated += directory + filename + "\n";
+        }
+        body = body.substr(body.find(boundary) + boundary.size());
+    }
+    return pathTranslated;
+}
+
+/*
  * Compare the length of the request with the content-length
  * Return 1 if the request is good
  */
@@ -108,6 +148,9 @@ int Server::checkContentRequest() {
     // Check if the request is a multipart/form-data
     if (_request.find("Content-Type: multipart") != std::string::npos) {
         std::cout << "MULTIPART" << std::endl;
+        std::string boundary = _request.substr(_request.find("boundary=") + 9);
+        boundary = boundary.substr(0, boundary.find("\r\n"));
+        std::cout << "pathTranslated : " << saveFiles(body, boundary, "./tmp/") << std::endl;
         return 1;
     }
     // Check the content length of the request (if not multipart)
@@ -116,7 +159,6 @@ int Server::checkContentRequest() {
         _tmpBody << body;
         _tmpBody.seekg(0, _tmpBody.end);
         int	size = _tmpBody.tellg();
-        // Error if size is different
         if (size != (int)n) {
 	        _tmpBody.close();
         	return 0;
