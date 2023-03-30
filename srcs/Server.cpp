@@ -118,7 +118,6 @@ static void extractFileData(const string& body, const string& boundary, const st
 static std::string saveFiles(std::string body, std::string boundary, std::string directory) {
     std::string pathTranslated = "";
     std::string delimiter = "\r\n--" + boundary + "\r\n";
-    std::string end = "\r\n--" + boundary + "--";
     std::string dataFiles;
     // Browse each part of the body
     while (body.size()) {
@@ -242,6 +241,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         response.setContentLength(tmpLength);
         std::string boundary = _request.substr(_request.find("boundary=") + 9);
         boundary = boundary.substr(0, boundary.find("\r\n"));
+        response.setBoundary(boundary);
         response.setPathTranslated(saveFiles(_body, boundary, "./tmp/"));
     }
 	response.setClientBody(_body);

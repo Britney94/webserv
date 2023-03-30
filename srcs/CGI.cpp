@@ -23,6 +23,42 @@ CGI	&CGI::operator=(const CGI &src) {
 }
 
 /*
+ * Set the query string of the request if this is a multipart/form-data request
+ */
+std::string createQueryMultipart(std::string body, std::string boundary) {
+    std::string delimiter = "\r\n--" + boundary + "\r\n";
+    std::string dataFiles;
+    std::string multipartQuery = "";
+    // Browse each part of the body
+    while (body.size()) {
+        dataFiles = body.substr(0, body.find(delimiter));
+        // Check if the part is a field
+        if (dataFiles.find("name=") != std::string::npos) {
+            if (multipartQuery.size())
+                multipartQuery += "&";
+            std::string name = dataFiles.substr(dataFiles.find("name=") + 6);
+            name = name.substr(0, name.find("\""));
+            std::string value = dataFiles.substr(dataFiles.find("\r\n\r\n") + 4);
+            value = value.substr(0, value.find("\r\n"));
+            if (dataFiles.find("filename=") != std::string::npos) {
+                value = dataFiles.substr(dataFiles.find("filename=") + 10);
+                value = value.substr(0, value.find("\""));
+            }
+            for (size_t i = 0; i < value.size(); i++)
+                if (value[i] == ' ')
+                    value[i] = '+';
+            multipartQuery += name + "=" + value;
+        }
+        dataFiles = "";
+        if (body.find(delimiter) != std::string::npos)
+            body = body.substr(body.find(delimiter) + delimiter.size());
+        else
+            break;
+    }
+    return multipartQuery;
+}
+
+/*
  * Create the env array for the CGI program from envp
  * Take the envp array as argument and the pathInfo and query string if needed
  * Return the new env array with PATH_INFO variable
@@ -33,7 +69,7 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
     while (envp[sizeEnvp])
         sizeEnvp++;
     if (_contentType != "")
-        sizeEnvp += 3;
+        sizeEnvp += 4;
     // --- up to here
     // Check if the query string is not empty
     if (this->_query.size() > 1)
@@ -42,7 +78,7 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
 	char	**env = new char*[sizeEnvp + 2];
     int i = 0;
     // --- add here
-    while (i < sizeEnvp - 4) {
+    while (i < sizeEnvp - 5) {
         env[i] = new char[strlen(envp[i]) + 1];
         env[i] = strcpy(env[i], envp[i]);
         i++;
@@ -72,7 +108,12 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
         env[i] = new char[element.size() + 1];
         env[i] = strcpy(env[i], (const char*)element.c_str());
         i++;
+        element = "QUERY_STRING=" + createQueryMultipart(_body, _boundary);
+        env[i] = new char[element.size() + 1];
+        env[i] = strcpy(env[i], (const char*)element.c_str());
+        i++;
         // --- add here
+
     }
     // Set the last element to NULL
     env[i] = NULL;
@@ -192,5 +233,10 @@ void    CGI::setContentLength(std::string contentLength) {
 
 void    CGI::setPathTranslated(std::string pathTranslated) {
     _pathTranslated = pathTranslated;
+    return ;
+}
+
+void    CGI::setBoundary(std::string boundary) {
+    _boundary = boundary;
     return ;
 }

@@ -23,6 +23,7 @@ class	HttpResponse {
 		void    setContentType(std::string contentType);
 		void    setContentLength(std::string contentLength);
 		void    setPathTranslated(std::string pathTranslated);
+		void    setBoundary(std::string boundary);
 		std::string	getResponse() const;
 	private:
 		int _status;
@@ -43,6 +44,7 @@ class	HttpResponse {
         std::string _contentType;
         std::string _contentLength;
         std::string _pathTranslated;
+        std::string _boundary;
 };
 
 /* Function that allows to manage response query */

@@ -13,6 +13,7 @@ HttpResponse::HttpResponse() {
 	_code[500] = "Internal Server Error";
 	this->_autoindex = 0;
 	this->_contentType = "";
+	this->_boundary = "";
 	return ;
 }
 
@@ -78,6 +79,11 @@ void    HttpResponse::setContentLength(std::string contentLength) {
 
 void    HttpResponse::setPathTranslated(std::string pathTranslated) {
     this->_pathTranslated = pathTranslated;
+    return ;
+}
+
+void    HttpResponse::setBoundary(std::string boundary) {
+    this->_boundary = boundary;
     return ;
 }
 
@@ -192,6 +198,7 @@ int	HttpResponse::createResponse(char **envp) {
                 cgi.setContentType(_contentType);
                 cgi.setContentLength(_contentLength);
                 cgi.setPathTranslated(_pathTranslated);
+                cgi.setBoundary(_boundary);
             }
             this->_body = cgi.execute(_file, envp);
 			_status = 200;
