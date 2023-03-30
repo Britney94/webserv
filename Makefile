@@ -24,7 +24,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
-	@ mkdir -p tmp
+	@ mkdir tmp
 
 client:
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(CLIE) -o client
