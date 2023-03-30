@@ -20,6 +20,10 @@ class	HttpResponse {
 		void	setMethod(std::string method);
 		void	setClientBody(std::string clientBody);
 		void	setErrorFiles(std::map<int, std::string> errorFiles);
+		void    setContentType(std::string contentType);
+		void    setContentLength(std::string contentLength);
+		void    setPathTranslated(std::string pathTranslated);
+		void    setBoundary(std::string boundary);
 		std::string	getResponse() const;
 	private:
 		int _status;
@@ -37,6 +41,10 @@ class	HttpResponse {
         std::string _body;
         std::string _response;
         std::string _file_content;
+        std::string _contentType;
+        std::string _contentLength;
+        std::string _pathTranslated;
+        std::string _boundary;
 };
 
 /* Function that allows to manage response query */

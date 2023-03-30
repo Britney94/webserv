@@ -4,6 +4,7 @@ HttpResponse::HttpResponse() {
 	_code[200] = "OK";
 	_code[201] = "Created";
 	_code[204] = "No Content";
+	_code[301] = "Redirection";
 	_code[400] = "Bad Request";
 	_code[403] = "Forbidden";
 	_code[404] = "Not Found";
@@ -11,6 +12,8 @@ HttpResponse::HttpResponse() {
 	_code[413] = "Payload Too Large";
 	_code[500] = "Internal Server Error";
 	this->_autoindex = 0;
+	this->_contentType = "";
+	this->_boundary = "";
 	return ;
 }
 
@@ -62,6 +65,26 @@ void	HttpResponse::setHost(std::string host) {
 void	HttpResponse::setAutoIndex(int autoindex) {
 	this->_autoindex = autoindex;
 	return ;
+}
+
+void    HttpResponse::setContentType(std::string contentType) {
+    this->_contentType = contentType;
+    return ;
+}
+
+void    HttpResponse::setContentLength(std::string contentLength) {
+    this->_contentLength = contentLength;
+    return ;
+}
+
+void    HttpResponse::setPathTranslated(std::string pathTranslated) {
+    this->_pathTranslated = pathTranslated;
+    return ;
+}
+
+void    HttpResponse::setBoundary(std::string boundary) {
+    this->_boundary = boundary;
+    return ;
 }
 
 int	isFile(std::string file) {
@@ -171,6 +194,12 @@ int	HttpResponse::createResponse(char **envp) {
 	    if (isCGI == 1) {
             CGI cgi;
             cgi.setBody(_clientBody);
+            if (_contentType != "") {
+                cgi.setContentType(_contentType);
+                cgi.setContentLength(_contentLength);
+                cgi.setPathTranslated(_pathTranslated);
+                cgi.setBoundary(_boundary);
+            }
             this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }

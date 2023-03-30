@@ -16,7 +16,7 @@ File::File(char *filename) {
 		this->content.push_back(tmp);
 		maxLine++;
 	}
-	fd.close(); 
+	fd.close();
 }
 
 std::string	File::getName() {

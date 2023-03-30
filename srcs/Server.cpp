@@ -96,6 +96,77 @@ void	Server::close_socket() {
 		close(this->_socket);
 }
 
+/*
+ * Create the file with the body of the multipart request
+ */
+static void extractFileData(const string& body, const string& boundary, const string& filename) {
+    string data = body.substr(body.find("Content-Type:"));
+    data = data.substr(data.find("\n") + 1);
+    data = data.substr(data.find("\n") + 1, data.find("\r\n--"));
+    string delimiter = "\r\n--" + boundary + "\r\n";
+    ofstream file(filename.c_str(), ios::binary);
+    if (file) {
+        file.write(data.data(), data.size() - 1);
+        file.close();
+    }
+}
+
+/*
+ * Save the files in the directory (when multipart request)
+ * Return pathTranslated which is the environment variable with the path(s) of the file(s)
+ */
+static std::string saveFiles(std::string body, std::string boundary, std::string directory) {
+    std::string pathTranslated = "";
+    std::string delimiter = "\r\n--" + boundary + "\r\n";
+    std::string dataFiles;
+    // Browse each part of the body
+    while (body.size()) {
+        dataFiles = body.substr(0, body.find(delimiter));
+        // Check if the part is a file
+        if (dataFiles.find("filename=") != std::string::npos) {
+            std::string filename = dataFiles.substr(dataFiles.find("filename=") + 10);
+            filename = filename.substr(0, filename.find("\""));
+            extractFileData(body, boundary, directory + "/" + filename);
+            pathTranslated += directory + filename + "\n";
+        }
+        dataFiles = "";
+        if (body.find(delimiter) != std::string::npos)
+            body = body.substr(body.find(delimiter) + delimiter.size());
+        else
+            break;
+    }
+    return pathTranslated;
+}
+
+/*
+ * Compare the length of the request with the content-length
+ * Return 1 if the request is good
+ */
+int Server::checkContentRequest() {
+    // Get the body of the request and write it in a file
+    std::string body = _request.substr(_request.find("\r\n\r\n") + 4);
+    std::string tmpFile = "tmp/" + toString(_socket);
+    _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
+    // Check if the request is a multipart/form-data
+    if (_request.find("Content-Type: multipart") != std::string::npos) {
+        std::cout << "MULTIPART" << std::endl;
+        return 1;
+    }
+    // Check the content length of the request (if not multipart)
+    else if (_request.find("Content-Length") != std::string::npos) {
+        size_t	n = std::atoi(&(_request.substr(_request.find("Content-Length: ") + 16))[0]);
+        _tmpBody << body;
+        _tmpBody.seekg(0, _tmpBody.end);
+        int	size = _tmpBody.tellg();
+        if (size != (int)n) {
+	        _tmpBody.close();
+        	return 0;
+        }
+    }
+	_tmpBody.close();
+    return 1;
+}
+
 int	Server::parseRequest() {
 	int		ret;
 	char	buffer[REQUEST_SIZE] = {0};
@@ -115,6 +186,8 @@ int	Server::parseRequest() {
 		else
 			parseChunked(); 
 	}
+	if (!this->checkContentRequest())
+        return 1;
 	std::cout << std::endl << std::endl << BHBLU << "*** Request ***\n" << BLUE << _request << BLANK;
 	ServerInfo	clientInfo(requestInfos());
 	ClientRequest	client(clientInfo, _request);
@@ -159,6 +232,18 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
 	HttpResponse    response;
 	response.setHost(_default->getIp());
 	response.setMethod(_method);
+    if (_request.find("Content-Type: multipart") != std::string::npos) {
+	    std::string tmpType = _request.substr(_request.find("Content-Type: ") + 14);
+	    tmpType = tmpType.substr(0, tmpType.find(";"));
+        response.setContentType(tmpType);
+        std::string tmpLength = _request.substr(_request.find("Content-Length: "));
+        tmpLength = tmpLength.substr(0, tmpLength.find("\n"));
+        response.setContentLength(tmpLength);
+        std::string boundary = _request.substr(_request.find("boundary=") + 9);
+        boundary = boundary.substr(0, boundary.find("\r\n"));
+        response.setBoundary(boundary);
+        response.setPathTranslated(saveFiles(_body, boundary, "./tmp/"));
+    }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
 	response.setFile(_file_request);

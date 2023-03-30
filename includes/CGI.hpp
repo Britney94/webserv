@@ -20,6 +20,10 @@ class CGI {
 		void	setQuery(std::string query);
 		void	setAddr(std::string host);
 		void	setPort(int	port);
+		void    setContentType(std::string contentType);
+		void    setContentLength(std::string contentLength);
+		void    setPathTranslated(std::string pathTranslated);
+		void    setBoundary(std::string boundary);
 		~CGI(){};
 	private:
 		std::string	_body;
@@ -29,6 +33,10 @@ class CGI {
 		std::string	_file;
 		std::string	_query;
 		std::string	_host;
+		std::string _contentType;
+		std::string _contentLength;
+		std::string _pathTranslated;
+		std::string _boundary;
 		int _port;
 		std::map<std::string, std::string>	_env;
 		char    **_createEnv(char **envp, std::string pathInfo) const;

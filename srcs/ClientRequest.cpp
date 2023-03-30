@@ -1,6 +1,6 @@
 #include "../includes/ClientRequest.hpp"
 
-ClientRequest::ClientRequest(ServerInfo info, std::string request) : _info(info), _request(request), _file(""), _status(200) {
+ClientRequest::ClientRequest(ServerInfo info, std::string request, int status) : _info(info), _request(request), _file(""), _status(status) {
 	checkSyntax();
     std::cout << "Syntax checked! Status: " << _status << std::endl;
 	determinateLoc();
@@ -85,14 +85,14 @@ int	ClientRequest::checkSyntax() {
 		bodyLine = copy_request.substr(0, copy_request.find("\r\n") + 2);
 	}
 	if (!bodyLine.length())
-		return 200;
+		return _status;
 	copy_request.erase(0, 2);
 	_body = copy_request;
-	if ((long)copy_request.size() != (long)body_size) {
+	if ((long)copy_request.size() != (long)body_size && _request.find("Content-Type: multipart") == std::string::npos) {
 		_status = 400;
 		return _status;
 	}
-	return 200;
+	return _status;
 }
 
 int	ClientRequest::checkSize() {

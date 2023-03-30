@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example form</title>
+</head>
+<body>
+<h1>Example form</h1>
+<form action="/cgi-bin/multipart.cgi" method="POST" enctype="multipart/form-data">
+    <label for="text">Article Title:</label>
+    <input type="text" name="text" id="text">
+    <label for="filename">Image:</label>
+    <input type="file" name="filename" id="filename">
+    <input type="submit" value="Submit">
+</form>
+</body>
+</html>

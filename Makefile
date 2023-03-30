@@ -1,4 +1,4 @@
-NAME = webserv 
+NAME = webserv
 CC = c++ -g #TO DELETE -g
 CFLAGS = -std=c++98 -Wall -Wextra -Werror
 INCLUDES = -I ./includes/
@@ -24,6 +24,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
+	@ mkdir tmp
 
 client:
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(CLIE) -o client
@@ -33,6 +34,7 @@ client:
 
 clean:
 	@ rm -f $(OBJS)
+	@ rm -rf tmp
 
 fclean: clean
 	@ rm -f $(NAME)
