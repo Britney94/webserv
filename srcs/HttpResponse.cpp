@@ -76,6 +76,11 @@ void    HttpResponse::setContentLength(std::string contentLength) {
     return ;
 }
 
+void    HttpResponse::setPathTranslated(std::string pathTranslated) {
+    this->_pathTranslated = pathTranslated;
+    return ;
+}
+
 int	isFile(std::string file) {
 	struct stat	st;
 	if (stat(file.c_str(), &st) == 0) {
@@ -186,6 +191,7 @@ int	HttpResponse::createResponse(char **envp) {
             if (_contentType != "") {
                 cgi.setContentType(_contentType);
                 cgi.setContentLength(_contentLength);
+                cgi.setPathTranslated(_pathTranslated);
             }
             this->_body = cgi.execute(_file, envp);
 			_status = 200;

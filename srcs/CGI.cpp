@@ -33,7 +33,7 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
     while (envp[sizeEnvp])
         sizeEnvp++;
     if (_contentType != "")
-        sizeEnvp += 2;
+        sizeEnvp += 3;
     // --- up to here
     // Check if the query string is not empty
     if (this->_query.size() > 1)
@@ -42,7 +42,7 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
 	char	**env = new char*[sizeEnvp + 2];
     int i = 0;
     // --- add here
-    while (i < sizeEnvp - 3) {
+    while (i < sizeEnvp - 4) {
         env[i] = new char[strlen(envp[i]) + 1];
         env[i] = strcpy(env[i], envp[i]);
         i++;
@@ -65,6 +65,10 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
         env[i] = strcpy(env[i], (const char*)element.c_str());
         i++;
         element = "CONTENT_LENGTH=" + _contentLength.substr(_contentLength.find(":") + 2);
+        env[i] = new char[element.size() + 1];
+        env[i] = strcpy(env[i], (const char*)element.c_str());
+        i++;
+        element = "PATH_TRANSLATED=" + _pathTranslated;
         env[i] = new char[element.size() + 1];
         env[i] = strcpy(env[i], (const char*)element.c_str());
         i++;
@@ -183,5 +187,10 @@ void    CGI::setContentType(std::string contentType) {
 
 void    CGI::setContentLength(std::string contentLength) {
     _contentLength = contentLength;
+    return ;
+}
+
+void    CGI::setPathTranslated(std::string pathTranslated) {
+    _pathTranslated = pathTranslated;
     return ;
 }

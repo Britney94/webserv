@@ -122,16 +122,11 @@ static std::string saveFiles(std::string body, std::string boundary, std::string
     std::string dataFiles;
     // Browse each part of the body
     while (body.size()) {
-//        std::cout << "Body : " << body << std::endl;
         dataFiles = body.substr(0, body.find(delimiter));
-        std::cout << "DataFiles : " << dataFiles << std::endl;
         // Check if the part is a file
         if (dataFiles.find("filename=") != std::string::npos) {
             std::string filename = dataFiles.substr(dataFiles.find("filename=") + 10);
             filename = filename.substr(0, filename.find("\""));
-//            if (dataFiles.find(boundary + "--") != std::string::npos)
-//                dataFiles = dataFiles.substr(0, body.find(boundary + "--"));
-            //dataFiles = dataFiles.substr(0, dataFiles.find_last_of("\n"));
             extractFileData(body, boundary, directory + "/" + filename);
             pathTranslated += directory + filename + "\n";
         }
@@ -140,10 +135,7 @@ static std::string saveFiles(std::string body, std::string boundary, std::string
             body = body.substr(body.find(delimiter) + delimiter.size());
         else
             break;
-        std::cout << "Body : " << body << std::endl;
-//        body = body.substr(body.find(boundary) + boundary.size());
     }
-    //extractFileData(body, boundary, directory + "test.txt");
     return pathTranslated;
 }
 
@@ -159,9 +151,6 @@ int Server::checkContentRequest() {
     // Check if the request is a multipart/form-data
     if (_request.find("Content-Type: multipart") != std::string::npos) {
         std::cout << "MULTIPART" << std::endl;
-        std::string boundary = _request.substr(_request.find("boundary=") + 9);
-        boundary = boundary.substr(0, boundary.find("\r\n"));
-        std::cout << "pathTranslated : " << saveFiles(body, boundary, "./tmp/") << std::endl;
         return 1;
     }
     // Check the content length of the request (if not multipart)
@@ -251,6 +240,9 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         std::string tmpLength = _request.substr(_request.find("Content-Length: "));
         tmpLength = tmpLength.substr(0, tmpLength.find("\n"));
         response.setContentLength(tmpLength);
+        std::string boundary = _request.substr(_request.find("boundary=") + 9);
+        boundary = boundary.substr(0, boundary.find("\r\n"));
+        response.setPathTranslated(saveFiles(_body, boundary, "./tmp/"));
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);

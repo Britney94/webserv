@@ -22,6 +22,7 @@ class CGI {
 		void	setPort(int	port);
 		void    setContentType(std::string contentType);
 		void    setContentLength(std::string contentLength);
+		void    setPathTranslated(std::string pathTranslated);
 		~CGI(){};
 	private:
 		std::string	_body;
@@ -33,6 +34,7 @@ class CGI {
 		std::string	_host;
 		std::string _contentType;
 		std::string _contentLength;
+		std::string _pathTranslated;
 		int _port;
 		std::map<std::string, std::string>	_env;
 		char    **_createEnv(char **envp, std::string pathInfo) const;

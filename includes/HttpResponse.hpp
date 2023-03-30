@@ -22,6 +22,7 @@ class	HttpResponse {
 		void	setErrorFiles(std::map<int, std::string> errorFiles);
 		void    setContentType(std::string contentType);
 		void    setContentLength(std::string contentLength);
+		void    setPathTranslated(std::string pathTranslated);
 		std::string	getResponse() const;
 	private:
 		int _status;
@@ -41,6 +42,7 @@ class	HttpResponse {
         std::string _file_content;
         std::string _contentType;
         std::string _contentLength;
+        std::string _pathTranslated;
 };
 
 /* Function that allows to manage response query */
