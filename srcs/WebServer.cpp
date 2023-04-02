@@ -110,6 +110,7 @@ void	WebServer::reset(void) {
 		it->second->close_socket();
 	_acceptfds.clear();
 	_writablefds.clear();
+	_max_fd = _config.getMaxFd();
 	FD_ZERO(&_sockets);
 	for (std::map<int, Server *>::iterator it = _servers.begin(); it != _servers.end(); it++)
 		FD_SET(it->second->getSocket(), &_sockets);
