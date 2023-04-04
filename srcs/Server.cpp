@@ -27,7 +27,9 @@ Server::Server(ServerInfo* infos, int port) {
 	// +
 	// Start listening on the socket
 	if (bind(this->_socket, (struct sockaddr *)&(this->_addr), sizeof(this->_addr)) < 0) {
+		std::cerr << RED;
 		perror("Error bind");
+		std::cerr << BLANK;
         _error = 1;
 		return ;
 	}

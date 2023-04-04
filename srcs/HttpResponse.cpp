@@ -187,7 +187,6 @@ int	HttpResponse::createResponse(char **envp) {
 		}
 	}
 	else if (_method == "POST") {
-		_status = 204;
 		// Check if the file is a CGI script
 		isCGI = isCGIRequest(_file);
 		// Execute the CGI script if it is
@@ -203,8 +202,15 @@ int	HttpResponse::createResponse(char **envp) {
             this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }
-	    // In other case, return a 204 status code
-        else {
+        else if (_clientBody.size() > 0) {
+		    _status = 204;
+        	std::fstream    post_file;
+            std::string path = "./tmp/" + _file.substr(_file.find_last_of("/") + 1);
+        	open(path.c_str(), O_RDWR|O_CREAT, 0777);
+        	post_file.open(path.c_str());
+        	post_file << this->_clientBody;
+		}
+		else {
 			_status = 404;
 			filestream.open(_errorFiles[_status].c_str());
 			while(filestream.good()) {
@@ -213,7 +219,7 @@ int	HttpResponse::createResponse(char **envp) {
 				this->_body += '\n';
 			}
 			filestream.close();
-		}
+        }
 	}
 	else if (_method == "DELETE") {
 		if (isFile(_file)) {
