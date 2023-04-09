@@ -260,6 +260,10 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
 		std::cerr << "Error: Could not write response to client." << std::endl;
 		return ret;
 	}
+	if (ret != (int)message.size()) {
+	    std::cerr << "Error: Could not write all response to client." << std::endl;
+	    return ret;
+	}
 	if (message.size() > 125) {
         message.resize(125);
         max_size = 1;
