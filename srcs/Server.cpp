@@ -170,9 +170,23 @@ int Server::checkContentRequest() {
 }
 
 int	Server::parseRequest() {
-	int		ret;
-	char	buffer[REQUEST_SIZE] = {0};
-	ret = read(_socket, buffer, REQUEST_SIZE - 1);
+    int        ret;
+    char    buffer[REQUEST_SIZE] = {0};
+    std::vector<char> tmpBuffer(REQUEST_SIZE);
+    ret = read(_socket, tmpBuffer.data(), REQUEST_SIZE - 1);
+    memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
+//    std::string bufferString = tmpBuffer.data();
+//    int sizeBoundary = bufferString.find_last_of("----") + 100;
+//    std::ofstream file("test.png", std::ios::binary | std::ios::app);
+//    if (!file.is_open()) {
+//        std::cerr << "Impossible d'ouvrir le fichier\n";
+//        return 1;
+//    }
+//    sizeBoundary = bufferString.find_last_of("Content-Type: image/png") + 5;
+//    while (sizeBoundary < (int)tmpBuffer.size()) {
+//        file.write(&tmpBuffer[sizeBoundary], 1);
+//        sizeBoundary++;
+//    }
 	if (ret <= 0) {
 		this->close_socket();
 		if (!ret)

@@ -27,18 +27,24 @@ if content_type == 'multipart/form-data':
 
     # Print a response to the client
     print('<html><head><title>CGI Multipart</title></head><body>')
-    print('<h1>CGI Test</h1>')
+    print('<h1>CGI Multipart</h1>')
     print('<table>')
     for file_path in file_list:
-        with open(file_path, 'r') as f:
+        with open(file_path, 'rb') as f:
             file_content = f.read()
         print('<p>File path: {}</p>'.format(file_path))
-        print('<tr><td><p>{}</p></td></tr>'.format(file_content))
+        if 'base64' in image_data:
+            source = "data:image/png;base64," + file_content.decode('utf-8')
+            print('<tr><td><img src="',source,'"alt="Image"></td></tr>')
+        if '.svg' in image_data:
+            print(file_content.decode('utf-8'))
+        if '.txt' in image_data:
+            print('<tr><td><p>',file_content.decode('utf-8'),'</p></td></tr>')
     print('</table>')
     print('</body></html>')
 
 else:
     print('<html><head><title>CGI Multipart</title></head><body>')
-    print('<h1>CGI Test</h1>')
+    print('<h1>CGI Multipart</h1>')
     print('<p>Error: Unsupported content type</p>')
     print('</body></html>')
