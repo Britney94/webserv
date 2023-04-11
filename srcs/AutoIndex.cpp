@@ -11,6 +11,7 @@ std::string	AutoIndex::renderPage(std::string directory, std::string path, std::
 	page.insert(page.size(), "</title></head>\n<body bgcolor=\"white\">\n<h1>Index of ");
 	page.insert(page.size(), host);
 	page.insert(page.size(), "</h1><body><pre><hr>\n");
+	directory = path.substr(path.find_last_of("/") + 1);
 	if ((dir = opendir (path.c_str())) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
 			if (strcmp(".", ent->d_name) != 0 && strcmp("..", ent->d_name) != 0) {
