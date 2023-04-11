@@ -2,7 +2,7 @@
 import os
 
 # Get the content type of the request
-content_type = os.environ['CONTENT_TYPE']
+content_type = os.environ.get('CONTENT_TYPE', '')
 
 if content_type == 'multipart/form-data':
     # Get the content length of the request
@@ -26,7 +26,7 @@ if content_type == 'multipart/form-data':
     file_list = path_translated.strip().split('\n')
 
     # Print a response to the client
-    print('<html><head><title>CGI Test</title></head><body>')
+    print('<html><head><title>CGI Multipart</title></head><body>')
     print('<h1>CGI Test</h1>')
     print('<table>')
     for file_path in file_list:
@@ -38,7 +38,7 @@ if content_type == 'multipart/form-data':
     print('</body></html>')
 
 else:
-    print('<html><head><title>CGI Test</title></head><body>')
+    print('<html><head><title>CGI Multipart</title></head><body>')
     print('<h1>CGI Test</h1>')
     print('<p>Error: Unsupported content type</p>')
     print('</body></html>')
