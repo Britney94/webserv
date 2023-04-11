@@ -75,7 +75,7 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
     if (this->_query.size() > 1)
         sizeEnvp++;
     // Set the new array
-	char	**env = new char*[sizeEnvp + 2];
+    char	**env = new char*[sizeEnvp + 2];
     int i = 0;
     // --- add here
     while (i < sizeEnvp - 5) {
