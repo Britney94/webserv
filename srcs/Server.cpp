@@ -176,15 +176,26 @@ int	Server::parseRequest() {
     ret = read(_socket, tmpBuffer.data(), REQUEST_SIZE - 1);
     memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
 //    std::string bufferString = tmpBuffer.data();
-//    int sizeBoundary = bufferString.find_last_of("----") + 100;
 //    std::ofstream file("test.png", std::ios::binary | std::ios::app);
 //    if (!file.is_open()) {
 //        std::cerr << "Impossible d'ouvrir le fichier\n";
 //        return 1;
 //    }
-//    sizeBoundary = bufferString.find_last_of("Content-Type: image/png") + 5;
+//    std::ofstream file2("test.txt", std::ios::binary | std::ios::app);
+//    if (!file.is_open()) {
+//        std::cerr << "Impossible d'ouvrir le fichier\n";
+//        return 1;
+//    }
+//    int sizeBoundary = bufferString.find_last_of("Content-Type:");
+//    bufferString = bufferString.substr(sizeBoundary);
+//    sizeBoundary += bufferString.find("\n") + 1;
+//    bufferString = bufferString.substr(bufferString.find("\n") + 1);
+//    sizeBoundary += bufferString.find("\n") + 1;
+//    bufferString = bufferString.substr(bufferString.find("\n") + 1);
 //    while (sizeBoundary < (int)tmpBuffer.size()) {
+//        // checker ici si c'est delimiter, si oui, break
 //        file.write(&tmpBuffer[sizeBoundary], 1);
+//        file2.write(&tmpBuffer[sizeBoundary], 1);
 //        sizeBoundary++;
 //    }
 	if (ret <= 0) {
