@@ -101,41 +101,124 @@ void	Server::close_socket() {
 /*
  * Create the file with the body of the multipart request
  */
-static void extractFileData(const string& body, const string& boundary, const string& filename) {
-    string data = body.substr(body.find("Content-Type:"));
-    data = data.substr(data.find("\n") + 1);
-    data = data.substr(data.find("\n") + 1, data.find("\r\n--"));
-    string delimiter = "\r\n--" + boundary + "\r\n";
-    ofstream file(filename.c_str(), ios::binary);
-    if (file) {
-        file.write(data.data(), data.size() - 1);
-        file.close();
+//static void extractFileData(const string& body, const string& boundary, const string& filename) {
+//    string data = body.substr(body.find("Content-Type:"));
+//    data = data.substr(data.find("\n") + 1);
+//    data = data.substr(data.find("\n") + 1, data.find("\r\n--"));
+//    string delimiter = "\r\n--" + boundary + "\r\n";
+//    ofstream file(filename.c_str(), ios::binary);
+//    if (file) {
+//        file.write(data.data(), data.size() - 1);
+//        file.close();
+//    }
+//}
+
+std::string getFilename(std::vector<char> body, std::string boundary) {
+    std::string filename = "";
+    size_t i = 0;
+    int boundaryFound = 0;
+    std::string filenameStr = "filename=\"";
+    while (i < body.size()) {
+        size_t j = 0;
+        if (body[i] == filenameStr[j]) {
+            while (j < filenameStr.size() && body[i + j] == filenameStr[j]) {
+                j++;
+            }
+            std::cout << "j = " << j << std::endl;
+            if (j == filenameStr.size()) {
+                i += j;
+                while (body[i] != '"') {
+                    std::cout << body[i];
+                    filename += body[i];
+                    i++;
+                }
+                if (boundaryFound == 1)
+                    return filename;
+                else
+                    return "";
+            }
+        }
+        size_t k = 0;
+        if (body[i] == boundary[k]) {
+            while (k < boundary.size() && body[i + k] == boundary[k]) {
+                k++;
+            }
+            if (k == boundary.size()) {
+                boundaryFound++;
+                i += k;
+            }
+        }
+        i++;
     }
+    return filename;
 }
 
 /*
  * Save the files in the directory (when multipart request)
  * Return pathTranslated which is the environment variable with the path(s) of the file(s)
  */
-static std::string saveFiles(std::string body, std::string boundary, std::string directory) {
+static std::string saveFiles(std::vector<char> body, std::string boundary, std::string bodyStr) {
     std::string pathTranslated = "";
-    std::string delimiter = "\r\n--" + boundary + "\r\n";
-    std::string dataFiles;
-    // Browse each part of the body
-    while (body.size()) {
-        dataFiles = body.substr(0, body.find(delimiter));
-        // Check if the part is a file
-        if (dataFiles.find("filename=") != std::string::npos) {
-            std::string filename = dataFiles.substr(dataFiles.find("filename=") + 10);
-            filename = filename.substr(0, filename.find("\""));
-            extractFileData(body, boundary, directory + "/" + filename);
-            pathTranslated += directory + filename + "\n";
-        }
-        dataFiles = "";
-        if (body.find(delimiter) != std::string::npos)
-            body = body.substr(body.find(delimiter) + delimiter.size());
-        else
+    boundary = "--" + boundary;
+    // Remove header of the body
+    for (size_t i = 0; i < body.size(); i++) {
+        if (body[i] == '\r' && body[i + 1] == '\n' && body[i + 2] == '\r' && body[i + 3] == '\n') {
+            body.erase(body.begin(), body.begin() + i + 4);
             break;
+        }
+    }
+    // Remove the first boundary
+    for (size_t i = 0; i < body.size(); i++) {
+        size_t j = 0;
+        while (j < boundary.size() && body[i + j] == boundary[j]) {
+            j++;
+        }
+        if (j == boundary.size()) {
+            body.erase(body.begin(), body.begin() + i + j + 2);
+            break;
+        }
+    }
+    std::string filename = "";
+    (void)bodyStr;
+    while (body.size() > 0) {
+        std::string bufferString = body.data();
+        // Check if there is a filename before the boundary
+        filename = getFilename(body, boundary);
+        std::ofstream file(filename.c_str(), std::ios::binary);
+        if (!file.is_open()) {
+            return "";
+            std::cerr << "Error: cannot open file" << std::endl;
+        }
+        if (filename == "")
+            file.close();
+        else
+            pathTranslated += filename + "\n";
+        int sizeBoundary = bufferString.find_last_of("Content-Type:");
+        bufferString = bufferString.substr(sizeBoundary);
+        sizeBoundary += bufferString.find("\n") + 1;
+        bufferString = bufferString.substr(bufferString.find("\n") + 1);
+        sizeBoundary += bufferString.find("\n") + 1;
+        bufferString = bufferString.substr(bufferString.find("\n") + 1);
+        while (sizeBoundary < (int)body.size()) {
+            int i = 0;
+            if (body[sizeBoundary] == boundary[i]) {
+                i++;
+                while (body[sizeBoundary + i] == boundary[i] && i < (int)boundary.size()) {
+                    i++;
+                }
+                if (i == (int)boundary.size()) {
+                    break;
+                }
+            }
+            if (filename != "" && (filename.find(".jpg") != std::string::npos || filename.find(".jpeg") != std::string::npos || filename.find(".png") != std::string::npos))
+                file.write(&body[sizeBoundary], 1);
+            else {
+//                bodyStr = bodyStr.substr(bodyStr.find(boundary) + boundary.size() + 2);
+//                std::cout << bodyStr << std::endl;
+            }
+            sizeBoundary++;
+        }
+        body.erase(body.begin(), body.begin() + sizeBoundary);
     }
     return pathTranslated;
 }
@@ -175,6 +258,7 @@ int	Server::parseRequest() {
     std::vector<char> tmpBuffer(REQUEST_SIZE);
     ret = read(_socket, tmpBuffer.data(), REQUEST_SIZE - 1);
     memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
+    _vectorBody = std::vector<char>(tmpBuffer.begin(), tmpBuffer.end());
 //    std::string bufferString = tmpBuffer.data();
 //    std::ofstream file("test.png", std::ios::binary | std::ios::app);
 //    if (!file.is_open()) {
@@ -269,7 +353,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         std::string boundary = _request.substr(_request.find("boundary=") + 9);
         boundary = boundary.substr(0, boundary.find("\r\n"));
         response.setBoundary(boundary);
-        response.setPathTranslated(saveFiles(_body, boundary, "./tmp/"));
+        response.setPathTranslated(saveFiles(_vectorBody, boundary, _body));
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);

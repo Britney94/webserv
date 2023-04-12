@@ -37,6 +37,7 @@ class Server {
 		std::string	_cgi;
 		std::string	_method;
 		std::fstream _tmpBody;
+		std::vector<char> _vectorBody;
 		int	_socket;
 		int	_status;
 		int	_error;
