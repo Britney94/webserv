@@ -124,15 +124,13 @@ std::string getFilename(std::vector<char> body, std::string boundary) {
             while (j < filenameStr.size() && body[i + j] == filenameStr[j]) {
                 j++;
             }
-            std::cout << "j = " << j << std::endl;
             if (j == filenameStr.size()) {
                 i += j;
                 while (body[i] != '"') {
-                    std::cout << body[i];
                     filename += body[i];
                     i++;
                 }
-                if (boundaryFound == 1)
+                if (boundaryFound <= 1)
                     return filename;
                 else
                     return "";
@@ -179,20 +177,19 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
         }
     }
     std::string filename = "";
-    (void)bodyStr;
     while (body.size() > 0) {
         std::string bufferString = body.data();
         // Check if there is a filename before the boundary
         filename = getFilename(body, boundary);
+        if (filename != "")
+            filename = "./tmp/" + filename;
+        std::cout << "filename: " << filename << std::endl;
         std::ofstream file(filename.c_str(), std::ios::binary);
-        if (!file.is_open()) {
-            return "";
-            std::cerr << "Error: cannot open file" << std::endl;
-        }
         if (filename == "")
             file.close();
         else
             pathTranslated += filename + "\n";
+        std::cout << "pathTranslated: " << pathTranslated << std::endl;
         int sizeBoundary = bufferString.find_last_of("Content-Type:");
         bufferString = bufferString.substr(sizeBoundary);
         sizeBoundary += bufferString.find("\n") + 1;
@@ -212,11 +209,19 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
             }
             if (filename != "" && (filename.find(".jpg") != std::string::npos || filename.find(".jpeg") != std::string::npos || filename.find(".png") != std::string::npos))
                 file.write(&body[sizeBoundary], 1);
-            else {
-//                bodyStr = bodyStr.substr(bodyStr.find(boundary) + boundary.size() + 2);
-//                std::cout << bodyStr << std::endl;
-            }
             sizeBoundary++;
+        }
+        if (filename != "" && (filename.find(".jpg") == std::string::npos && filename.find(".jpeg") == std::string::npos && filename.find(".png") == std::string::npos)) {
+            std::string searchFile = filename.substr(filename.find_last_of("/") + 1);
+            if (bodyStr.find(searchFile) != std::string::npos) {
+                std::string tmp(bodyStr.substr(bodyStr.find(searchFile)));
+                tmp = tmp.substr(tmp.find("\n") + 1);
+                tmp = tmp.substr(tmp.find("\n") + 1);
+                tmp = tmp.substr(tmp.find("\n") + 1, tmp.find("\r\n--"));
+                while (!isascii(tmp[0]))
+                    tmp.erase(tmp.begin());
+                file.write(tmp.c_str(), tmp.size() - 1);
+            }
         }
         body.erase(body.begin(), body.begin() + sizeBoundary);
     }
@@ -353,7 +358,9 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         std::string boundary = _request.substr(_request.find("boundary=") + 9);
         boundary = boundary.substr(0, boundary.find("\r\n"));
         response.setBoundary(boundary);
-        response.setPathTranslated(saveFiles(_vectorBody, boundary, _body));
+        std::string tmpBody = _request;
+        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody));
+
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);

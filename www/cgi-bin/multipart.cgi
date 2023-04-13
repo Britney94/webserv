@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import os
+import io
+import base64
+from PIL import Image
 
 # Get the content type of the request
 content_type = os.environ.get('CONTENT_TYPE', '')
@@ -25,6 +28,14 @@ if content_type == 'multipart/form-data':
     # Write the text data to a file
     file_list = path_translated.strip().split('\n')
 
+    # Check if the path translated is empty
+    if path_translated == '':
+        print('<html><head><title>CGI Multipart</title></head><body>')
+        print('<h1>CGI Multipart</h1>')
+        print('<p>Error: No file uploaded</p>')
+        print('</body></html>')
+        exit()
+
     # Print a response to the client
     print('<html><head><title>CGI Multipart</title></head><body>')
     print('<h1>CGI Multipart</h1>')
@@ -35,11 +46,23 @@ if content_type == 'multipart/form-data':
         print('<p>File path: {}</p>'.format(file_path))
         if 'base64' in image_data:
             source = "data:image/png;base64," + file_content.decode('utf-8')
-            print('<tr><td><img src="',source,'"alt="Image"></td></tr>')
-        if '.svg' in image_data:
+            print('<tr><td><img src="{}" alt="Image"></td></tr>'.format(source))
+        elif '.svg' in image_data:
             print(file_content.decode('utf-8'))
-        if '.txt' in image_data:
-            print('<tr><td><p>',file_content.decode('utf-8'),'</p></td></tr>')
+        elif '.txt' in image_data:
+            print('<tr><td><p>{}</p></td></tr>'.format(file_content.decode('utf-8')))
+        elif '.jpeg' in image_data or '.jpg' in image_data:
+            # Load the image using PIL
+            image = Image.open(io.BytesIO(file_content))
+            # Convert the image to JPEG and encode it as base64
+            buffered = io.BytesIO()
+            image.convert('RGB').save(buffered, format="JPEG")
+            encoded_image = base64.b64encode(buffered.getvalue()).decode()
+            # Generate the HTML code to display the image
+            html = '<img src="data:image/jpeg;base64,{}">'.format(encoded_image)
+            print('<tr><td>{}</td></tr>'.format(html))
+        else:
+            print('<tr><td><p>Unsupported file type</p></td></tr>')
     print('</table>')
     print('</body></html>')
 
