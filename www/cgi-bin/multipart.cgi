@@ -39,15 +39,13 @@ if content_type == 'multipart/form-data':
     # Print a response to the client
     print('<html><head><title>CGI Multipart</title></head><body>')
     print('<h1>CGI Multipart</h1>')
+    print('<p>Path translated: {}</p>'.format(path_translated))
     print('<table>')
     for file_path in file_list:
         with open(file_path, 'rb') as f:
             file_content = f.read()
         print('<p>File path: {}</p>'.format(file_path))
-        if 'base64' in image_data:
-            source = "data:image/png;base64," + file_content.decode('utf-8')
-            print('<tr><td><img src="{}" alt="Image"></td></tr>'.format(source))
-        elif '.svg' in image_data:
+        if '.svg' in image_data:
             print(file_content.decode('utf-8'))
         elif '.txt' in image_data:
             print('<tr><td><p>{}</p></td></tr>'.format(file_content.decode('utf-8')))
@@ -61,6 +59,9 @@ if content_type == 'multipart/form-data':
             # Generate the HTML code to display the image
             html = '<img src="data:image/jpeg;base64,{}">'.format(encoded_image)
             print('<tr><td>{}</td></tr>'.format(html))
+        elif '.base64' in image_data:
+            source = "data:image/png;base64," + file_content.decode('utf-8')
+            print('<tr><td><img src="{}" alt="Image"></td></tr>'.format(source))
         else:
             print('<tr><td><p>Unsupported file type</p></td></tr>')
     print('</table>')
