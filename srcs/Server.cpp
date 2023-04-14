@@ -271,7 +271,7 @@ int Server::checkContentRequest() {
     return 1;
 }
 
-int	Server::parseRequest() {
+int	Server::parseRequest(std::map<int, Server *> servs) {
     int        ret;
     char    buffer[REQUEST_SIZE] = {0};
     std::vector<char> tmpBuffer(REQUEST_SIZE);
@@ -296,7 +296,7 @@ int	Server::parseRequest() {
 	if (!this->checkContentRequest())
         return 1;
 	std::cout << std::endl << std::endl << BHBLU << "*** Request ***\n" << BLUE << _request << BLANK;
-	ServerInfo	clientInfo(requestInfos());
+	ServerInfo	clientInfo(requestInfos(servs));
 	ClientRequest	client(clientInfo, _request);
 	_file_request = client.getFile();
 	_body = client.getBody();
@@ -387,7 +387,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
 	return (0);
 }
 
-ServerInfo	*Server::requestInfos() {
+ServerInfo	*Server::requestInfos(std::map<int, Server *> servs) {
 	std::string	serv_name;
 	size_t  found;
 	found = _request.find("HOST:");
@@ -406,6 +406,17 @@ ServerInfo	*Server::requestInfos() {
 			std::string	name = (*it)->getServerNames().at(count);
 			if (serv_name == name)
 				return (*it);
+		}
+	}
+	for (std::map<int, Server *>::iterator it = servs.begin(); it != servs.end(); it++) {
+		std::vector<ServerInfo *> infos = (*it).second->getInfos();
+		for (std::vector<ServerInfo *>::iterator it2 = infos.begin(); it2 != infos.end(); it2++) {
+			for (int count = 0; count < (int)(*it2)->getServerNames().size(); count++) {
+				std::string	name = (*it2)->getServerNames().at(count);
+				std::cout << "Name : " << name << " " << (name == serv_name) << std::endl;
+				if (serv_name == name)
+					return (*it2);
+			}
 		}
 	}
 	return _default;

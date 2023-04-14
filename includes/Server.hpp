@@ -21,12 +21,12 @@ class Server {
 		int	getError() const;
 		std::vector<ServerInfo *>	getInfos() const;
 		int	accept_fd();
-		int	parseRequest();
+		int	parseRequest(std::map<int, Server *> servs);
 		int	sendResponse(std::map<int, std::string> errors, char **envp);
 		int	chunkedRequest();
 		void    parseChunked();
 		int checkContentRequest();
-		ServerInfo	*requestInfos();
+		ServerInfo	*requestInfos(std::map<int, Server *> servs);
 	private:
 		struct sockaddr_in	_addr;
 		std::vector<ServerInfo *>	_infos;

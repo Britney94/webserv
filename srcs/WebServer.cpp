@@ -71,7 +71,8 @@ int	WebServer::launch(char **envp) {
 		for (std::map<int, Server *>::iterator it = _acceptfds.begin(); pending && it != _acceptfds.end(); it++) {
 			int	fd = it->second->getSocket();
 			if (FD_ISSET(fd, &readfds)) {
-				ret = it->second->parseRequest();
+				Server	*tmp = it->second;
+				ret = it->second->parseRequest(_servers);
 				if (ret <= 0) {
 					if (!ret)
 						_writablefds.insert(std::make_pair(it->first, it->second));
@@ -79,6 +80,8 @@ int	WebServer::launch(char **envp) {
 					FD_CLR(fd, &readfds);
 					_acceptfds.erase(it);
 					it = _acceptfds.begin();
+					if (ret && tmp)
+						delete tmp;
 				}
 				pending--;
 				break;

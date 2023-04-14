@@ -6,6 +6,7 @@ ServerInfo::ServerInfo(void) {
 	this->_root = "./data/my_website/";
 	this->_index = "index.html";
 	this->_autoIndex = 0; 
+	this->_port = 0; 
 	this->_allow[0] = 0;
 	this->_allow[1] = 0;
 	this->_allow[2] = 0;
@@ -71,6 +72,10 @@ int	ServerInfo::setServerNames(std::string names) {
 }
 
 int	ServerInfo::setIp(std::string line) {
+	if (this->_port != 0) {
+	std::cerr << RED << "Config file is incorrect: more than one listen directive." << BLANK << std::endl;
+		return 2;
+	}
     std::string port;
 	if (line.find(";") == std::string::npos)
 		return 1;
@@ -81,8 +86,7 @@ int	ServerInfo::setIp(std::string line) {
 		this->_ip = "127.0.0.1";
 	else
 		this->_ip = &line[line.find(" ") + 1];
-	this->_port = 0;
-	if (has(this->_ip, ":")) {
+	if (has(this->_ip, ":") >= 0) {
 	    port = &this->_ip[this->_ip.find(":")];
 		this->_ip.erase(this->_ip.find(":"));
 	}
@@ -98,6 +102,7 @@ int	ServerInfo::setIp(std::string line) {
 	if (this->_ip != "127.0.0.1" && this->_ip != "0.0.0.0")
 		return 1;
 	this->_ip += port;
+	this->_port = atoi(&port[1]);
 	return 0;
 }
 
@@ -249,4 +254,5 @@ int	ServerInfo::getAllow(std::string allow) const {
 ServerInfo::~ServerInfo()
 {
 	this->_serverNames.clear();
+	this->_loc.clear();
 }
