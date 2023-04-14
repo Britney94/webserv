@@ -234,6 +234,8 @@ int	ConfigInfo::setErrorFile(std::string line) {
 		return 1;
 	else {
 		line.erase(0, line.find_last_of(" ") + 1);
+		if (line.find(';') != std::string::npos)
+			line.erase(line.find(';'));
 		_errorFiles[error] = line;
 	}
 	return 0;
