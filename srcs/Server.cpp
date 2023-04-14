@@ -155,7 +155,7 @@ std::string getFilename(std::vector<char> body, std::string boundary) {
  * Save the files in the directory (when multipart request)
  * Return pathTranslated which is the environment variable with the path(s) of the file(s)
  */
-static std::string saveFiles(std::vector<char> body, std::string boundary, std::string bodyStr) {
+static std::string saveFiles(std::vector<char> body, std::string boundary, std::string bodyStr, std::string root) {
     std::string pathTranslated = "";
     boundary = "--" + boundary;
     // Remove header of the body
@@ -181,9 +181,15 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
         std::string bufferString = body.data();
         // Check if there is a filename before the boundary
         filename = getFilename(body, boundary);
-        if (filename != "")
-            filename = "./tmp/" + filename;
+        if (filename != "") {
+            std::string directory = root + "uploads/";
+            mkdir(directory.c_str(), 0777);
+            filename = directory + filename;
+        }
+        // Dont forget to add the host name not the basic www
         std::ofstream file(filename.c_str(), std::ios::binary);
+        if (!file.is_open())
+            std::cout << RED << "Error" << std::endl;
         if (filename == "")
             file.close();
         else
@@ -272,29 +278,6 @@ int	Server::parseRequest() {
     ret = read(_socket, tmpBuffer.data(), REQUEST_SIZE - 1);
     memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
     _vectorBody = std::vector<char>(tmpBuffer.begin(), tmpBuffer.end());
-//    std::string bufferString = tmpBuffer.data();
-//    std::ofstream file("test.png", std::ios::binary | std::ios::app);
-//    if (!file.is_open()) {
-//        std::cerr << "Impossible d'ouvrir le fichier\n";
-//        return 1;
-//    }
-//    std::ofstream file2("test.txt", std::ios::binary | std::ios::app);
-//    if (!file.is_open()) {
-//        std::cerr << "Impossible d'ouvrir le fichier\n";
-//        return 1;
-//    }
-//    int sizeBoundary = bufferString.find_last_of("Content-Type:");
-//    bufferString = bufferString.substr(sizeBoundary);
-//    sizeBoundary += bufferString.find("\n") + 1;
-//    bufferString = bufferString.substr(bufferString.find("\n") + 1);
-//    sizeBoundary += bufferString.find("\n") + 1;
-//    bufferString = bufferString.substr(bufferString.find("\n") + 1);
-//    while (sizeBoundary < (int)tmpBuffer.size()) {
-//        // checker ici si c'est delimiter, si oui, break
-//        file.write(&tmpBuffer[sizeBoundary], 1);
-//        file2.write(&tmpBuffer[sizeBoundary], 1);
-//        sizeBoundary++;
-//    }
 	if (ret <= 0) {
 		this->close_socket();
 		if (!ret)
@@ -367,8 +350,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         boundary = boundary.substr(0, boundary.find("\r\n"));
         response.setBoundary(boundary);
         std::string tmpBody = _request;
-        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody));
-
+        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody, _default->getRoot()));
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
