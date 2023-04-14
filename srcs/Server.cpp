@@ -98,21 +98,6 @@ void	Server::close_socket() {
 		close(this->_socket);
 }
 
-/*
- * Create the file with the body of the multipart request
- */
-//static void extractFileData(const string& body, const string& boundary, const string& filename) {
-//    string data = body.substr(body.find("Content-Type:"));
-//    data = data.substr(data.find("\n") + 1);
-//    data = data.substr(data.find("\n") + 1, data.find("\r\n--"));
-//    string delimiter = "\r\n--" + boundary + "\r\n";
-//    ofstream file(filename.c_str(), ios::binary);
-//    if (file) {
-//        file.write(data.data(), data.size() - 1);
-//        file.close();
-//    }
-//}
-
 std::string getFilename(std::vector<char> body, std::string boundary) {
     std::string filename = "";
     size_t i = 0;
