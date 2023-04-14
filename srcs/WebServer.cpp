@@ -54,7 +54,7 @@ int	WebServer::launch(char **envp) {
 			int	fd = it->second->getSocket();
 			if (FD_ISSET(fd, &writefds)) {
 				Server	*tmp = it->second;
-				ret = it->second->sendResponse(_config.getErrors(), envp);
+				ret = it->second->sendResponse(_config.getErrors(), envp, _config.getUpload());
 				if (ret == -1) {
 					FD_CLR(fd, &_sockets);
 					FD_CLR(fd, &readfds);

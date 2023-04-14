@@ -109,8 +109,6 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 					ret = (*tmpInfo).setClientSize(line);
 				else if (has(line, "allow_methods ") >= 0)
 					ret = (*tmpInfo).setAllow(line);
-				else if (has(line, "upload_directory ") >= 0)
-					ret = (*tmpInfo).setUpload(line);
 				else if (has(line, "location ") >= 0) {
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
 					if (_err == 1) {
@@ -136,6 +134,18 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 				delete tmp.at(tmp.size() - 1);
 				tmp.clear();
 			}
+		}
+		else if (has(line, "upload_directory ") >= 0) {
+			if (line.find(";") != std::string::npos)
+				line.resize(line.find(";"));
+			line.erase(0, line.find(' ') + 1);
+			line = trim(line);
+			if (line.size()) {
+				_upload = line;
+				if (_upload[_upload.size() - 1] != '/')
+					_upload.push_back('/');
+			}
+			line = file.getLine();
 		}
 		else if (has(line, "error_page ") >= 0) {
 			if (setErrorFile(line)) {
@@ -186,7 +196,7 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.allow[0] = 0;
 	tmp.allow[1] = 0;
 	tmp.allow[2] = 0;
-	tmp.cgi = "";
+	tmp.cgi = "off";
 	tmp.clientSize = -1;
 	tmp.index = "";
 	tmp.root = "";
@@ -196,6 +206,7 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 			_tmp_loc = tmp;
 			return _tmp_loc;
 		}
+		line.erase(line.find(';'));
 		if (has(line, "location ") >= 0)
 			tmp.loc.push_back(setupLoc(file, line));
 		else if (has(line, "root ") >= 0) {
@@ -207,6 +218,10 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 			tmp.index = line.substr(line.find(" ") + 1);
 		else if (has(line, "cgi_pass ") >= 0) {
 			tmp.cgi = line.substr(line.find(" ") + 1);
+			if (tmp.cgi != "on") {
+				std::cout << RED << "Please limit CGI configuration to \"on\" or \"off\"." << BLANK << std::endl;
+				tmp.cgi = "off";
+			}
 		}
 		else if (has(line, "client_body_buffer_size ") >= 0) {
 			tmp.clientSize = atoi(&(line.substr(has(line, " ") + 1))[0]);
@@ -258,6 +273,10 @@ void ConfigInfo::setSize(int size) {
 
 int ConfigInfo::getError() const {
 	return (this->_err);
+}
+
+std::string	ConfigInfo::getUpload() const {
+	return (this->_upload);
 }
 
 std::map<int, std::string>	ConfigInfo::getErrors() const {

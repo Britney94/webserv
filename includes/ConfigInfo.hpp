@@ -24,12 +24,14 @@ class ConfigInfo {
 		int getError() const;
 		int	getSize() const;
 		int	getMaxFd() const;
+		std::string	getUpload() const;
 	private:
 		std::map<int, Server *> _servers;
 		std::map<int, std::string>  _errorFiles;
 		int	_err;
 		int	_maxFd;
 		int	_size;
+		std::string	_upload;
 		Location    _tmp_loc;
 };
 

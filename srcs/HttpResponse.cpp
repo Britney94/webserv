@@ -131,6 +131,8 @@ int	HttpResponse::createResponse(char **envp) {
 	    query = _file.substr(_file.find("?") + 1);
         _file.erase(_file.find("?"));
     }
+	if (_cgi == "on")
+		_file = "/cgi-bin/multipart.cgi";
 	if (_status >= 400 && _status < 500) {
 		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
 		filestream.open(_errorFiles[_status].c_str());

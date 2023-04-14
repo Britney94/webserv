@@ -22,7 +22,7 @@ class Server {
 		std::vector<ServerInfo *>	getInfos() const;
 		int	accept_fd();
 		int	parseRequest(std::map<int, Server *> servs);
-		int	sendResponse(std::map<int, std::string> errors, char **envp);
+		int	sendResponse(std::map<int, std::string> errors, char **envp, std::string uploadDir);
 		int	chunkedRequest();
 		void    parseChunked();
 		int checkContentRequest();

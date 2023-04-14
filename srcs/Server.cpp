@@ -319,7 +319,7 @@ void	Server::parseChunked() {
 	_request = header + body + "\r\n";
 }
 
-int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
+int	Server::sendResponse(std::map<int, std::string> errors, char **envp, std::string uploadDir) {
 	HttpResponse    response;
 	response.setHost(_default->getIp());
 	response.setMethod(_method);
@@ -334,7 +334,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         boundary = boundary.substr(0, boundary.find("\r\n"));
         response.setBoundary(boundary);
         std::string tmpBody = _request;
-        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody, _default->getUpload()));
+        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody, uploadDir));
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
@@ -397,7 +397,6 @@ ServerInfo	*Server::requestInfos(std::map<int, Server *> servs) {
 		for (std::vector<ServerInfo *>::iterator it2 = infos.begin(); it2 != infos.end(); it2++) {
 			for (int count = 0; count < (int)(*it2)->getServerNames().size(); count++) {
 				std::string	name = (*it2)->getServerNames().at(count);
-				std::cout << "Name : " << name << " " << (name == serv_name) << std::endl;
 				if (serv_name == name)
 					return (*it2);
 			}

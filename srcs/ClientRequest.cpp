@@ -125,6 +125,7 @@ int	ClientRequest::determinateLoc() {
 	_loc.root = _info.getRoot();
 	_loc.index = _info.getIndex();
 	_loc.uri = "/";
+	_loc.cgi = "off";
 	_loc.allow[0] = _info.getAllow("GET");
 	_loc.allow[1] = _info.getAllow("POST");
 	_loc.allow[2] = _info.getAllow("DELETE");
