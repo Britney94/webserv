@@ -120,10 +120,6 @@ static int  isCGIRequest(std::string file) {
 int	HttpResponse::createResponse(char **envp) {
 	std::ifstream   filestream;
 	std::filebuf    filebuf;
-	std::cout << std::endl << std::endl << "File to open: " << _file << std::endl;
-	std::cout << "Status: " << _status << std::endl;
-	std::cout << "Method: " << _method << std::endl;
-	std::cout << "Body: " << _body << BLANK << std::endl;
 	int isCGI = 0;
 	std::string query;
 	// Check the URI for a query string
@@ -131,20 +127,19 @@ int	HttpResponse::createResponse(char **envp) {
 	    query = _file.substr(_file.find("?") + 1);
         _file.erase(_file.find("?"));
     }
+	if (_cgi == "on")
+		_file = "/cgi-bin/multipart.cgi";
 	if (_status >= 400 && _status < 500) {
-		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
 		filestream.open(_errorFiles[_status].c_str());
 		while(filestream.good()) {
 			std::getline(filestream, this->_file_content);
 			this->_body += this->_file_content;
 			this->_body += '\n';
 		}
-		std::cout << RED << "Error file content: " << this->_file_content << BLANK << std::endl;
 	}
 	else if (_method == "GET") {
 	    // Check if the file is a CGI script
 		isCGI = isCGIRequest(_file);
-		std::cout << isCGI << std::endl;
 		// Execute the CGI script if it is
 	    if (isCGI == 1) {
             CGI cgi;

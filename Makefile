@@ -1,5 +1,5 @@
 NAME = webserv
-CC = c++ -g #TO DELETE -g
+CC = c++
 CFLAGS = -std=c++98 -Wall -Wextra -Werror
 INCLUDES = -I ./includes/
 

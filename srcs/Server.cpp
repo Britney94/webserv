@@ -38,6 +38,8 @@ Server::Server(ServerInfo* infos, int port) {
         _error = 1;
 		return ;
 	}
+    fcntl(_socket, F_SETFL, O_NONBLOCK);
+
 }
 
 Server::Server(Server& copy, int new_socket) {
@@ -90,6 +92,9 @@ int	Server::accept_fd() {
 	new_socket = accept(_socket, (struct sockaddr *)&_addr, (socklen_t *)&(size));
 	if (new_socket == -1)
 		std::cerr << RED << "Error: accept()" << BLANK << std::endl;
+    else {
+        fcntl(new_socket, F_SETFL, O_NONBLOCK);
+    }
 	return new_socket;
 }
 
@@ -97,21 +102,6 @@ void	Server::close_socket() {
 	if (this->_socket > 0)
 		close(this->_socket);
 }
-
-/*
- * Create the file with the body of the multipart request
- */
-//static void extractFileData(const string& body, const string& boundary, const string& filename) {
-//    string data = body.substr(body.find("Content-Type:"));
-//    data = data.substr(data.find("\n") + 1);
-//    data = data.substr(data.find("\n") + 1, data.find("\r\n--"));
-//    string delimiter = "\r\n--" + boundary + "\r\n";
-//    ofstream file(filename.c_str(), ios::binary);
-//    if (file) {
-//        file.write(data.data(), data.size() - 1);
-//        file.close();
-//    }
-//}
 
 std::string getFilename(std::vector<char> body, std::string boundary) {
     std::string filename = "";
@@ -182,14 +172,11 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
         // Check if there is a filename before the boundary
         filename = getFilename(body, boundary);
         if (filename != "") {
-            std::string directory = root + "uploads/";
-            mkdir(directory.c_str(), 0777);
-            filename = directory + filename;
+            mkdir(root.c_str(), 0777);
+            filename = root + filename;
         }
         // Dont forget to add the host name not the basic www
         std::ofstream file(filename.c_str(), std::ios::binary);
-        if (!file.is_open())
-            std::cout << RED << "Error" << std::endl;
         if (filename == "")
             file.close();
         else
@@ -253,7 +240,6 @@ int Server::checkContentRequest() {
     _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
     // Check if the request is a multipart/form-data
     if (_request.find("Content-Type: multipart") != std::string::npos) {
-        std::cout << "MULTIPART" << std::endl;
         return 1;
     }
     // Check the content length of the request (if not multipart)
@@ -275,7 +261,7 @@ int	Server::parseRequest(std::map<int, Server *> servs) {
     int        ret;
     char    buffer[REQUEST_SIZE] = {0};
     std::vector<char> tmpBuffer(REQUEST_SIZE);
-    ret = read(_socket, tmpBuffer.data(), REQUEST_SIZE - 1);
+    ret = recv(_socket, tmpBuffer.data(), REQUEST_SIZE - 1, 0);
     memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
     _vectorBody = std::vector<char>(tmpBuffer.begin(), tmpBuffer.end());
 	if (ret <= 0) {
@@ -335,7 +321,7 @@ void	Server::parseChunked() {
 	_request = header + body + "\r\n";
 }
 
-int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
+int	Server::sendResponse(std::map<int, std::string> errors, char **envp, std::string uploadDir) {
 	HttpResponse    response;
 	response.setHost(_default->getIp());
 	response.setMethod(_method);
@@ -350,7 +336,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         boundary = boundary.substr(0, boundary.find("\r\n"));
         response.setBoundary(boundary);
         std::string tmpBody = _request;
-        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody, _default->getRoot()));
+        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody, uploadDir));
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);
@@ -413,7 +399,6 @@ ServerInfo	*Server::requestInfos(std::map<int, Server *> servs) {
 		for (std::vector<ServerInfo *>::iterator it2 = infos.begin(); it2 != infos.end(); it2++) {
 			for (int count = 0; count < (int)(*it2)->getServerNames().size(); count++) {
 				std::string	name = (*it2)->getServerNames().at(count);
-				std::cout << "Name : " << name << " " << (name == serv_name) << std::endl;
 				if (serv_name == name)
 					return (*it2);
 			}

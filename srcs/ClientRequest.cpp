@@ -2,22 +2,18 @@
 
 ClientRequest::ClientRequest(ServerInfo info, std::string request, int status) : _info(info), _request(request), _file(""), _status(status) {
 	checkSyntax();
-    std::cout << "Syntax checked! Status: " << _status << std::endl;
 	determinateLoc();
-    std::cout << "Location found! Root is: " << _loc.root << std::endl;
 	checkMethod();
-    std::cout << "Method checked! Status: " << _status << std::endl;
 	checkSize();
-    std::cout << "Size of body checked! Status: " << _status << std::endl;
 	determinateFile();
-    std::cout << "File requested: " << _file << " Status: " << _status << BLANK << std::endl;
 }
 
 ClientRequest::~ClientRequest() {
+	if (_info.getLoc().size() == 0)
+		_info.getLoc().push_back(Location());
 }
 
 int	ClientRequest::checkMethod() {
-    std::cout << "Method: " << _method << " Allowed[GPDP]: " << _loc.allow[0] << _loc.allow[1] << _loc.allow[2] << std::endl;
 	if (_method == "GET" && !_loc.allow[0])
 		_status = 405;
 	if (_method == "POST" && !_loc.allow[1])
@@ -105,14 +101,12 @@ std::string	ClientRequest::determinateFile() {
 	std::string	file_uri = _uri.substr(_loc.uri.length());
 	_file.insert(0, _loc.root);
 	_file.insert(_file.size(), file_uri);
-    std::cout << "Autoindex: " << _info.getAutoIndex() << std::endl;
 	if (_info.getAutoIndex() == 0 && _file.at(_file.length() - 1) == '/') {
 		if (_loc.index.size() && _loc.index != "")
 			_file += _loc.index;
 		else
 			_file.insert(_file.size(), "index.html");
 	}
-	std::cout << "File: " << _file << std::endl;
 	return _file;
 }
 
@@ -123,6 +117,7 @@ int	ClientRequest::determinateLoc() {
 	_loc.root = _info.getRoot();
 	_loc.index = _info.getIndex();
 	_loc.uri = "/";
+	_loc.cgi = "off";
 	_loc.allow[0] = _info.getAllow("GET");
 	_loc.allow[1] = _info.getAllow("POST");
 	_loc.allow[2] = _info.getAllow("DELETE");
@@ -131,7 +126,6 @@ int	ClientRequest::determinateLoc() {
 	if (tmp_uri.find(".") != std::string::npos)
 		ext = tmp_uri.substr(tmp_uri.find("."));
 	tmp_uri.erase(tmp_uri.find_last_of('/') + 1);
-    std::cout << "URI: " << tmp_uri << " EXT: " << ext << std::endl;
 	while (tmp_vec.size() != 0) {
 		int	loop = 1;
 		for (int count = 0; count < (int)tmp_vec.size() && loop; count++) {

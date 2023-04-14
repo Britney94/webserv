@@ -33,7 +33,7 @@ class ServerInfo {
 		std::string	getRoot() const;
 		std::string	getIndex() const;
 		long    getClientSize() const;
-		int getAutoIndex() const;
+		bool getAutoIndex() const;
 		int getAllow(std::string allow) const;
 		std::vector<std::string>	getServerNames() const;
 		std::vector<Location>		getLoc() const;
@@ -45,7 +45,7 @@ class ServerInfo {
 		std::string _index;
 		int _allow[3]; // GET POST DELETE: 0 si interdit, 1 si autorise
 		long    _clientSize;
-		int _autoIndex; //0 si off, 1 si on
+		bool _autoIndex; //0 si off, 1 si on
 		std::vector<Location>   _loc;
 };
 

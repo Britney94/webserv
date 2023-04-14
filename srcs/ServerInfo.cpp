@@ -3,7 +3,7 @@
 ServerInfo::ServerInfo(void) {
 	this->_ip = "0.0.0.0";
 	this->_clientSize = 10000;
-	this->_root = "./data/my_website/";
+	this->_root = "./www/";
 	this->_index = "index.html";
 	this->_autoIndex = 0; 
 	this->_port = 0; 
@@ -232,7 +232,7 @@ long int	ServerInfo::getClientSize() const {
 	return (this->_clientSize);
 }
 
-int	ServerInfo::getAutoIndex() const {
+bool	ServerInfo::getAutoIndex() const {
 	return(this->_autoIndex);
 }
 
