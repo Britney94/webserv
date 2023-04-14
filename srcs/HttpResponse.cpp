@@ -120,10 +120,6 @@ static int  isCGIRequest(std::string file) {
 int	HttpResponse::createResponse(char **envp) {
 	std::ifstream   filestream;
 	std::filebuf    filebuf;
-	std::cout << std::endl << std::endl << "File to open: " << _file << std::endl;
-	std::cout << "Status: " << _status << std::endl;
-	std::cout << "Method: " << _method << std::endl;
-	std::cout << "Body: " << _body << BLANK << std::endl;
 	int isCGI = 0;
 	std::string query;
 	// Check the URI for a query string
@@ -146,7 +142,6 @@ int	HttpResponse::createResponse(char **envp) {
 	else if (_method == "GET") {
 	    // Check if the file is a CGI script
 		isCGI = isCGIRequest(_file);
-		std::cout << isCGI << std::endl;
 		// Execute the CGI script if it is
 	    if (isCGI == 1) {
             CGI cgi;
