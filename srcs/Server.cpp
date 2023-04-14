@@ -38,6 +38,8 @@ Server::Server(ServerInfo* infos, int port) {
         _error = 1;
 		return ;
 	}
+    fcntl(_socket, F_SETFL, O_NONBLOCK);
+
 }
 
 Server::Server(Server& copy, int new_socket) {
@@ -90,6 +92,9 @@ int	Server::accept_fd() {
 	new_socket = accept(_socket, (struct sockaddr *)&_addr, (socklen_t *)&(size));
 	if (new_socket == -1)
 		std::cerr << RED << "Error: accept()" << BLANK << std::endl;
+    else {
+        fcntl(new_socket, F_SETFL, O_NONBLOCK);
+    }
 	return new_socket;
 }
 
@@ -172,8 +177,6 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
         }
         // Dont forget to add the host name not the basic www
         std::ofstream file(filename.c_str(), std::ios::binary);
-        if (!file.is_open())
-            std::cout << RED << "Error" << std::endl;
         if (filename == "")
             file.close();
         else
@@ -259,7 +262,7 @@ int	Server::parseRequest(std::map<int, Server *> servs) {
     int        ret;
     char    buffer[REQUEST_SIZE] = {0};
     std::vector<char> tmpBuffer(REQUEST_SIZE);
-    ret = read(_socket, tmpBuffer.data(), REQUEST_SIZE - 1);
+    ret = recv(_socket, tmpBuffer.data(), REQUEST_SIZE - 1, 0);
     memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
     _vectorBody = std::vector<char>(tmpBuffer.begin(), tmpBuffer.end());
 	if (ret <= 0) {

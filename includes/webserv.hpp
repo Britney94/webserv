@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sys/ioctl.h>
 
 #include "AutoIndex.hpp"
 #include "CGI.hpp"

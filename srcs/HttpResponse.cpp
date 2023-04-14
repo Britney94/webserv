@@ -130,14 +130,12 @@ int	HttpResponse::createResponse(char **envp) {
 	if (_cgi == "on")
 		_file = "/cgi-bin/multipart.cgi";
 	if (_status >= 400 && _status < 500) {
-		std::cout << RED << "Error file: " << _errorFiles[_status].c_str() << BLANK << std::endl;
 		filestream.open(_errorFiles[_status].c_str());
 		while(filestream.good()) {
 			std::getline(filestream, this->_file_content);
 			this->_body += this->_file_content;
 			this->_body += '\n';
 		}
-		std::cout << RED << "Error file content: " << this->_file_content << BLANK << std::endl;
 	}
 	else if (_method == "GET") {
 	    // Check if the file is a CGI script
