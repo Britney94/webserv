@@ -38,7 +38,7 @@ if content_type == 'multipart/form-data':
     print('<p>Path translated: {}</p>'.format(path_translated))
     print('<table>')
     for file_path in file_list:
-        if '.svg' in file_path:
+        if '.svg' in file_path or '.txt' in file_path:
             with open(file_path, 'r') as f:
                 file_content = f.read()
             print(file_content)
