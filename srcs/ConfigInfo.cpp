@@ -58,27 +58,33 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 	}
 	std::string	line = file.getLine();
 	while (file.lineHistory < file.getMaxLine()) {
-		if (!has(line, "server {")) {
+		if (has(line, "server {") >= 0) {
 			ServerInfo	*tmpInfo = new ServerInfo();
 			tmp.push_back(tmpInfo);
 			line = file.getLine();
 			while (line.find("server {") == std::string::npos && file.lineHistory < file.getMaxLine()) {
-				if (has(line, "autoindex "))
+				if (has(line, "autoindex ") >= 0)
                 	ret = (*tmpInfo).setAutoIndex(line);
-				if (has(line, "server_name "))
+				else if (has(line, "server_name ") >= 0)
 					ret = (*tmpInfo).setServerNames(line);
-				else if (has(line, "listen ")) {
+				else if (has(line, "listen ") >= 0) {
 					int	port;
-					if (has(line, ":")) {
+					if (has(line, ":") >= 0) {
 						port = atoi(&line[line.find(":") + 1]);
 						ret = (*tmpInfo).setIp(line);
+						if (ret == 2) {
+							_err = 1;
+							return _servers;
+						}
 					}
-					else if (has(line, "."))
+					else if (has(line, ".") >= 0)
 						port = atoi(&line[line.find(" ") + 1]);
 					else {
 						std::cerr << RED << "Error: Parsing configuration file : port" << BLANK << std::endl, _err = 1;
-						if (tmp.size() != count)
+						if (tmp.size() != count) {
 							delete tmp.at(tmp.size() - 1);
+							tmp.clear();
+						}
 						return _servers;
 					}
 					try {
@@ -95,39 +101,47 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 						}
 					}
 				}
-				else if (has(line, "root "))
+				else if (has(line, "root ") >= 0)
 					ret = (*tmpInfo).setRoot(line);
-				else if (has(line, "index "))
+				else if (has(line, "index ") >= 0)
 					ret = (*tmpInfo).setIndex(line);
-				else if (has(line, "client_body_buffer_size "))
+				else if (has(line, "client_body_buffer_size ") >= 0)
 					ret = (*tmpInfo).setClientSize(line);
-				else if (has(line, "allow_methods "))
+				else if (has(line, "allow_methods ") >= 0)
 					ret = (*tmpInfo).setAllow(line);
-				else if (has(line, "location ")) {
+				else if (has(line, "location ") >= 0) {
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
 					if (_err == 1) {
 						std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
-						if (tmp.size() != count)
+						if (tmp.size() != count) {
 							delete tmp.at(tmp.size() - 1);
+							tmp.clear();
+						}
 						return _servers;
 					}
 				}
 				if (ret) {
 					std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl, _err = 1;
-					if (tmp.size() != count)
+					if (tmp.size() != count) {
 						delete tmp.at(tmp.size() - 1);
+						tmp.clear();
+					}
 					return _servers;
 				}
 				line = file.getLine();
 			}
-			if (tmp.size() != count)
+			if (tmp.size() != count) {
 				delete tmp.at(tmp.size() - 1);
+				tmp.clear();
+			}
 		}
-		else if (has(line, "error_page ") > 0) {
+		else if (has(line, "error_page ") >= 0) {
 			if (setErrorFile(line)) {
 				std::cerr << RED << "Config file is incorrect: error_page" << BLANK << std::endl, _err = 1;
-				if (tmp.size() != count)
+				if (tmp.size() != count) {
 					delete tmp.at(tmp.size() - 1);
+					tmp.clear();
+				}
 				return _servers;
 			}
 			line = file.getLine();
@@ -136,8 +150,10 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 			line = file.getLine();
 		else {
 			std::cerr << RED << "Error: Parsing configuration file : unknown directive : " << line << BLANK << std::endl, _err = 1;
-			if (tmp.size() != count)
+			if (tmp.size() != count) {
 				delete tmp.at(tmp.size() - 1);
+				tmp.clear();
+			}
 			return _servers;
 		}
 	}
@@ -149,7 +165,7 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 			if (it->second->getInfos().at(count)->getAllow("GET") == 0 &&
 				it->second->getInfos().at(count)->getAllow("POST") == 0 &&
 				it->second->getInfos().at(count)->getAllow("DELETE") == 0)
-				it->second->getInfos().at(count)->setAllow("allow_methods GET POST DELETE");
+				it->second->getInfos().at(count)->setAllow("allow_methods GET POST DELETE;");
 		}
 	}
 	return (_servers);
@@ -161,9 +177,9 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.find("{") - (curr_line.find("location ") + 9));
 	while (tmp.uri.at(tmp.uri.length() - 1) == ' ')
 		tmp.uri.erase(tmp.uri.length() - 1);
-	if (!has(tmp.uri, ".") && tmp.uri.at(tmp.uri.length() - 1) != '/')
+	if (has(tmp.uri, ".") >= 0 && tmp.uri.at(tmp.uri.length() - 1) != '/')
 		tmp.uri += "/";
-	if (has(tmp.uri, "*"))
+	if (has(tmp.uri, "*") >= 0)
 		tmp.uri.erase(0, 1);
 	tmp.allow[0] = 0;
 	tmp.allow[1] = 0;
@@ -172,25 +188,25 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	tmp.clientSize = -1;
 	tmp.index = "";
 	tmp.root = "";
-	while (!has(line, "}")) {
-		if (!has(line, ";") && !has(line, "{") && trim(line) != "") {
+	while (has(line, "}") == -1) {
+		if (has(line, ";") == -1 && has(line, "{") == -1 && trim(line) != "") {
 			this->_err = 1;
 			_tmp_loc = tmp;
 			return _tmp_loc;
 		}
-		if (has(line, "location "))
+		if (has(line, "location ") >= 0)
 			tmp.loc.push_back(setupLoc(file, line));
-		else if (has(line, "root ")) {
+		else if (has(line, "root ") >= 0) {
 			tmp.root = line.substr(line.find(" ") + 1);
 			if (tmp.root.at(tmp.root.length() - 1) != '/')
 				tmp.root += "/";
 		}
-		else if (has(line, "index "))
+		else if (has(line, "index ") >= 0)
 			tmp.index = line.substr(line.find(" ") + 1);
-		else if (has(line, "cgi_pass ")) {
+		else if (has(line, "cgi_pass ") >= 0) {
 			tmp.cgi = line.substr(line.find(" ") + 1);
 		}
-		else if (has(line, "client_body_buffer_size ")) {
+		else if (has(line, "client_body_buffer_size ") >= 0) {
 			tmp.clientSize = atoi(&(line.substr(has(line, " ") + 1))[0]);
 			if (tmp.clientSize <= 0) {
 				this->_err = 1;
@@ -198,12 +214,12 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 				return _tmp_loc;
 			}
 		}
-		else if (has(line, "allow_methods ")) {
-			if (has(line, "GET"))
+		else if (has(line, "allow_methods ") >= 0) {
+			if (has(line, "GET") >= 0)
 				tmp.allow[0] = 1;
-			if (has(line, "POST"))
+			if (has(line, "POST") >= 0)
 				tmp.allow[1] = 1;
-			if (has(line, "DELETE"))
+			if (has(line, "DELETE") >= 0)
 				tmp.allow[2] = 1;
 		}
 		line = file.getLine();
@@ -262,6 +278,7 @@ ConfigInfo::~ConfigInfo() {
 		if (it->second != NULL)
 			delete (it->second);
 	}
+	_servers.clear();
 	_errorFiles.clear();
 	return ;
 }

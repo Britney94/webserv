@@ -40,5 +40,5 @@ int has(std::string to_search, std::string to_find) {
             }
         }
     }
-    return 0;
+    return -1;
 }
