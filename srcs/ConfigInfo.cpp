@@ -109,6 +109,8 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 					ret = (*tmpInfo).setClientSize(line);
 				else if (has(line, "allow_methods ") >= 0)
 					ret = (*tmpInfo).setAllow(line);
+				else if (has(line, "upload_directory ") >= 0)
+					ret = (*tmpInfo).setUpload(line);
 				else if (has(line, "location ") >= 0) {
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
 					if (_err == 1) {

@@ -167,9 +167,8 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
         // Check if there is a filename before the boundary
         filename = getFilename(body, boundary);
         if (filename != "") {
-            std::string directory = root + "uploads/";
-            mkdir(directory.c_str(), 0777);
-            filename = directory + filename;
+            mkdir(root.c_str(), 0777);
+            filename = root + filename;
         }
         // Dont forget to add the host name not the basic www
         std::ofstream file(filename.c_str(), std::ios::binary);
@@ -335,7 +334,7 @@ int	Server::sendResponse(std::map<int, std::string> errors, char **envp) {
         boundary = boundary.substr(0, boundary.find("\r\n"));
         response.setBoundary(boundary);
         std::string tmpBody = _request;
-        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody, _default->getRoot()));
+        response.setPathTranslated(saveFiles(_vectorBody, boundary, tmpBody, _default->getUpload()));
     }
 	response.setClientBody(_body);
 	response.setCGI(_cgi);

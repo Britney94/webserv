@@ -3,7 +3,8 @@
 ServerInfo::ServerInfo(void) {
 	this->_ip = "0.0.0.0";
 	this->_clientSize = 10000;
-	this->_root = "./data/my_website/";
+	this->_root = "./www/";
+	this->_upload = "./www/uploads/";
 	this->_index = "index.html";
 	this->_autoIndex = 0; 
 	this->_port = 0; 
@@ -103,6 +104,19 @@ int	ServerInfo::setIp(std::string line) {
 		return 1;
 	this->_ip += port;
 	this->_port = atoi(&port[1]);
+	return 0;
+}
+int	ServerInfo::setUpload(std::string line) {
+	if (line.find(";") == std::string::npos)
+		return 1;
+	line.resize(line.find(";"));
+	line.erase(0, line.find(' ') + 1);
+	line = trim(line);
+	if (line.size()) {
+		this->_upload = line;
+		if (this->_upload[this->_upload.size() - 1] != '/')
+			this->_upload.push_back('/');
+	}
 	return 0;
 }
 
@@ -224,6 +238,10 @@ std::string ServerInfo::getRoot() const {
 	return (this->_root);
 }
 
+std::string ServerInfo::getUpload() const {
+	return (this->_upload);
+}
+
 std::string ServerInfo::getIndex() const {
 	return (this->_index);
 }
@@ -232,7 +250,7 @@ long int	ServerInfo::getClientSize() const {
 	return (this->_clientSize);
 }
 
-int	ServerInfo::getAutoIndex() const {
+bool	ServerInfo::getAutoIndex() const {
 	return(this->_autoIndex);
 }
 

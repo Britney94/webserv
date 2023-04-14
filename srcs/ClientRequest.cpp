@@ -14,6 +14,8 @@ ClientRequest::ClientRequest(ServerInfo info, std::string request, int status) :
 }
 
 ClientRequest::~ClientRequest() {
+	if (_info.getLoc().size() == 0)
+		_info.getLoc().push_back(Location());
 }
 
 int	ClientRequest::checkMethod() {
