@@ -89,12 +89,13 @@ void	Server::addNewInfo(ServerInfo* new_infos) {
 int	Server::accept_fd() {
 	int	new_socket;
 	int	size = sizeof(_addr);
+    std::cout << "Pouette ACCEPT\n";   // DEBUG
 	new_socket = accept(_socket, (struct sockaddr *)&_addr, (socklen_t *)&(size));
 	if (new_socket == -1)
 		std::cerr << RED << "Error: accept()" << BLANK << std::endl;
-    else {
-        fcntl(new_socket, F_SETFL, O_NONBLOCK);
-    }
+    // else {
+    //     fcntl(new_socket, F_SETFL, O_NONBLOCK);
+    // }
 	return new_socket;
 }
 
@@ -182,11 +183,15 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
         else
             pathTranslated += filename + "\n";
         int sizeBoundary = bufferString.find_last_of("Content-Type:");
+        std::cout << "Caca 1\n";   // DEBUG
         bufferString = bufferString.substr(sizeBoundary);
+        std::cout << "Caca 2\n";   // DEBUG
         sizeBoundary += bufferString.find("\n") + 1;
         bufferString = bufferString.substr(bufferString.find("\n") + 1);
+        std::cout << "Caca 3\n";   // DEBUG
         sizeBoundary += bufferString.find("\n") + 1;
         bufferString = bufferString.substr(bufferString.find("\n") + 1);
+        std::cout << "Caca 4\n";   // DEBUG
         std::string tmpBoundary = body.data();
         int tmpSize = 0;
         while (sizeBoundary < (int)body.size()) {
@@ -234,17 +239,28 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
  * Return 1 if the request is good
  */
 int Server::checkContentRequest() {
+    std::cout << "Caca 1\n";   // DEBUG
+    std::cout << "Caca 8888\n_request = [" << _request << "]";   // DEBUG
     // Get the body of the request and write it in a file
+    if (std::string::npos == _request.find("\r\n\r\n") + 4)
+    {
+        std::cout << "RRNN not found\n"; //DEBUG
+     //   _body = _request;        
+    }
     std::string body = _request.substr(_request.find("\r\n\r\n") + 4);
+    std::cout << "Caca 222222\nbody = [" << body << "]";   // DEBUG
     std::string tmpFile = "tmp/" + toString(_socket);
     _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
     // Check if the request is a multipart/form-data
-    if (_request.find("Content-Type: multipart") != std::string::npos) {
+    if (_request.find("Content-Type: multipart") != std::string::npos)
+    {
+        std::cout << "Caca 3\n";   // DEBUG
         return 1;
     }
     // Check the content length of the request (if not multipart)
     else if (_request.find("Content-Length") != std::string::npos) {
         size_t	n = std::atoi(&(_request.substr(_request.find("Content-Length: ") + 16))[0]);
+        std::cout << "Caca 4\n";   // DEBUG
         _tmpBody << body;
         _tmpBody.seekg(0, _tmpBody.end);
         int	size = _tmpBody.tellg();
@@ -261,6 +277,7 @@ int	Server::parseRequest(std::map<int, Server *> servs) {
     int        ret;
     char    buffer[REQUEST_SIZE] = {0};
     std::vector<char> tmpBuffer(REQUEST_SIZE);
+    std::cout << "Pouette\n";	// DEBUG
     ret = recv(_socket, tmpBuffer.data(), REQUEST_SIZE - 1, 0);
     memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
     _vectorBody = std::vector<char>(tmpBuffer.begin(), tmpBuffer.end());

@@ -53,6 +53,7 @@ int	WebServer::launch(char **envp) {
 		for (std::map<int, Server *>::iterator it = _writablefds.begin(); pending && it != _writablefds.end(); it++) {
 			int	fd = it->second->getSocket();
 			if (FD_ISSET(fd, &writefds)) {
+				std::cout << "Pouette 1\n";   // DEBUG
 				Server	*tmp = it->second;
 				ret = it->second->sendResponse(_config.getErrors(), envp, _config.getUpload());
 				if (ret == -1) {
@@ -71,6 +72,7 @@ int	WebServer::launch(char **envp) {
 		for (std::map<int, Server *>::iterator it = _acceptfds.begin(); pending && it != _acceptfds.end(); it++) {
 			int	fd = it->second->getSocket();
 			if (FD_ISSET(fd, &readfds)) {
+				std::cout << "Pouette 2\n";   // DEBUG
 				Server	*tmp = it->second;
 				ret = it->second->parseRequest(_servers);
 				if (ret <= 0) {
@@ -90,16 +92,20 @@ int	WebServer::launch(char **envp) {
 		for (std::map<int, Server *>::iterator it = _servers.begin(); pending && it != _servers.end(); it++) {
 			int	fd = it->second->getSocket();
 			if (FD_ISSET(fd, &readfds)) {
+				std::cout << "Pouette 3\n";   // DEBUG
 				int	new_socket = it->second->accept_fd();
 				if (new_socket == -1)
 					return 1;
+				std::cout << "Pouette 4\n";   // DEBUG
 				if (new_socket > 0) {
+					std::cout << "Pouette 5\n";   // DEBUG
 				 	Server	*new_fd = new Server(*(it->second), new_socket);
 					FD_SET(new_socket, &_sockets);
 					if (new_socket > _max_fd)
 						_max_fd = new_socket;
 					_acceptfds.insert(std::make_pair(it->first, new_fd));
 				}
+				std::cout << "Pouette 6\n";   // DEBUG
 				pending--;
 				break;
 			}
