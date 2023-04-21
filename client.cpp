@@ -8,7 +8,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 
-#define PORT 8888
+#define PORT 8885
 
 int main() {
     int sock = 0;

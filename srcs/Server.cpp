@@ -239,22 +239,25 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
  * Return 1 if the request is good
  */
 int Server::checkContentRequest() {
+
+	std::string		body;
     std::cout << "Caca 1\n";   // DEBUG
-    std::cout << "Caca 8888\n_request = [" << _request << "]";   // DEBUG
+    std::cout << "Caca 1000\n_request = [" << _request << "]\n";   // DEBUG
     // Get the body of the request and write it in a file
-    if (std::string::npos == _request.find("\r\n\r\n") + 4)
+    if (std::string::npos == _request.find("\r\n\r\n"))
     {
+    	body = _request;
         std::cout << "RRNN not found\n"; //DEBUG
-     //   _body = _request;        
     }
-    std::string body = _request.substr(_request.find("\r\n\r\n") + 4);
-    std::cout << "Caca 222222\nbody = [" << body << "]";   // DEBUG
+    else
+    	 body = _request.substr(_request.find("\r\n\r\n") + 4);
+    std::cout << "Caca 222\nbody = [" << body << "]\n";   // DEBUG
     std::string tmpFile = "tmp/" + toString(_socket);
     _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
     // Check if the request is a multipart/form-data
     if (_request.find("Content-Type: multipart") != std::string::npos)
     {
-        std::cout << "Caca 3\n";   // DEBUG
+        std::cout << "Caca 333\n";   // DEBUG
         return 1;
     }
     // Check the content length of the request (if not multipart)
@@ -301,6 +304,7 @@ int	Server::parseRequest(std::map<int, Server *> servs) {
 	std::cout << std::endl << std::endl << BHBLU << "*** Request ***\n" << BLUE << _request << BLANK;
 	ServerInfo	clientInfo(requestInfos(servs));
 	ClientRequest	client(clientInfo, _request);
+    	std::cout << "PWETTE\n";	// DEBUG
 	_file_request = client.getFile();
 	_body = client.getBody();
 	_status = client.getStatus();
