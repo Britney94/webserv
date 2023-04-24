@@ -98,15 +98,21 @@ int	WebServer::launch(char **envp) {
 				int	new_socket = it->second->accept_fd();
 				if (new_socket == -1)
 					return 1;
-				//
-				Server		tmpServ;
-				tmpServ.parseRequest(this->_servers);
-				if (this->_request.empty() == true)
+/*				///////////////////////////////////////////////////////
+				std::string		tmpRequest;
+				char			buffer[10];
+				std::vector<char>	tmpBuffer(10);
+				int			res = recv(fd, tmpBuffer.data(), 10, 0);
+				if (res < 0)
+					std::cout << "Problem occured during RECV\n";
+				memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
+				if (buffer[0] == 0)
 				{
 					// Flush tmpServ & all.
+					std::cout << "Pouette STOP buff = [" << tmpBuffer.data() << "]\n"; // DEBUG
 					return (1);
 				}
-				//
+*/				///////////////////////////////////////////////////////
 				std::cout << "Pouette 4\n";   // DEBUG
 				if (new_socket > 0)
 				{

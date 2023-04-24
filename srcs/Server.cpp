@@ -432,6 +432,11 @@ int	Server::getError() const {
 	return _error;
 }
 
+std::string	Server::getRequest(void) const
+{
+	return (this->_request);
+}
+
 std::vector<ServerInfo *>	Server::getInfos() const {
 	return _infos;
 }

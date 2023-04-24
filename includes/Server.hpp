@@ -19,6 +19,7 @@ class Server {
 		void	close_socket();
 		int	getSocket() const;
 		int	getError() const;
+		std::string	getRequest() const;
 		std::vector<ServerInfo *>	getInfos() const;
 		int	accept_fd();
 		int	parseRequest(std::map<int, Server *> servs);
