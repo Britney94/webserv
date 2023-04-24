@@ -280,7 +280,7 @@ int	Server::parseRequest(std::map<int, Server *> servs) {
     int        ret;
     char    buffer[REQUEST_SIZE] = {0};
     std::vector<char> tmpBuffer(REQUEST_SIZE);
-    std::cout << "Pouette\n";	// DEBUG
+    std::cout << "ParseRequest Pouette\n";	// DEBUG
     ret = recv(_socket, tmpBuffer.data(), REQUEST_SIZE - 1, 0);
     memcpy(buffer, tmpBuffer.data(), tmpBuffer.size());
     _vectorBody = std::vector<char>(tmpBuffer.begin(), tmpBuffer.end());

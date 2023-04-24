@@ -89,15 +89,27 @@ int	WebServer::launch(char **envp) {
 				break;
 			}
 		}
-		for (std::map<int, Server *>::iterator it = _servers.begin(); pending && it != _servers.end(); it++) {
+		for (std::map<int, Server *>::iterator it = _servers.begin(); pending && it != _servers.end(); it++)
+		{
 			int	fd = it->second->getSocket();
-			if (FD_ISSET(fd, &readfds)) {
+			if (FD_ISSET(fd, &readfds))
+			{
 				std::cout << "Pouette 3\n";   // DEBUG
 				int	new_socket = it->second->accept_fd();
 				if (new_socket == -1)
 					return 1;
+				//
+				Server		tmpServ;
+				tmpServ.parseRequest(this->_servers);
+				if (this->_request.empty() == true)
+				{
+					// Flush tmpServ & all.
+					return (1);
+				}
+				//
 				std::cout << "Pouette 4\n";   // DEBUG
-				if (new_socket > 0) {
+				if (new_socket > 0)
+				{
 					std::cout << "Pouette 5\n";   // DEBUG
 				 	Server	*new_fd = new Server(*(it->second), new_socket);
 					FD_SET(new_socket, &_sockets);

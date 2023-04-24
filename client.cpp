@@ -8,13 +8,13 @@
 #include <string.h>
 #include <arpa/inet.h>
 
-#define PORT 8885
+#define PORT 8888
 
 int main() {
     int sock = 0;
     long    valread;
     struct sockaddr_in  serv_addr;
-    const char  *hello = "bonjour";
+    const char  *hello = "";
     char    buffer[1024] = {0};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
