@@ -16,6 +16,11 @@ int main() {
     struct sockaddr_in  serv_addr;
     const char  *hello = "";
     char    buffer[1024] = {0};
+    if (hello[0] == 0)
+    {
+        printf("\n You decided to send nothing ? This is nonsense ! \n");
+	return (-1);
+    }
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
         return -1;
