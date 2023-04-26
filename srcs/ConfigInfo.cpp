@@ -110,7 +110,14 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 				else if (has(line, "allow_methods ") >= 0)
 					ret = (*tmpInfo).setAllow(line);
 				else if (has(line, "location ") >= 0) {
+					/////////////////////////////////////////
+					std::cout << "ENCOUNTERED LOCATION\n";
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
+					int	tmpAllow = tmpInfo->getAllow("GET");
+					std::cout << "ret == [" << ret << " | tmpAllow = [" << tmpAllow << "\n"; //DEBUG
+					if (tmpAllow == -999 || ret == -999) // OK
+						_err = 1;				// OK
+					/////////////////////////////////////////
 					if (_err == 1) {
 						std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 						if (tmp.size() != count) {
@@ -213,7 +220,17 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 			line.erase(line.find(';'));		// ABORT CORE DUMP //#2 RESOLVED
 		std::cout << "P4 setupLoc Line = [" << line << "]\n";	//DEBUG
 		if (has(line, "location ") >= 0)
-			tmp.loc.push_back(setupLoc(file, line));
+		{
+			std::cout << "P5555 setupLoc Line = [" << line << "]\n"; //DEBUG
+			tmp.allow[0] = -999;
+			tmp.allow[1] = -999;
+			tmp.allow[2] = -999;
+			_tmp_loc = tmp;
+			return (this->_tmp_loc);	//TEST, temporary
+			tmp.loc.push_back(setupLoc(file, line)); // Retrieves location inside another location,
+								 // remove to count this as Error.
+			return (this->_tmp_loc);	//TEST, temporary
+		}
 		else if (has(line, "root ") >= 0) {
 			tmp.root = line.substr(line.find(" ") + 1);
 			if (tmp.root.at(tmp.root.length() - 1) != '/')

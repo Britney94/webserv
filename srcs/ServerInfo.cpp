@@ -204,6 +204,8 @@ int	ServerInfo::setAllow(std::string line) {
 }
 
 int	ServerInfo::setLoc(Location& loc) {
+	if (loc.allow[0] == -999)
+		return (-999);
 	this->_loc.push_back(loc);
 	return 0;
 }
