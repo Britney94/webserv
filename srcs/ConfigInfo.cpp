@@ -188,7 +188,9 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	std::string	line = file.getLine();
 	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.find("{") - (curr_line.find("location ") + 9));
 	while (tmp.uri.at(tmp.uri.length() - 1) == ' ')
+	{
 		tmp.uri.erase(tmp.uri.length() - 1);
+	}
 	if (has(tmp.uri, ".") >= 0 && tmp.uri.at(tmp.uri.length() - 1) != '/')
 		tmp.uri += "/";
 	if (has(tmp.uri, "*") >= 0)
@@ -206,7 +208,10 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 			_tmp_loc = tmp;
 			return _tmp_loc;
 		}
-		line.erase(line.find(';'));
+		std::cout << "P3 setupLoc Line = [" << line << "]\n";	//DEBUG
+		if (line.find(';') != std::string::npos)	// Protects erase if location was inside location
+			line.erase(line.find(';'));		// ABORT CORE DUMP //#2 RESOLVED
+		std::cout << "P4 setupLoc Line = [" << line << "]\n";	//DEBUG
 		if (has(line, "location ") >= 0)
 			tmp.loc.push_back(setupLoc(file, line));
 		else if (has(line, "root ") >= 0) {
