@@ -117,6 +117,47 @@ static int  isCGIRequest(std::string file) {
     return 1;
 }
 
+static std::string  postForm(std::string file, std::string body) {
+    std::string newBody;
+    std::ifstream infile;
+    std::string fileContent;
+    open(file.c_str(), O_RDWR | O_CREAT, 0777);
+    infile.open(file.c_str());
+    while (infile.good()) {
+        std::getline(infile, fileContent);
+        newBody += fileContent;
+        newBody += '\n';
+    }
+    infile.close();
+    std::string tmpNewBody;
+    while (body.find("&") != std::string::npos || body.find("=") != std::string::npos) {
+        std::string key = body.substr(0, body.find("="));
+        body.erase(0, body.find("=") + 1);
+        std::string value = body.substr(0, body.find("&"));
+        body.erase(0, body.find("&") + 1);
+        while (value.find("+") != std::string::npos)
+            value.replace(value.find("+"), 1, " ");
+        if (key.find("name") != std::string::npos)
+            key = "Name";
+        if (key.find("mail") != std::string::npos && value.find("%40") != std::string::npos)
+            value.replace(value.find("%40"), 3, "@");
+        if (key.find("mail") != std::string::npos)
+            key = "Email";
+        if (key.find("message") != std::string::npos)
+            key = "Message";
+        if (value != "")
+            tmpNewBody += "<div><p>" + key + " <i>" + value + "</i></p></div>\n";
+    }
+    if (tmpNewBody != "") {
+        newBody += "<div><h3>Post data</h3></div>\n";
+        newBody += tmpNewBody;
+    }
+    std::ofstream outfile;
+    outfile.open(file.c_str());
+    outfile << newBody;
+    return newBody;
+}
+
 int	HttpResponse::createResponse(char **envp) {
 	std::ifstream   filestream;
 	std::filebuf    filebuf;
@@ -197,6 +238,13 @@ int	HttpResponse::createResponse(char **envp) {
             this->_body = cgi.execute(_file, envp);
 			_status = 200;
 	    }
+	    else if (_clientBody.size() > 0 && _file.find("form.html") != std::string::npos) {
+            this->_body = postForm(_file, _clientBody);
+            if (this->_body == "")
+                _status = 404;
+            else
+                _status = 200;
+        }
         else if (_clientBody.size() > 0) {
 		    _status = 204;
         	std::fstream    post_file;
