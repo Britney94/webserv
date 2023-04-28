@@ -110,7 +110,14 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 				else if (has(line, "allow_methods ") >= 0)
 					ret = (*tmpInfo).setAllow(line);
 				else if (has(line, "location ") >= 0) {
+					/////////////////////////////////////////
+					std::cout << "ENCOUNTERED LOCATION\n";
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
+					int	tmpAllow = tmpInfo->getAllow("GET");
+					std::cout << "ret == [" << ret << " | tmpAllow = [" << tmpAllow << "\n"; //DEBUG
+					if (tmpAllow == -999 || ret == -999) // OK
+						_err = 1;				// OK
+					/////////////////////////////////////////
 					if (_err == 1) {
 						std::cerr << RED << "Config file is incorrect: syntax error(s)" << BLANK << std::endl;
 						if (tmp.size() != count) {
@@ -188,7 +195,9 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	std::string	line = file.getLine();
 	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.find("{") - (curr_line.find("location ") + 9));
 	while (tmp.uri.at(tmp.uri.length() - 1) == ' ')
+	{
 		tmp.uri.erase(tmp.uri.length() - 1);
+	}
 	if (has(tmp.uri, ".") >= 0 && tmp.uri.at(tmp.uri.length() - 1) != '/')
 		tmp.uri += "/";
 	if (has(tmp.uri, "*") >= 0)
@@ -206,9 +215,22 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 			_tmp_loc = tmp;
 			return _tmp_loc;
 		}
-		line.erase(line.find(';'));
+		std::cout << "P3 setupLoc Line = [" << line << "]\n";	//DEBUG
+		if (line.find(';') != std::string::npos)	// Protects erase if location was inside location
+			line.erase(line.find(';'));		// ABORT CORE DUMP //#2 RESOLVED
+		std::cout << "P4 setupLoc Line = [" << line << "]\n";	//DEBUG
 		if (has(line, "location ") >= 0)
-			tmp.loc.push_back(setupLoc(file, line));
+		{
+			std::cout << "P5555 setupLoc Line = [" << line << "]\n"; //DEBUG
+			tmp.allow[0] = -999;
+			tmp.allow[1] = -999;
+			tmp.allow[2] = -999;
+			_tmp_loc = tmp;
+			return (this->_tmp_loc);	//TEST, temporary
+			tmp.loc.push_back(setupLoc(file, line)); // Retrieves location inside another location,
+								 // remove to count this as Error.
+			return (this->_tmp_loc);	//TEST, temporary
+		}
 		else if (has(line, "root ") >= 0) {
 			tmp.root = line.substr(line.find(" ") + 1);
 			if (tmp.root.at(tmp.root.length() - 1) != '/')
@@ -243,19 +265,6 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	}
 	_tmp_loc = tmp;
 	return _tmp_loc;
-}
-
-int	ConfigInfo::setErrorFile(std::string line) {
-	int error = atoi(&(line.substr(has(line, " ") + 1))[0]);
-	if (error < 400 || error >= 600)
-		return 1;
-	else {
-		line.erase(0, line.find_last_of(" ") + 1);
-		if (line.find(';') != std::string::npos)
-			line.erase(line.find(';'));
-		_errorFiles[error] = line;
-	}
-	return 0;
 }
 
 void	ConfigInfo::setErrorFiles(){
