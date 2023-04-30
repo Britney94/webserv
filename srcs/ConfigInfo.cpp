@@ -267,6 +267,19 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	return _tmp_loc;
 }
 
+int	ConfigInfo::setErrorFile(std::string line) {
+	int error = atoi(&(line.substr(has(line, " ") + 1))[0]);
+	if (error < 400 || error >= 600)
+		return 1;
+	else {
+		line.erase(0, line.find_last_of(" ") + 1);
+		if (line.find(';') != std::string::npos)
+			line.erase(line.find(';'));
+		_errorFiles[error] = line;
+	}
+	return 0;
+}
+
 void	ConfigInfo::setErrorFiles(){
 	_errorFiles[400] = "./data/error_files/400.html";
 	_errorFiles[403] = "./data/error_files/403.html";
