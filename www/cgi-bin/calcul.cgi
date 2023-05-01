@@ -2,6 +2,9 @@
 
 import cgi
 
+# while 1:
+#     continue
+
 # Parse the form data
 form = cgi.FieldStorage()
 

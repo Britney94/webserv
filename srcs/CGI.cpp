@@ -120,6 +120,12 @@ char	**CGI::_createEnv(char **envp, std::string pathInfo) const {
 	return env;
 }
 
+void sig_handler(int signal) {
+    (void)signal;
+    std::cerr << RED << "CGI process timed out\n" << BLANK;
+    exit(3);
+}
+
 /*
  * Execute the CGI program
  * Take two argument: the path to the CGI program and the envp arrays
@@ -145,6 +151,8 @@ std::string	CGI::execute(const std::string& scriptName, char **envp) {
 		return ("Status: 500\r\n\r\n");
 	}
 	else if (!pid) {
+        alarm(1);
+        signal(SIGALRM, sig_handler);
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
 		// Create the arg array for execve
@@ -155,15 +163,20 @@ std::string	CGI::execute(const std::string& scriptName, char **envp) {
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 	}
 	else {
+        int status;
 		char    buffer[65536] = {0};
-		waitpid(-1, NULL, 0);
-		lseek(fdOut, 0, SEEK_SET);
-		ret = 1;
-		while (ret > 0) {
-			memset(buffer, 0, 65536);
-			ret = read(fdOut, buffer, 65536 - 1);
-			tmpBody += buffer;
-		}
+		waitpid(-1, &status, 0);
+        if (status == 3)
+            return ("Status: 500\r\n\r\n"); 
+        else {
+            lseek(fdOut, 0, SEEK_SET);
+            ret = 1;
+            while (ret > 0) {
+                memset(buffer, 0, 65536);
+                ret = read(fdOut, buffer, 65536 - 1);
+                tmpBody += buffer;
+            }
+        }
 	}
 	dup2(tmpStdin, STDIN_FILENO);
 	dup2(tmpStdout, STDOUT_FILENO);
