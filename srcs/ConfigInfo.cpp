@@ -192,9 +192,13 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	Location	tmp;
 	std::string	line = file.getLine();
 	tmp.uri = curr_line.substr(curr_line.find("location ") + 9, curr_line.find("{") - (curr_line.find("location ") + 9));
-	while (tmp.uri.at(tmp.uri.length() - 1) == ' ')
+	while (tmp.uri.size() && tmp.uri.at(tmp.uri.length() - 1) == ' ')
 	{
 		tmp.uri.erase(tmp.uri.length() - 1);
+	}
+	if (tmp.uri.size() == 0 || tmp.uri == " ") {
+		tmp.allow[0] = -999;
+		return (_tmp_loc = tmp);
 	}
 	if (has(tmp.uri, ".") == -1 && tmp.uri.at(tmp.uri.length() - 1) != '/')
 		tmp.uri += "/";

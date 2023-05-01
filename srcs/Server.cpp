@@ -92,9 +92,6 @@ int	Server::accept_fd() {
 	new_socket = accept(_socket, (struct sockaddr *)&_addr, (socklen_t *)&(size));
 	if (new_socket == -1)
 		std::cerr << RED << "Error: accept()" << BLANK << std::endl;
-    else {
-        fcntl(new_socket, F_SETFL, O_NONBLOCK);
-    }
 	return new_socket;
 }
 
@@ -235,7 +232,11 @@ static std::string saveFiles(std::vector<char> body, std::string boundary, std::
  */
 int Server::checkContentRequest() {
     // Get the body of the request and write it in a file
-    std::string body = _request.substr(_request.find("\r\n\r\n") + 4);
+    std::string body;
+    if (_request.find("\r\n\r\n") == std::string::npos)
+        body = _request;
+    else
+        body = _request.substr(_request.find("\r\n\r\n") + 4);
     std::string tmpFile = "tmp/" + toString(_socket);
     _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
     // Check if the request is a multipart/form-data
