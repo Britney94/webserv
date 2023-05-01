@@ -240,7 +240,6 @@ int Server::checkContentRequest() {
     _tmpBody.open(tmpFile.c_str(), std::ios::out | std::ios::trunc);
     // Check if the request is a multipart/form-data
     if (_request.find("Content-Type: multipart") != std::string::npos) {
-        std::cout << "MULTIPART" << std::endl;
         return 1;
     }
     // Check the content length of the request (if not multipart)

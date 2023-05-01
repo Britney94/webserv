@@ -156,10 +156,22 @@ std::string	CGI::execute(const std::string& scriptName, char **envp) {
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
 		// Create the arg array for execve
-        char* const arg[] = {const_cast<char*>(scriptName.c_str()), const_cast<char*>(_body.c_str()), NULL};
+        char* arg[3];
+        if (_body.size() != 0) {
+            arg[0] = const_cast<char*>(scriptName.c_str());
+            arg[1] = const_cast<char*>(_body.c_str());
+            arg[2] = NULL;
+        }
+        else {
+            arg[0] = const_cast<char*>(scriptName.c_str());
+            arg[1] = NULL;
+            arg[2] = NULL;
+        }
         // Call the CGI script with the script and the arguments (variables)
         execve(scriptName.c_str(), arg, env);
-		std::cerr << "Error: execve() in execute" << std::endl;
+        std::cerr << std::endl << RED;
+        perror("Exceve");
+        std::cerr << BLANK;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 	}
 	else {

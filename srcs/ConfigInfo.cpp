@@ -111,10 +111,8 @@ std::map<int, Server *>	ConfigInfo::parse(char *filename) {
 					ret = (*tmpInfo).setAllow(line);
 				else if (has(line, "location ") >= 0) {
 					/////////////////////////////////////////
-					std::cout << "ENCOUNTERED LOCATION\n";
 					ret = (*tmpInfo).setLoc(setupLoc(file, line));
 					int	tmpAllow = tmpInfo->getAllow("GET");
-					std::cout << "ret == [" << ret << " | tmpAllow = [" << tmpAllow << "\n"; //DEBUG
 					if (tmpAllow == -999 || ret == -999) // OK
 						_err = 1;				// OK
 					/////////////////////////////////////////
@@ -198,7 +196,7 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 	{
 		tmp.uri.erase(tmp.uri.length() - 1);
 	}
-	if (has(tmp.uri, ".") >= 0 && tmp.uri.at(tmp.uri.length() - 1) != '/')
+	if (has(tmp.uri, ".") == -1 && tmp.uri.at(tmp.uri.length() - 1) != '/')
 		tmp.uri += "/";
 	if (has(tmp.uri, "*") >= 0)
 		tmp.uri.erase(0, 1);
@@ -215,13 +213,10 @@ Location&	ConfigInfo::setupLoc(File& file, std::string curr_line) {
 			_tmp_loc = tmp;
 			return _tmp_loc;
 		}
-		std::cout << "P3 setupLoc Line = [" << line << "]\n";	//DEBUG
 		if (line.find(';') != std::string::npos)	// Protects erase if location was inside location
 			line.erase(line.find(';'));		// ABORT CORE DUMP //#2 RESOLVED
-		std::cout << "P4 setupLoc Line = [" << line << "]\n";	//DEBUG
 		if (has(line, "location ") >= 0)
 		{
-			std::cout << "P5555 setupLoc Line = [" << line << "]\n"; //DEBUG
 			tmp.allow[0] = -999;
 			tmp.allow[1] = -999;
 			tmp.allow[2] = -999;

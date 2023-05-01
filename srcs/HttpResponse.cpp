@@ -168,8 +168,6 @@ int	HttpResponse::createResponse(char **envp) {
 	    query = _file.substr(_file.find("?") + 1);
         _file.erase(_file.find("?"));
     }
-	if (_cgi == "on")
-		_file = "/cgi-bin/multipart.cgi";
 	if (_status >= 400 && _status < 500) {
 		filestream.open(_errorFiles[_status].c_str());
 		while(filestream.good()) {
@@ -182,14 +180,24 @@ int	HttpResponse::createResponse(char **envp) {
 	    // Check if the file is a CGI script
 		isCGI = isCGIRequest(_file);
 		// Execute the CGI script if it is
-	    if (isCGI == 1) {
+	    if (isCGI == 1 || _cgi == "on") {
             CGI cgi;
             if (query.size() == 0)
                 cgi.setQuery("");
             else
                 cgi.setQuery(query);
             this->_body = cgi.execute(_file, envp);
-			_status = 200;
+			if (this->_body == "Status: 500\r\n\r\n") {
+				_status = 500;
+				this->_body.clear();
+				filestream.open(_errorFiles[_status].c_str());
+				while(filestream.good()) {
+					std::getline(filestream, this->_file_content);
+					this->_body += this->_file_content;
+					this->_body += '\n';
+				}
+				filestream.close();
+			}
 	    }
 	    // If this is a valid file, open it and read its content
 		else if (isFile(_file)) {
@@ -226,7 +234,8 @@ int	HttpResponse::createResponse(char **envp) {
 		// Check if the file is a CGI script
 		isCGI = isCGIRequest(_file);
 		// Execute the CGI script if it is
-	    if (isCGI == 1) {
+	    if (isCGI == 1 || _cgi == "on") {
+			std::cout << "CGI PASS" << std::endl;
             CGI cgi;
             cgi.setBody(_clientBody);
             if (_contentType != "") {

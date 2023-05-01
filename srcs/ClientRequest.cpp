@@ -98,7 +98,11 @@ int	ClientRequest::checkSize() {
 }
 
 std::string	ClientRequest::determinateFile() {
-	std::string	file_uri = _uri.substr(_loc.uri.length());
+	std::string	file_uri;
+	if (this->_uri.empty() == true)
+		file_uri = _uri;
+	else
+		file_uri = _uri.substr(_loc.uri.length());	
 	_file.insert(0, _loc.root);
 	_file.insert(_file.size(), file_uri);
 	if (_info.getAutoIndex() == 0 && _file.at(_file.length() - 1) == '/') {
@@ -123,6 +127,8 @@ int	ClientRequest::determinateLoc() {
 	_loc.allow[2] = _info.getAllow("DELETE");
 	_loc.clientSize = _info.getClientSize();
 	tmp_uri = _uri;
+	if (tmp_uri.empty() == true)
+		return (this->_status);
 	if (tmp_uri.find(".") != std::string::npos)
 		ext = tmp_uri.substr(tmp_uri.find("."));
 	tmp_uri.erase(tmp_uri.find_last_of('/') + 1);
@@ -155,8 +161,11 @@ int	ClientRequest::determinateLoc() {
 		if (tmp_uri == "/")
 			return _status;
 		if (loop) {
-			tmp_uri.erase(tmp_uri.length() - 1);
-			tmp_uri.erase(tmp_uri.find_last_of('/') + 1);
+			if (tmp_uri.size() != 0)
+			{
+				tmp_uri.erase(tmp_uri.length() - 1);
+				tmp_uri.erase(tmp_uri.find_last_of('/') + 1);
+			}
 		}
 	}
 	return _status;
